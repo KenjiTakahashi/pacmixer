@@ -3,20 +3,23 @@
 
 @implementation Channel
 -(Channel*) initWithIndex: (int) i
+                 andLevel: (int) level_
                 andParent: (WINDOW*) parent {
     self = [super init];
     int mx;
     getmaxyx(parent, my, mx);
+    my -= 1;
     win = derwin(parent, my, 1, 0, i + 1);
-    wbkgd(win, COLOR_PAIR(2));
+    [self setLevel: level_];
     return self;
 }
 
 -(Channel*) initWithIndex: (int) i
+                 andLevel: (int) level_
                   andMute: (bool) mute_
                 andParent: (WINDOW*) parent {
-    self = [self initWithIndex: i andParent: parent];
-    mvwaddch(win, my - 3, 0, ACS_HLINE | COLOR_PAIR(1));
+    self = [self initWithIndex: i andLevel: level_ andParent: parent];
+    mvwaddch(win, my - 2, 0, ACS_HLINE | COLOR_PAIR(1));
     [self setMute: mute_];
     return self;
 }
@@ -29,39 +32,70 @@
 -(void) setMute: (bool) mute_ {
     mute = mute_;
     if(mute) {
-        mvwaddch(win, my - 2, 0, ' ' | COLOR_PAIR(4));
+        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
     } else {
-        mvwaddch(win, my - 2, 0, ' ' | COLOR_PAIR(1));
-        mvwaddch(win, my - 2, 0, ' ' | COLOR_PAIR(2));
+        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
     }
+}
+
+-(void) setLevel: (int) level_ {
+    level = level_;
+}
+@end
+
+
+@implementation Channels
+-(Channels*) initWithChannels: (int) channels_
+                    andParent: (WINDOW*) parent {
+    self = [super init];
+    int my;
+    int mx;
+    getmaxyx(parent, my, mx);
+    my -= 1;
+    win = derwin(parent, my, channels_ + 2, 0, 1);
+    box(win, 0, 0);
+    channels = [[NSMutableArray alloc] init];
+    for(int i = 0; i < channels_; ++i) {
+        Channel *channel = [[Channel alloc] initWithIndex: i
+                                                 andLevel: 100
+                                                  andMute: true
+                                                andParent: win];
+        [channels addObject: channel];
+    }
+    // TODO: tees at correct positions
+    [[channels objectAtIndex: 0] setMute: false];
+    return self;
+}
+-(void) dealloc {
+    delwin(win);
+    [channels release];
+    [super dealloc];
 }
 @end
 
 
 @implementation Widget
--(Widget*) initWithPosition: (int) p andChannels: (int) channels {
+-(Widget*) initWithPosition: (int) p
+                    andName: (NSString*) name_
+                andChannels: (int) channels {
     self = [super init];
     controls = [[NSMutableArray alloc] init];
     position = p;
+    name = name_;
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
     int y = 10; // FIXME: change this to actual header size
     height = my - y - 2;
-    width = channels + 2;
-    win = newwin(height, width, y, p);
-    for(int i = 0; i < channels; ++i) {
-        Channel *control = [[Channel alloc] initWithIndex: i
-                                                  andMute: true
-                                                andParent: win];
-        [controls addObject: control];
+    width = channels + 4;
+    if(width < 6) {
+        width = 6;
     }
-    [[controls objectAtIndex: 0] setMute: false];
+    win = newwin(height, width, y, p);
+    Channels* control = [[Channels alloc] initWithChannels: channels
+                                                 andParent: win];
+    [controls addObject: control];
     // TODO: create different (i.e. combobox) controls.
-    // TODO: box will go outside, widget is merely for name and
-    // and other controls storage (we want it to be at least 2ch wide).
-    box(win, 0, 0);
-    // TODO: tees at correct positions
     wrefresh(win);
     return self;
 }
@@ -88,7 +122,7 @@
     NSString *inside = [NSString stringWithString: @"Card: <NA>\n"
                                                    @"Chip:"];
     win = newwin(10, mx, 0, 0);
-    wprintw(win, "%s", [inside UTF8String]);
+    wprintw(win, "%@", inside);
     wrefresh(win);
     return self;
 }
@@ -112,7 +146,7 @@
                                                     @"F2: System Information "
                                                     @"Esc: Exit"];
     win = newwin(1, mx, my - 1, 0);
-    wprintw(win, "%s", [outside UTF8String]);
+    wprintw(win, "%@", outside);
     wrefresh(win);
     return self;
 }
@@ -157,7 +191,9 @@
 
 -(void) addWidgetWithChannels: (int) channels {
     int x = [[widgets lastObject] endPosition];
-    Widget *widget = [[Widget alloc] initWithPosition: x andChannels: channels];
+    Widget *widget = [[Widget alloc] initWithPosition: x
+                                              andName: @"test"
+                                          andChannels: channels];
     [widgets addObject: widget];
 }
 @end

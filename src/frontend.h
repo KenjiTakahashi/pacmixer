@@ -14,12 +14,27 @@
 }
 
 -(Channel*) initWithIndex: (int) i
+                 andLevel: (int) level_
                 andParent: (WINDOW*) parent;
 -(Channel*) initWithIndex: (int) i
+                 andLevel: (int) level_
                   andMute: (bool) mute_
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) setMute: (bool) mute_;
+-(void) setLevel: (int) level_;
+@end
+
+
+@interface Channels: NSObject {
+    @private
+        WINDOW *win;
+        NSMutableArray *channels;
+}
+
+-(Channels*) initWithChannels: (int) channels_
+                    andParent: (WINDOW*) parent;
+-(void) dealloc;
 @end
 
 
@@ -29,10 +44,13 @@
         int position;
         int height;
         int width;
+        NSString *name;
         NSMutableArray *controls;
 }
 
--(Widget*) initWithPosition: (int) p andChannels: (int) channels;
+-(Widget*) initWithPosition: (int) p
+                    andName: (NSString*) name_
+                andChannels: (int) channels;
 -(void) dealloc;
 -(int) endPosition;
 @end
