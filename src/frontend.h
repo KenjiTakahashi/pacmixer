@@ -6,6 +6,19 @@
 #import <curses.h>
 
 
+@interface channel_t: NSObject {
+    @private
+        int maxLevel;
+        BOOL mutable;
+}
+
+-(channel_t*) initWithMaxLevel: (int) maxLevel_
+              andMutable: (BOOL) mutable_;
+-(int) maxLevel;
+-(BOOL) mutable;
+@end
+
+
 @interface Channel: NSObject {
     @private
         int my;
@@ -17,7 +30,6 @@
 }
 
 -(Channel*) initWithIndex: (int) i
-          andCurrentLevel: (NSNumber*) level_
               andMaxLevel: (NSNumber*) mlevel_
                   andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
                 andParent: (WINDOW*) parent;
@@ -33,7 +45,7 @@
         NSMutableArray *channels;
 }
 
--(Channels*) initWithChannels: (int) channels_
+-(Channels*) initWithChannels: (NSArray*) channels_
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
 @end
@@ -50,9 +62,9 @@
 }
 
 -(Widget*) initWithPosition: (int) p
-                    andName: (NSString*) name_
-                andChannels: (int) channels;
+                    andName: (NSString*) name_;
 -(void) dealloc;
+-(void) addChannels: (NSArray*) channels;
 -(int) endPosition;
 @end
 
@@ -88,5 +100,5 @@
 
 -(TUI*) init;
 -(void) dealloc;
--(void) addWidgetWithChannels: (int) channels;
+-(Widget*) addWidgetWithName: (NSString*) name;
 @end

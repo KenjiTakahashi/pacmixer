@@ -1,9 +1,27 @@
 #import "frontend.h"
 
 
+@implementation channel_t
+-(channel_t*) initWithMaxLevel: (int) maxLevel_
+                    andMutable: (BOOL) mutable_ {
+    self = [super init];
+    maxLevel = maxLevel_;
+    mutable = mutable_;
+    return self;
+}
+
+-(int) maxLevel {
+    return maxLevel;
+}
+
+-(BOOL) mutable {
+    return mutable;
+}
+@end
+
+
 @implementation Channel
 -(Channel*) initWithIndex: (int) i
-          andCurrentLevel: (NSNumber*) level_
               andMaxLevel: (NSNumber*) mlevel_
                   andMute: (NSNumber*) mute_
                 andParent: (WINDOW*) parent {
@@ -19,9 +37,8 @@
     } else {
         mutable = NO;
     }
-    if(level_ != nil) {
+    if(mlevel_ != nil) {
         maxLevel = [mlevel_ intValue];
-        [self setLevel: [level_ intValue]];
     }
     return self;
 }
@@ -67,33 +84,37 @@
 
 
 @implementation Channels
--(Channels*) initWithChannels: (int) channels_
+-(Channels*) initWithChannels: (NSArray*) channels_
                     andParent: (WINDOW*) parent {
     self = [super init];
     int my;
     int mx;
     getmaxyx(parent, my, mx);
     my -= 1;
-    win = derwin(parent, my, channels_ + 2, 0, 1);
+    win = derwin(parent, my, [channels_ count] + 2, 0, 1);
     box(win, 0, 0);
     channels = [[NSMutableArray alloc] init];
-    for(int i = 0; i < channels_; ++i) {
-        NSNumber* level = [NSNumber numberWithInt: 100];
-        NSNumber* mlevel = [NSNumber numberWithInt: 130];
-        NSNumber* mute = [NSNumber numberWithBool: YES];
+    for(int i = 0; i < [channels_ count]; ++i) {
+        channel_t *obj = [channels_ objectAtIndex: i];
+        NSNumber *level = [NSNumber numberWithInt: 100]; // FIXME
+        NSNumber *mlevel = [NSNumber numberWithInt: [obj maxLevel]];
+        NSNumber *mute = [NSNumber numberWithBool: [obj mutable]];
         Channel *channel = [[Channel alloc] initWithIndex: i
-                                          andCurrentLevel: level
                                               andMaxLevel: mlevel
                                                   andMute: mute
                                                 andParent: win];
+        [channel setLevel: 100];
         [channels addObject: channel];
     }
     // TODO: tees at correct positions
     // FIXME: remove settings below, they're here for testing purposes
     [[channels objectAtIndex: 0] setMute: false];
     [[channels objectAtIndex: 0] setLevel: 130];
+    touchwin(parent);
+    wrefresh(win);
     return self;
 }
+
 -(void) dealloc {
     delwin(win);
     [channels release];
@@ -104,8 +125,7 @@
 
 @implementation Widget
 -(Widget*) initWithPosition: (int) p
-                    andName: (NSString*) name_
-                andChannels: (int) channels {
+                    andName: (NSString*) name_ {
     self = [super init];
     controls = [[NSMutableArray alloc] init];
     position = p;
@@ -115,15 +135,8 @@
     getmaxyx(stdscr, my, mx);
     int y = 10; // FIXME: change this to actual header size
     height = my - y - 2;
-    width = channels + 4;
-    if(width < 6) {
-        width = 6;
-    }
+    width = 6;
     win = newwin(height, width, y, p);
-    Channels* control = [[Channels alloc] initWithChannels: channels
-                                                 andParent: win];
-    [controls addObject: control];
-    // TODO: create different (i.e. combobox) controls.
     int length = (width - [name length]) / 2;
     if(length < 0) {
         length = 0;
@@ -140,6 +153,17 @@
     delwin(win);
     [controls release];
     [super dealloc];
+}
+
+-(void) addChannels: (NSArray*) channels {
+    width = [channels count] + 4;
+    if(width < 6) {
+        width = 6;
+    }
+    Channels* control = [[Channels alloc] initWithChannels: channels
+                                                 andParent: win];
+    [controls addObject: control];
+    wrefresh(win);
 }
 
 -(int) endPosition {
@@ -221,15 +245,16 @@
 -(void) dealloc {
     endwin();
     [bottom release];
+    [top release];
     [widgets release];
     [super dealloc];
 }
 
--(void) addWidgetWithChannels: (int) channels {
+-(Widget*) addWidgetWithName: (NSString*) name {
     int x = [[widgets lastObject] endPosition];
     Widget *widget = [[Widget alloc] initWithPosition: x
-                                              andName: @"test"
-                                          andChannels: channels];
+                                              andName: name];
     [widgets addObject: widget];
+    return widget;
 }
 @end
