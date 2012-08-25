@@ -10,17 +10,20 @@
     @private
         int my;
         WINDOW *win;
-        NSNumber* level;
+        int currentLevel;
+        int maxLevel;
         BOOL mute;
+        BOOL mutable;
 }
 
 -(Channel*) initWithIndex: (int) i
-                 andLevel: (NSNumber*) level_
+          andCurrentLevel: (NSNumber*) level_
+              andMaxLevel: (NSNumber*) mlevel_
                   andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) setMute: (BOOL) mute_;
--(void) setLevel: (NSNumber*) level_;
+-(void) setLevel: (int) level_;
 @end
 
 

@@ -3,7 +3,8 @@
 
 @implementation Channel
 -(Channel*) initWithIndex: (int) i
-                 andLevel: (NSNumber*) level_
+          andCurrentLevel: (NSNumber*) level_
+              andMaxLevel: (NSNumber*) mlevel_
                   andMute: (NSNumber*) mute_
                 andParent: (WINDOW*) parent {
     self = [super init];
@@ -12,11 +13,15 @@
     my -= 1;
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
+        mutable = YES;
         mvwaddch(win, my - 2, 0, ACS_HLINE | COLOR_PAIR(1));
         [self setMute: [mute_ boolValue]];
+    } else {
+        mutable = NO;
     }
     if(level_ != nil) {
-        [self setLevel: level_];
+        maxLevel = [mlevel_ intValue];
+        [self setLevel: [level_ intValue]];
     }
     return self;
 }
@@ -35,8 +40,28 @@
     }
 }
 
--(void) setLevel: (NSNumber*) level_ {
-    level = level_;
+-(void) setLevel: (int) level_ {
+    currentLevel = level_;
+    int currentPos = my - 1;
+    if(mutable) {
+        currentPos -= 2;
+    }
+    float dy = (float)currentPos / (float)maxLevel;
+    int limit = dy * currentLevel;
+    int high = dy * 100; // FIXME: 100% might not be at 100
+    int medium = high * (4. / 5.);
+    int low = high * (2. / 5.);
+    for(int i = 0; i < limit; ++i) {
+        int color = COLOR_PAIR(2);
+        if(i >= high) {
+            color = COLOR_PAIR(5);
+        } else if(i >= medium) {
+            color = COLOR_PAIR(4);
+        } else if(i >= low) {
+            color = COLOR_PAIR(3);
+        }
+        mvwaddch(win, currentPos - i, 0, ' ' | color);
+    }
 }
 @end
 
@@ -54,15 +79,19 @@
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < channels_; ++i) {
         NSNumber* level = [NSNumber numberWithInt: 100];
+        NSNumber* mlevel = [NSNumber numberWithInt: 130];
         NSNumber* mute = [NSNumber numberWithBool: YES];
         Channel *channel = [[Channel alloc] initWithIndex: i
-                                                 andLevel: level
+                                          andCurrentLevel: level
+                                              andMaxLevel: mlevel
                                                   andMute: mute
                                                 andParent: win];
         [channels addObject: channel];
     }
     // TODO: tees at correct positions
+    // FIXME: remove settings below, they're here for testing purposes
     [[channels objectAtIndex: 0] setMute: false];
+    [[channels objectAtIndex: 0] setLevel: 130];
     return self;
 }
 -(void) dealloc {
