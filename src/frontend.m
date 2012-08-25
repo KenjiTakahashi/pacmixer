@@ -2,7 +2,7 @@
 
 
 @implementation channel_t
--(channel_t*) initWithMaxLevel: (int) maxLevel_
+-(channel_t*) initWithMaxLevel: (NSNumber*) maxLevel_
                     andMutable: (BOOL) mutable_ {
     self = [super init];
     maxLevel = maxLevel_;
@@ -10,7 +10,7 @@
     return self;
 }
 
--(int) maxLevel {
+-(NSNumber*) maxLevel {
     return maxLevel;
 }
 
@@ -32,7 +32,6 @@
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
         mutable = YES;
-        mvwaddch(win, my - 2, 0, ACS_HLINE | COLOR_PAIR(1));
         [self setMute: [mute_ boolValue]];
     } else {
         mutable = NO;
@@ -49,20 +48,19 @@
 }
 
 -(void) setMute: (BOOL) mute_ {
-    mute = mute_;
-    if(mute) {
-        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
-    } else {
-        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
+    if(mutable) {
+        mute = mute_;
+        if(mute) {
+            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
+        } else {
+            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
+        }
     }
 }
 
 -(void) setLevel: (int) level_ {
     currentLevel = level_;
-    int currentPos = my - 1;
-    if(mutable) {
-        currentPos -= 2;
-    }
+    int currentPos = my - 3;
     float dy = (float)currentPos / (float)maxLevel;
     int limit = dy * currentLevel;
     int high = dy * 100; // FIXME: 100% might not be at 100
@@ -91,18 +89,26 @@
     int mx;
     getmaxyx(parent, my, mx);
     my -= 1;
-    win = derwin(parent, my, [channels_ count] + 2, 0, 1);
+    mx = [channels_ count] + 2;
+    win = derwin(parent, my, mx, 0, 1);
     box(win, 0, 0);
+    mvwaddch(win, my - 3, 0, ACS_LTEE);
+    mvwhline(win, my - 3, 1, 0, mx - 2);
+    mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
-        NSNumber *level = [NSNumber numberWithInt: 100]; // FIXME
-        NSNumber *mlevel = [NSNumber numberWithInt: [obj maxLevel]];
-        NSNumber *mute = [NSNumber numberWithBool: [obj mutable]];
+        NSNumber *mute;
+        if([obj mutable]) {
+            mute = [NSNumber numberWithBool: YES];
+        } else {
+            mute = nil;
+        }
         Channel *channel = [[Channel alloc] initWithIndex: i
-                                              andMaxLevel: mlevel
+                                              andMaxLevel: [obj maxLevel]
                                                   andMute: mute
                                                 andParent: win];
+        NSNumber *level = [NSNumber numberWithInt: 100]; // FIXME
         [channel setLevel: 100];
         [channels addObject: channel];
     }

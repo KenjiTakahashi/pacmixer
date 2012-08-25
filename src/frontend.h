@@ -8,13 +8,13 @@
 
 @interface channel_t: NSObject {
     @private
-        int maxLevel;
+        NSNumber* maxLevel;
         BOOL mutable;
 }
 
--(channel_t*) initWithMaxLevel: (int) maxLevel_
+-(channel_t*) initWithMaxLevel: (NSNumber*) maxLevel_
               andMutable: (BOOL) mutable_;
--(int) maxLevel;
+-(NSNumber*) maxLevel;
 -(BOOL) mutable;
 @end
 
