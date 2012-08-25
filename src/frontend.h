@@ -2,6 +2,7 @@
 #import <Foundation/NSArray.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSString.h>
+#import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
 
 
@@ -9,20 +10,17 @@
     @private
         int my;
         WINDOW *win;
-        int level;
-        bool mute;
+        NSNumber* level;
+        BOOL mute;
 }
 
 -(Channel*) initWithIndex: (int) i
-                 andLevel: (int) level_
-                andParent: (WINDOW*) parent;
--(Channel*) initWithIndex: (int) i
-                 andLevel: (int) level_
-                  andMute: (bool) mute_
+                 andLevel: (NSNumber*) level_
+                  andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
--(void) setMute: (bool) mute_;
--(void) setLevel: (int) level_;
+-(void) setMute: (BOOL) mute_;
+-(void) setLevel: (NSNumber*) level_;
 @end
 
 

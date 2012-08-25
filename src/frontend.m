@@ -3,24 +3,21 @@
 
 @implementation Channel
 -(Channel*) initWithIndex: (int) i
-                 andLevel: (int) level_
+                 andLevel: (NSNumber*) level_
+                  andMute: (NSNumber*) mute_
                 andParent: (WINDOW*) parent {
     self = [super init];
     int mx;
     getmaxyx(parent, my, mx);
     my -= 1;
     win = derwin(parent, my, 1, 0, i + 1);
-    [self setLevel: level_];
-    return self;
-}
-
--(Channel*) initWithIndex: (int) i
-                 andLevel: (int) level_
-                  andMute: (bool) mute_
-                andParent: (WINDOW*) parent {
-    self = [self initWithIndex: i andLevel: level_ andParent: parent];
-    mvwaddch(win, my - 2, 0, ACS_HLINE | COLOR_PAIR(1));
-    [self setMute: mute_];
+    if(mute_ != nil) {
+        mvwaddch(win, my - 2, 0, ACS_HLINE | COLOR_PAIR(1));
+        [self setMute: [mute_ boolValue]];
+    }
+    if(level_ != nil) {
+        [self setLevel: level_];
+    }
     return self;
 }
 
@@ -29,7 +26,7 @@
     [super dealloc];
 }
 
--(void) setMute: (bool) mute_ {
+-(void) setMute: (BOOL) mute_ {
     mute = mute_;
     if(mute) {
         mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
@@ -38,7 +35,7 @@
     }
 }
 
--(void) setLevel: (int) level_ {
+-(void) setLevel: (NSNumber*) level_ {
     level = level_;
 }
 @end
@@ -56,9 +53,11 @@
     box(win, 0, 0);
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < channels_; ++i) {
+        NSNumber* level = [NSNumber numberWithInt: 100];
+        NSNumber* mute = [NSNumber numberWithBool: YES];
         Channel *channel = [[Channel alloc] initWithIndex: i
-                                                 andLevel: 100
-                                                  andMute: true
+                                                 andLevel: level
+                                                  andMute: mute
                                                 andParent: win];
         [channels addObject: channel];
     }
@@ -96,6 +95,14 @@
                                                  andParent: win];
     [controls addObject: control];
     // TODO: create different (i.e. combobox) controls.
+    int length = (width - [name length]) / 2;
+    if(length < 0) {
+        length = 0;
+    }
+    wattron(win, COLOR_PAIR(5));
+    mvwprintw(win, height - 1, 0, "      ");
+    mvwprintw(win, height - 1, length, "%@", name);
+    wattroff(win, COLOR_PAIR(5));
     wrefresh(win);
     return self;
 }
