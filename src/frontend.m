@@ -83,6 +83,7 @@
 
 @implementation Channels
 -(Channels*) initWithChannels: (NSArray*) channels_
+                  andPosition: (int) position
                     andParent: (WINDOW*) parent {
     self = [super init];
     int my;
@@ -90,7 +91,7 @@
     getmaxyx(parent, my, mx);
     my -= 1;
     mx = [channels_ count] + 2;
-    win = derwin(parent, my, mx, 0, 1);
+    win = derwin(parent, my, mx, 0, position);
     box(win, 0, 0);
     mvwaddch(win, my - 3, 0, ACS_LTEE);
     mvwhline(win, my - 3, 1, 0, mx - 2);
@@ -136,21 +137,7 @@
     controls = [[NSMutableArray alloc] init];
     position = p;
     name = name_;
-    int my;
-    int mx;
-    getmaxyx(stdscr, my, mx);
-    int y = 2;
-    height = my - y - 2;
-    width = 6;
-    win = newwin(height, width, y, p);
-    int length = (width - [name length]) / 2;
-    if(length < 0) {
-        length = 0;
-    }
-    wattron(win, COLOR_PAIR(5) | A_BOLD);
-    mvwprintw(win, height - 1, 0, "      ");
-    mvwprintw(win, height - 1, length, "%@", name);
-    wattroff(win, COLOR_PAIR(5) | A_BOLD);
+    [self printWithWidth: 6];
     wrefresh(win);
     return self;
 }
@@ -161,12 +148,40 @@
     [super dealloc];
 }
 
--(void) addChannels: (NSArray*) channels {
-    width = [channels count] + 4;
-    if(width < 6) {
-        width = 6;
+-(void) printWithWidth: (int) width_ {
+    width = width_;
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    height = my - 4;
+    if(win == NULL) {
+        win = newwin(height, width, 2, position);
+    } else {
+        wresize(win, height, width);
     }
+    int length = (width - [name length]) / 2;
+    if(length < 0) {
+        length = 0;
+    }
+    wattron(win, COLOR_PAIR(5) | A_BOLD);
+    mvwprintw(win, height - 1, 0, "      ");
+    mvwprintw(win, height - 1, 0, "%@",
+        [@"" stringByPaddingToLength: width
+                               withString: @" "
+                          startingAtIndex: 0]
+    );
+    mvwprintw(win, height - 1, length, "%@", name);
+    wattroff(win, COLOR_PAIR(5) | A_BOLD);
+}
+
+-(void) addChannels: (NSArray*) channels {
+    int width_ = [channels count] + 2;
+    if(width_ > 6) {
+        [self printWithWidth: width_];
+    }
+    int position_ = (width - width_) / 2;
     Channels* control = [[Channels alloc] initWithChannels: channels
+                                               andPosition: position_
                                                  andParent: win];
     [controls addObject: control];
     wrefresh(win);
@@ -202,6 +217,7 @@
     NSString *recording = @"F3: Recording";
     NSString *outputs = @"F4: Outputs";
     NSString *inputs = @"F5: Inputs";
+    // FIXME: refactor this
     if(view == PLAYBACK) {
         wprintw(win, " [%@] ", playback);
     } else {

@@ -46,6 +46,7 @@
 }
 
 -(Channels*) initWithChannels: (NSArray*) channels_
+                  andPosition: (int) position
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
 @end
@@ -64,6 +65,7 @@
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_;
 -(void) dealloc;
+-(void) printWithWidth: (int) width_;
 -(void) addChannels: (NSArray*) channels;
 -(int) endPosition;
 @end
