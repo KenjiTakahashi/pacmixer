@@ -37,10 +37,18 @@ int main(int argc, char const *argv[]) {
                                                 andMutable: YES];
     channel_t *ch3w6 = [[channel_t alloc] initWithMaxLevel: lvl
                                                 andMutable: YES];
-    [w6 addChannels: [NSArray arrayWithObjects: ch1w6, ch2w6, ch3w6, nil]];
+    channel_t *ch4w6 = [[channel_t alloc] initWithMaxLevel: lvl
+                                                andMutable: YES];
+    [w6 addChannels: [
+        NSArray arrayWithObjects: ch1w6, ch2w6, ch3w6, ch4w6, nil]
+    ];
     getch(); // TODO: remove this when event loop is in place
     [tui release];
     [w1 release];
     [w2 release]; // FIXME: get rid of those (make TUI maintain)
+    [w3 release];
+    [w4 release];
+    [w5 release];
+    [w6 release];
     return 0;
 }

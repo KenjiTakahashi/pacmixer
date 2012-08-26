@@ -69,25 +69,43 @@
 @end
 
 
+typedef enum {
+    PLAYBACK,
+    RECORDING,
+    OUTPUTS,
+    INPUTS
+} View;
+
+
 @interface Top: NSObject {
     @private
         WINDOW *win;
         NSAutoreleasePool *pool;
+        View view;
 }
 
 -(Top*) init;
 -(void) dealloc;
+-(void) print;
 @end
+
+
+typedef enum {
+    INSIDE,
+    OUTSIDE
+} State;
 
 
 @interface Bottom: NSObject {
     @private
         WINDOW *win;
         NSAutoreleasePool *pool;
+        State state;
 }
 
 -(Bottom*) init;
 -(void) dealloc;
+-(void) print;
 @end
 
 

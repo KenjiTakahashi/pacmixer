@@ -139,7 +139,7 @@
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    int y = 10; // FIXME: change this to actual header size
+    int y = 2;
     height = my - y - 2;
     width = 6;
     win = newwin(height, width, y, p);
@@ -147,10 +147,10 @@
     if(length < 0) {
         length = 0;
     }
-    wattron(win, COLOR_PAIR(5));
+    wattron(win, COLOR_PAIR(5) | A_BOLD);
     mvwprintw(win, height - 1, 0, "      ");
     mvwprintw(win, height - 1, length, "%@", name);
-    wattroff(win, COLOR_PAIR(5));
+    wattroff(win, COLOR_PAIR(5) | A_BOLD);
     wrefresh(win);
     return self;
 }
@@ -182,14 +182,12 @@
 -(Top*) init {
     self = [super init];
     pool = [[NSAutoreleasePool alloc] init];
+    view = PLAYBACK;
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    NSString *inside = [NSString stringWithString: @"Card: <NA>\n"
-                                                   @"Chip:"];
     win = newwin(10, mx, 0, 0);
-    wprintw(win, "%@", inside);
-    wrefresh(win);
+    [self print];
     return self;
 }
 
@@ -197,6 +195,34 @@
     [pool release];
     delwin(win);
     [super dealloc];
+}
+
+-(void) print {
+    NSString *playback = @"F2: Playback";
+    NSString *recording = @"F3: Recording";
+    NSString *outputs = @"F4: Outputs";
+    NSString *inputs = @"F5: Inputs";
+    if(view == PLAYBACK) {
+        wprintw(win, " [%@] ", playback);
+    } else {
+        wprintw(win, " %@ ", playback);
+    }
+    if(view == RECORDING) {
+        wprintw(win, " [%@] ", recording);
+    } else {
+        wprintw(win, " %@ ", recording);
+    }
+    if(view == OUTPUTS) {
+        wprintw(win, " [%@] ", outputs);
+    } else {
+        wprintw(win, " %@ ", outputs);
+    }
+    if(view == INPUTS) {
+        wprintw(win, " [%@] ", inputs);
+    } else {
+        wprintw(win, " %@ ", inputs);
+    }
+    wrefresh(win);
 }
 @end
 
@@ -208,12 +234,9 @@
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    NSString *outside = [NSString stringWithString: @"F1: Help "
-                                                    @"F2: System Information "
-                                                    @"Esc: Exit"];
     win = newwin(1, mx, my - 1, 0);
-    wprintw(win, "%@", outside);
-    wrefresh(win);
+    state = OUTSIDE;
+    [self print];
     return self;
 }
 
@@ -221,6 +244,33 @@
     [pool release];
     delwin(win);
     [super dealloc];
+}
+
+-(void) print {
+    NSString *line;
+    char mode = 'o';
+    int color = COLOR_PAIR(6);
+    if(state == OUTSIDE) {
+        line =
+            @" i: inside mode "
+            @"h/l: previous/next control "
+            @"j/k: volume up/down or previous/next option "
+            @"Esc: Exit";
+    } else if(state == INSIDE) {
+        line =
+            @" Esc: outside mode "
+            @"h/l: previous/next channel "
+            @"j/k: volume up/down or previous/next option ";
+        mode = 'i';
+    } else {
+        line = @"";
+        mode = '?';
+    }
+    wattron(win, color | A_BOLD);
+    wprintw(win, " %c ", mode);
+    wattroff(win, color | A_BOLD);
+    wprintw(win, "%@", line);
+    wrefresh(win);
 }
 @end
 
@@ -241,7 +291,9 @@
     init_pair(2, -1, COLOR_GREEN); // low level volume/not muted
     init_pair(3, -1, COLOR_YELLOW); // medium level volume
     init_pair(4, -1, COLOR_RED); // high level volume/muted
-    init_pair(5, -1, COLOR_MAGENTA); // extreme (>100%) level volume
+    init_pair(5, COLOR_BLACK, COLOR_MAGENTA); // extreme (>100%) level volume
+    init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
+    init_pair(7, COLOR_BLACK, COLOR_CYAN); // inside mode
     refresh();
     top = [[Top alloc] init];
     bottom = [[Bottom alloc] init];
@@ -257,7 +309,7 @@
 }
 
 -(Widget*) addWidgetWithName: (NSString*) name {
-    int x = [[widgets lastObject] endPosition];
+    int x = [[widgets lastObject] endPosition] + 1;
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name];
     [widgets addObject: widget];
