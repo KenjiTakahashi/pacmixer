@@ -55,11 +55,13 @@
 @interface ComboBox: NSObject {
     @private
         WINDOW *win;
+        NSArray *options;
         int highlight;
 }
 
--(ComboBox*) initWithOptions: (NSArray*) options
+-(ComboBox*) initWithOptions: (NSArray*) options_
                    andParent: (WINDOW*) parent;
+-(void) print;
 -(void) dealloc;
 @end
 

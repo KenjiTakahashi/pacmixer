@@ -131,9 +131,10 @@
 
 
 @implementation ComboBox
--(ComboBox*) initWithOptions: (NSArray*) options
+-(ComboBox*) initWithOptions: (NSArray*) options_
                    andParent: (WINDOW*) parent {
     self = [super init];
+    options = options_;
     highlight = 0;
     int my;
     int mx;
@@ -141,6 +142,12 @@
     int dy = [options count];
     win = derwin(parent, dy + 2, 8, my - dy - 3, 0);
     box(win, 0, 0);
+    [self print];
+    return self;
+}
+
+-(void) print {
+    int dy = [options count];
     for(int i = 0; i < dy; ++i) {
         NSString *obj = [options objectAtIndex: i];
         if(i == highlight) {
@@ -150,9 +157,7 @@
         mvwprintw(win, i + 1, 1, "%@", obj);
         wattroff(win, COLOR_PAIR(7));
     }
-    touchwin(parent);
     wrefresh(win);
-    return self;
 }
 
 -(void) dealloc {
