@@ -47,8 +47,8 @@ int main(int argc, char const *argv[]) {
     [w7 addOptions: optw7];
     Widget *w8 = [tui addWidgetWithName: @"opttest2"];
     NSArray *optw8 = [NSArray arrayWithObjects: @"opt3", @"opt4", nil];
-    [w8 addOptions: optw8];
-    [w8 setOption: 1];
+    Options *o1 = [w8 addOptions: optw8];
+    [o1 set: 1];
     getch(); // TODO: remove this when event loop is in place
     [tui release];
     [w1 release];
@@ -59,5 +59,6 @@ int main(int argc, char const *argv[]) {
     [w6 release];
     [w7 release];
     [w8 release];
+    [o1 release];
     return 0;
 }

@@ -130,8 +130,8 @@
 @end
 
 
-@implementation ComboBox
--(ComboBox*) initWithOptions: (NSArray*) options_
+@implementation Options
+-(Options*) initWithOptions: (NSArray*) options_
                    andParent: (WINDOW*) parent {
     self = [super init];
     options = options_;
@@ -152,12 +152,17 @@
         NSString *obj = [options objectAtIndex: i];
         if(i == highlight) {
             wattron(win, COLOR_PAIR(7));
-            mvwprintw(win, i + 1, 1, "      ");
         }
+        mvwprintw(win, i + 1, 1, "      ");
         mvwprintw(win, i + 1, 1, "%@", obj);
         wattroff(win, COLOR_PAIR(7));
     }
     wrefresh(win);
+}
+
+-(void) set: (int) i {
+    highlight = i;
+    [self print];
 }
 
 -(void) dealloc {
@@ -204,8 +209,8 @@
     mvwprintw(win, height - 1, 0, "      ");
     mvwprintw(win, height - 1, 0, "%@",
         [@"" stringByPaddingToLength: width
-                               withString: @" "
-                          startingAtIndex: 0]
+                          withString: @" "
+                     startingAtIndex: 0]
     );
     mvwprintw(win, height - 1, length, "%@", name);
     wattroff(win, COLOR_PAIR(5) | A_BOLD);
@@ -224,11 +229,12 @@
     wrefresh(win);
 }
 
--(void) addOptions: (NSArray*) options {
-    ComboBox *box = [[ComboBox alloc] initWithOptions: options
+-(Options*) addOptions: (NSArray*) options {
+    Options *control = [[Options alloc] initWithOptions: options
                                             andParent: win];
-    [controls addObject: box];
+    [controls addObject: control];
     wrefresh(win);
+    return control;
 }
 
 -(int) endPosition {
