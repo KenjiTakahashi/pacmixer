@@ -249,7 +249,6 @@
 @implementation Top
 -(Top*) init {
     self = [super init];
-    pool = [[NSAutoreleasePool alloc] init];
     view = PLAYBACK;
     int my;
     int mx;
@@ -260,7 +259,6 @@
 }
 
 -(void) dealloc {
-    [pool release];
     delwin(win);
     [super dealloc];
 }
@@ -345,6 +343,7 @@
 @implementation TUI
 -(TUI*) init {
     self = [super init];
+    pool = [[NSAutoreleasePool alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
     cbreak();
@@ -362,8 +361,8 @@
     init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_CYAN); // inside mode
     refresh();
-    top = [[Top alloc] init];
     bottom = [[Bottom alloc] init];
+    top = [[Top alloc] init];
     return self;
 }
 
@@ -372,6 +371,7 @@
     [bottom release];
     [top release];
     [widgets release];
+    [pool drain];
     [super dealloc];
 }
 

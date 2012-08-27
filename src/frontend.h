@@ -98,7 +98,6 @@ typedef enum {
 @interface Top: NSObject {
     @private
         WINDOW *win;
-        NSAutoreleasePool *pool;
         View view;
 }
 
@@ -128,6 +127,7 @@ typedef enum {
 
 @interface TUI: NSObject {
     @private
+        NSAutoreleasePool *pool;
         NSMutableArray *widgets;
         Top *top;
         Bottom *bottom;
