@@ -130,6 +130,38 @@
 @end
 
 
+@implementation ComboBox
+-(ComboBox*) initWithOptions: (NSArray*) options
+                   andParent: (WINDOW*) parent {
+    self = [super init];
+    highlight = 0;
+    int my;
+    int mx;
+    getmaxyx(parent, my, mx);
+    int dy = [options count];
+    win = derwin(parent, dy + 2, 8, my - dy - 3, 0);
+    box(win, 0, 0);
+    for(int i = 0; i < dy; ++i) {
+        NSString *obj = [options objectAtIndex: i];
+        if(i == highlight) {
+            wattron(win, COLOR_PAIR(7));
+            mvwprintw(win, i + 1, 1, "      ");
+        }
+        mvwprintw(win, i + 1, 1, "%@", obj);
+        wattroff(win, COLOR_PAIR(7));
+    }
+    touchwin(parent);
+    wrefresh(win);
+    return self;
+}
+
+-(void) dealloc {
+    delwin(win);
+    [super dealloc];
+}
+@end
+
+
 @implementation Widget
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_ {
@@ -137,7 +169,7 @@
     controls = [[NSMutableArray alloc] init];
     position = p;
     name = name_;
-    [self printWithWidth: 6];
+    [self printWithWidth: 8];
     wrefresh(win);
     return self;
 }
@@ -176,14 +208,21 @@
 
 -(void) addChannels: (NSArray*) channels {
     int width_ = [channels count] + 2;
-    if(width_ > 6) {
+    if(width_ > 8) {
         [self printWithWidth: width_];
     }
     int position_ = (width - width_) / 2;
-    Channels* control = [[Channels alloc] initWithChannels: channels
+    Channels *control = [[Channels alloc] initWithChannels: channels
                                                andPosition: position_
                                                  andParent: win];
     [controls addObject: control];
+    wrefresh(win);
+}
+
+-(void) addOptions: (NSArray*) options {
+    ComboBox *box = [[ComboBox alloc] initWithOptions: options
+                                            andParent: win];
+    [controls addObject: box];
     wrefresh(win);
 }
 

@@ -42,6 +42,9 @@ int main(int argc, char const *argv[]) {
     [w6 addChannels: [
         NSArray arrayWithObjects: ch1w6, ch2w6, ch3w6, ch4w6, nil]
     ];
+    Widget *w7 = [tui addWidgetWithName: @"opttest_long"];
+    NSArray *optw7 = [NSArray arrayWithObjects: @"opt1", @"opt2", nil];
+    [w7 addOptions: optw7];
     getch(); // TODO: remove this when event loop is in place
     [tui release];
     [w1 release];

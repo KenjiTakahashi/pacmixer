@@ -52,6 +52,18 @@
 @end
 
 
+@interface ComboBox: NSObject {
+    @private
+        WINDOW *win;
+        int highlight;
+}
+
+-(ComboBox*) initWithOptions: (NSArray*) options
+                   andParent: (WINDOW*) parent;
+-(void) dealloc;
+@end
+
+
 @interface Widget: NSObject {
     @private
         WINDOW *win;
@@ -67,6 +79,7 @@
 -(void) dealloc;
 -(void) printWithWidth: (int) width_;
 -(void) addChannels: (NSArray*) channels;
+-(void) addOptions: (NSArray*) options;
 -(int) endPosition;
 @end
 
