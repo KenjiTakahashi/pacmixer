@@ -56,6 +56,7 @@
             mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
         }
     }
+    wrefresh(win);
 }
 
 -(void) setLevel: (int) level_ {
@@ -66,17 +67,23 @@
     int high = dy * 100; // FIXME: 100% might not be at 100
     int medium = high * (4. / 5.);
     int low = high * (2. / 5.);
-    for(int i = 0; i < limit; ++i) {
+    for(int i = 0; i < my - 3; ++i) {
+    //for(int i = 0; i < limit; ++i) {
         int color = COLOR_PAIR(2);
-        if(i >= high) {
-            color = COLOR_PAIR(5);
-        } else if(i >= medium) {
-            color = COLOR_PAIR(4);
-        } else if(i >= low) {
-            color = COLOR_PAIR(3);
+        if(i < limit) {
+            if(i >= high) {
+                color = COLOR_PAIR(5);
+            } else if(i >= medium) {
+                color = COLOR_PAIR(4);
+            } else if(i >= low) {
+                color = COLOR_PAIR(3);
+            }
+        } else {
+            color = COLOR_PAIR(1);
         }
         mvwaddch(win, currentPos - i, 0, ' ' | color);
     }
+    wrefresh(win);
 }
 @end
 
@@ -113,10 +120,9 @@
         [channel setLevel: 100];
         [channels addObject: channel];
     }
-    // TODO: tees at correct positions
     // FIXME: remove settings below, they're here for testing purposes
-    [[channels objectAtIndex: 0] setMute: false];
-    [[channels objectAtIndex: 0] setLevel: 130];
+    //[[channels objectAtIndex: 0] setMute: false];
+    //[[channels objectAtIndex: 0] setLevel: 130];
     touchwin(parent);
     wrefresh(win);
     return self;
@@ -126,6 +132,26 @@
     delwin(win);
     [channels release];
     [super dealloc];
+}
+
+-(void) setMute: (BOOL) mute {
+    for(int i = 0; i < [channels count]; ++i) {
+        [self setMute: mute forChannel: i];
+    }
+}
+
+-(void) setLevel: (int) level {
+    for(int i = 0; i < [channels count]; ++i) {
+        [self setLevel: level forChannel: i];
+    }
+}
+
+-(void) setMute: (BOOL) mute forChannel: (int) channel {
+    [[channels objectAtIndex: channel] setMute: mute];
+}
+
+-(void) setLevel: (int) level forChannel: (int) channel {
+    [[channels objectAtIndex: channel] setLevel: level];
 }
 @end
 

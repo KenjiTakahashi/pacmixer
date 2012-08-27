@@ -36,6 +36,7 @@ int main(int argc, char const *argv[]) {
     Channels *ch5 = [w5 addChannels:
         [NSArray arrayWithObjects: ch1w5, ch2w5, nil]
     ];
+    [ch5 setLevel: 110];
     Widget *w6 = [tui addWidgetWithName: @"test6"];
     channel_t *ch1w6 = [[channel_t alloc] initWithMaxLevel: lvl
                                                 andMutable: YES];
@@ -45,16 +46,19 @@ int main(int argc, char const *argv[]) {
                                                 andMutable: YES];
     channel_t *ch4w6 = [[channel_t alloc] initWithMaxLevel: lvl
                                                 andMutable: YES];
-    [w6 addChannels: [
+    Channels *ch6 = [w6 addChannels: [
         NSArray arrayWithObjects: ch1w6, ch2w6, ch3w6, ch4w6, nil]
     ];
+    [ch6 setMute: NO forChannel: 0];
+    [ch6 setLevel: 120 forChannel: 1];
+    [ch6 setLevel: 80 forChannel: 2];
     Widget *w7 = [tui addWidgetWithName: @"opttest_long"];
     NSArray *optw7 = [NSArray arrayWithObjects: @"opt1", @"opt2", nil];
-    [w7 addOptions: optw7];
+    Options *o1 = [w7 addOptions: optw7];
     Widget *w8 = [tui addWidgetWithName: @"opttest2"];
     NSArray *optw8 = [NSArray arrayWithObjects: @"opt3", @"opt4", nil];
-    Options *o1 = [w8 addOptions: optw8];
-    [o1 set: 1];
+    Options *o2 = [w8 addOptions: optw8];
+    [o2 set: 1];
     getch(); // TODO: remove this when event loop is in place
     [tui release];
     return 0;

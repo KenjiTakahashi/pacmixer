@@ -49,6 +49,10 @@
                   andPosition: (int) position
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
+-(void) setMute: (BOOL) mute;
+-(void) setLevel: (int) level;
+-(void) setMute: (BOOL) mute forChannel: (int) channel;
+-(void) setLevel: (int) level forChannel: (int) channel;
 @end
 
 
