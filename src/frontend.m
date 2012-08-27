@@ -216,7 +216,7 @@
     wattroff(win, COLOR_PAIR(5) | A_BOLD);
 }
 
--(void) addChannels: (NSArray*) channels {
+-(Channels*) addChannels: (NSArray*) channels {
     int width_ = [channels count] + 2;
     if(width_ > 8) {
         [self printWithWidth: width_];
@@ -226,13 +226,16 @@
                                                andPosition: position_
                                                  andParent: win];
     [controls addObject: control];
+    [control release];
     wrefresh(win);
+    return control;
 }
 
 -(Options*) addOptions: (NSArray*) options {
     Options *control = [[Options alloc] initWithOptions: options
                                             andParent: win];
     [controls addObject: control];
+    [control release];
     wrefresh(win);
     return control;
 }
@@ -296,7 +299,6 @@
 @implementation Bottom
 -(Bottom*) init {
     self = [super init];
-    pool = [[NSAutoreleasePool alloc] init];
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
@@ -307,7 +309,6 @@
 }
 
 -(void) dealloc {
-    [pool release];
     delwin(win);
     [super dealloc];
 }
@@ -379,6 +380,7 @@
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name];
     [widgets addObject: widget];
+    [widget release];
     return widget;
 }
 @end

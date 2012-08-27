@@ -81,7 +81,7 @@
                     andName: (NSString*) name_;
 -(void) dealloc;
 -(void) printWithWidth: (int) width_;
--(void) addChannels: (NSArray*) channels;
+-(Channels*) addChannels: (NSArray*) channels;
 -(Options*) addOptions: (NSArray*) options;
 -(int) endPosition;
 @end
@@ -117,7 +117,6 @@ typedef enum {
 @interface Bottom: NSObject {
     @private
         WINDOW *win;
-        NSAutoreleasePool *pool;
         State state;
 }
 
