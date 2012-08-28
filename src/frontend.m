@@ -456,14 +456,14 @@
     NSString *line;
     char mode_ = 'o';
     int color = COLOR_PAIR(6);
-    if(mode_ == OUTSIDE) {
+    if(mode == OUTSIDE) {
         line =
             @" i: inside mode, "
             @"h/l: previous/next control, "
             @"j/k: volume down/up or previous/next option, "
             @"m: (un)mute, "
             @"q: Exit";
-    } else if(mode_ == INSIDE) {
+    } else if(mode == INSIDE) {
         line =
             @" q: outside mode, "
             @"h/l: previous/next channel, "
@@ -490,15 +490,13 @@
     }
 }
 
--(void) outside {
+-(BOOL) outside {
     if(mode == INSIDE) {
         mode = OUTSIDE;
         [self print];
+        return NO;
     }
-}
-
--(BOOL) isInside {
-    return mode == INSIDE;
+    return YES;
 }
 @end
 
@@ -590,11 +588,7 @@
     [bottom inside];
 }
 
--(void) outside {
-    [bottom outside];
-}
-
--(BOOL) isInside {
-    return [bottom isInside];
+-(BOOL) outside {
+    return [bottom outside];
 }
 @end

@@ -142,8 +142,7 @@ typedef enum {
 -(void) dealloc;
 -(void) print;
 -(void) inside;
--(void) outside;
--(BOOL) isInside;
+-(BOOL) outside;
 @end
 
 
@@ -168,6 +167,5 @@ typedef enum {
 -(void) downMore;
 -(void) mute;
 -(void) inside;
--(void) outside;
--(BOOL) isInside;
+-(BOOL) outside;
 @end

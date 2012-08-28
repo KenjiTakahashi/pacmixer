@@ -67,11 +67,7 @@ int main(int argc, char const *argv[]) {
         switch(ch) {
             case 27:
             case 'q':
-                if([tui isInside]) {
-                    [tui outside];
-                } else {
-                    quit = YES;
-                }
+                quit = [tui outside];
                 break;
             case 'h':
             case KEY_LEFT:
