@@ -67,7 +67,7 @@
                    andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
--(void) set: (int) i;
+-(void) setCurrent: (int) i;
 @end
 
 
@@ -144,4 +144,5 @@ typedef enum {
 -(TUI*) init;
 -(void) dealloc;
 -(Widget*) addWidgetWithName: (NSString*) name;
+-(void) setCurrent: (int) i;
 @end

@@ -186,7 +186,7 @@
     wrefresh(win);
 }
 
--(void) set: (int) i {
+-(void) setCurrent: (int) i {
     highlight = i;
     [self print];
 }
@@ -429,7 +429,7 @@
     return widget;
 }
 
--(void) set: (int) i {
+-(void) setCurrent: (int) i {
     [[widgets objectAtIndex: highlight] setHighlight: NO];
     highlight = i;
     [[widgets objectAtIndex: highlight] setHighlight: YES];
