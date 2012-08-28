@@ -27,19 +27,20 @@
         int maxLevel;
         BOOL mute;
         BOOL mutable;
+        BOOL printMute;
 }
 
 -(Channel*) initWithIndex: (int) i
               andMaxLevel: (NSNumber*) mlevel_
                   andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
+             andPrintMute: (BOOL) printMute_
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
 -(void) up;
--(void) upMore;
 -(void) down;
--(void) downMore;
+-(void) mute;
 @end
 
 
@@ -58,9 +59,8 @@
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
 -(void) up;
--(void) upMore;
 -(void) down;
--(void) downMore;
+-(void) mute;
 @end
 
 
@@ -163,4 +163,5 @@ typedef enum {
 -(void) down;
 -(void) upMore;
 -(void) downMore;
+-(void) mute;
 @end

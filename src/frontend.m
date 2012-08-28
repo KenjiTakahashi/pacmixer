@@ -24,9 +24,11 @@
 -(Channel*) initWithIndex: (int) i
               andMaxLevel: (NSNumber*) mlevel_
                   andMute: (NSNumber*) mute_
+             andPrintMute: (BOOL) printMute_
                 andParent: (WINDOW*) parent {
     self = [super init];
     int mx;
+    printMute = printMute_;
     getmaxyx(parent, my, mx);
     my -= 1;
     win = derwin(parent, my, 1, 0, i + 1);
@@ -61,7 +63,10 @@
 
 -(void) setLevel: (int) level_ {
     currentLevel = level_;
-    int currentPos = my - 3;
+    int currentPos = my - 1;
+    if(printMute) {
+        currentPos -= 2;
+    }
     float dy = (float)currentPos / (float)maxLevel;
     int limit = dy * currentLevel;
     int high = dy * 100; // FIXME: 100% might not be at 100
@@ -96,6 +101,16 @@
         [self setLevel: currentLevel - 1];
     }
 }
+
+-(void) mute {
+    if(mutable) {
+        if(mute) {
+            [self setMute: NO];
+        } else {
+            [self setMute: YES];
+        }
+    }
+}
 @end
 
 
@@ -109,11 +124,35 @@
     getmaxyx(parent, my, mx);
     my -= 1;
     mx = [channels_ count] + 2;
-    win = derwin(parent, my, mx, 0, position);
+    BOOL hasPeak = NO;
+    BOOL hasMute = NO;
+    for(int i = 0; i < [channels_ count]; ++i) {
+        channel_t *obj = [channels_ objectAtIndex: i];
+        if([obj maxLevel] != nil) {
+            hasPeak = YES;
+        }
+        if([obj mutable]) {
+            hasMute = YES;
+        }
+        if(hasPeak && hasMute) {
+            break;
+        }
+    }
+    if(!hasMute) {
+        my -= 2;
+    }
+    int y = 0;
+    if(!hasPeak) {
+        y = my - 3;
+        my = 3;
+    }
+    win = derwin(parent, my, mx, y, position);
     box(win, 0, 0);
-    mvwaddch(win, my - 3, 0, ACS_LTEE);
-    mvwhline(win, my - 3, 1, 0, mx - 2);
-    mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
+    if(hasPeak && hasMute) {
+        mvwaddch(win, my - 3, 0, ACS_LTEE);
+        mvwhline(win, my - 3, 1, 0, mx - 2);
+        mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
+    }
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
@@ -126,6 +165,7 @@
         Channel *channel = [[Channel alloc] initWithIndex: i
                                               andMaxLevel: [obj maxLevel]
                                                   andMute: mute
+                                             andPrintMute: hasMute
                                                 andParent: win];
         NSNumber *level = [NSNumber numberWithInt: 100]; // FIXME
         [channel setLevel: 100];
@@ -171,6 +211,12 @@
 -(void) down {
     for(int i = 0; i < [channels count]; ++i) {
         [[channels objectAtIndex: i] down];
+    }
+}
+
+-(void) mute {
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] mute];
     }
 }
 @end
@@ -326,6 +372,15 @@
     }
 }
 
+-(void) mute {
+    for(int i = 0; i < [controls count]; ++i) {
+        id obj = [controls objectAtIndex: i];
+        if([obj respondsToSelector: @selector(mute)]) {
+            [obj mute];
+        }
+    }
+}
+
 -(int) endPosition {
     return position + width;
 }
@@ -403,15 +458,17 @@
     int color = COLOR_PAIR(6);
     if(state == OUTSIDE) {
         line =
-            @" i: inside mode "
-            @"h/l: previous/next control "
-            @"j/k: volume up/down or previous/next option "
+            @" i: inside mode, "
+            @"h/l: previous/next control, "
+            @"j/k: volume down/up or previous/next option, "
+            @"m: (un)mute, "
             @"q: Exit";
     } else if(state == INSIDE) {
         line =
-            @" q: outside mode "
-            @"h/l: previous/next channel "
-            @"j/k: volume up/down or previous/next option ";
+            @" q: outside mode, "
+            @"h/l: previous/next channel, "
+            @"j/k: volume down/up or previous/next option, "
+            @"m: (un)mute";
         mode = 'i';
     } else {
         line = @"";
@@ -503,5 +560,9 @@
 }
 
 -(void) downMore {
+}
+
+-(void) mute {
+    [[widgets objectAtIndex: highlight] mute];
 }
 @end

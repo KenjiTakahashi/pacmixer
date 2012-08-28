@@ -79,6 +79,9 @@ int main(int argc, char const *argv[]) {
             case KEY_DOWN:
                 [tui down];
                 break;
+            case 'm':
+                [tui mute];
+                break;
         }
     }
     [tui release];
