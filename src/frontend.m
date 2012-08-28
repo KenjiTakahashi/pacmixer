@@ -454,30 +454,30 @@
 
 -(void) print {
     NSString *line;
-    char mode = 'o';
+    char mode_ = 'o';
     int color = COLOR_PAIR(6);
-    if(mode == OUTSIDE) {
+    if(mode_ == OUTSIDE) {
         line =
             @" i: inside mode, "
             @"h/l: previous/next control, "
             @"j/k: volume down/up or previous/next option, "
             @"m: (un)mute, "
             @"q: Exit";
-    } else if(mode == INSIDE) {
+    } else if(mode_ == INSIDE) {
         line =
             @" q: outside mode, "
             @"h/l: previous/next channel, "
             @"j/k: volume down/up or previous/next option, "
             @"m: (un)mute";
-        mode = 'i';
+        mode_ = 'i';
         color = COLOR_PAIR(7);
     } else {
         line = @"";
-        mode = '?';
+        mode_ = '?';
     }
     werase(win);
     wattron(win, color | A_BOLD);
-    wprintw(win, " %c ", mode);
+    wprintw(win, " %c ", mode_);
     wattroff(win, color | A_BOLD);
     wprintw(win, "%@", line);
     wrefresh(win);
