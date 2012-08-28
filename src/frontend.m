@@ -442,7 +442,7 @@
     int mx;
     getmaxyx(stdscr, my, mx);
     win = newwin(1, mx, my - 1, 0);
-    state = OUTSIDE;
+    mode = OUTSIDE;
     [self print];
     return self;
 }
@@ -456,14 +456,14 @@
     NSString *line;
     char mode = 'o';
     int color = COLOR_PAIR(6);
-    if(state == OUTSIDE) {
+    if(mode == OUTSIDE) {
         line =
             @" i: inside mode, "
             @"h/l: previous/next control, "
             @"j/k: volume down/up or previous/next option, "
             @"m: (un)mute, "
             @"q: Exit";
-    } else if(state == INSIDE) {
+    } else if(mode == INSIDE) {
         line =
             @" q: outside mode, "
             @"h/l: previous/next channel, "
@@ -484,21 +484,21 @@
 }
 
 -(void) inside {
-    if(state == OUTSIDE) {
-        state = INSIDE;
+    if(mode == OUTSIDE) {
+        mode = INSIDE;
         [self print];
     }
 }
 
 -(void) outside {
-    if(state == INSIDE) {
-        state = OUTSIDE;
+    if(mode == INSIDE) {
+        mode = OUTSIDE;
         [self print];
     }
 }
 
 -(BOOL) isInside {
-    return state == INSIDE;
+    return mode == INSIDE;
 }
 @end
 

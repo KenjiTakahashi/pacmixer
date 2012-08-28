@@ -129,13 +129,13 @@ typedef enum {
 typedef enum {
     INSIDE,
     OUTSIDE
-} State;
+} Mode;
 
 
 @interface Bottom: NSObject {
     @private
         WINDOW *win;
-        State state;
+        Mode mode;
 }
 
 -(Bottom*) init;
