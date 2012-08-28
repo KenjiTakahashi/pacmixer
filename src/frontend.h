@@ -36,6 +36,10 @@
 -(void) dealloc;
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
+-(void) up;
+-(void) upMore;
+-(void) down;
+-(void) downMore;
 @end
 
 
@@ -53,6 +57,10 @@
 -(void) setLevel: (int) level;
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
+-(void) up;
+-(void) upMore;
+-(void) down;
+-(void) downMore;
 @end
 
 
@@ -68,6 +76,8 @@
 -(void) dealloc;
 -(void) print;
 -(void) setCurrent: (int) i;
+-(void) up;
+-(void) down;
 @end
 
 
@@ -90,6 +100,8 @@
 -(Channels*) addChannels: (NSArray*) channels;
 -(Options*) addOptions: (NSArray*) options;
 -(void) setHighlight: (BOOL) highlight_;
+-(void) up;
+-(void) down;
 -(int) endPosition;
 @end
 
@@ -145,4 +157,10 @@ typedef enum {
 -(void) dealloc;
 -(Widget*) addWidgetWithName: (NSString*) name;
 -(void) setCurrent: (int) i;
+-(void) previous;
+-(void) next;
+-(void) up;
+-(void) down;
+-(void) upMore;
+-(void) downMore;
 @end

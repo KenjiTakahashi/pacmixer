@@ -59,7 +59,28 @@ int main(int argc, char const *argv[]) {
     NSArray *optw8 = [NSArray arrayWithObjects: @"opt3", @"opt4", nil];
     Options *o2 = [w8 addOptions: optw8];
     [o2 setCurrent: 1];
-    getch(); // TODO: remove this when event loop is in place
+    int ch;
+    // TODO: move this away when event loop is done
+    while((ch = getch()) != 27 && ch != 'q') {
+        switch(ch) {
+            case 'h':
+            case KEY_LEFT:
+                [tui previous];
+                break;
+            case 'l':
+            case KEY_RIGHT:
+                [tui next];
+                break;
+            case 'k':
+            case KEY_UP:
+                [tui up];
+                break;
+            case 'j':
+            case KEY_DOWN:
+                [tui down];
+                break;
+        }
+    }
     [tui release];
     return 0;
 }

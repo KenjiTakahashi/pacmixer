@@ -68,7 +68,6 @@
     int medium = high * (4. / 5.);
     int low = high * (2. / 5.);
     for(int i = 0; i < my - 3; ++i) {
-    //for(int i = 0; i < limit; ++i) {
         int color = COLOR_PAIR(2);
         if(i < limit) {
             if(i >= high) {
@@ -84,6 +83,18 @@
         mvwaddch(win, currentPos - i, 0, ' ' | color);
     }
     wrefresh(win);
+}
+
+-(void) up {
+    if(currentLevel < maxLevel) {
+        [self setLevel: currentLevel + 1];
+    }
+}
+
+-(void) down {
+    if(currentLevel > 0) { // TODO: is minLevel always == 0?
+        [self setLevel: currentLevel - 1];
+    }
 }
 @end
 
@@ -120,9 +131,6 @@
         [channel setLevel: 100];
         [channels addObject: channel];
     }
-    // FIXME: remove settings below, they're here for testing purposes
-    //[[channels objectAtIndex: 0] setMute: false];
-    //[[channels objectAtIndex: 0] setLevel: 130];
     touchwin(parent);
     wrefresh(win);
     return self;
@@ -153,6 +161,18 @@
 -(void) setLevel: (int) level forChannel: (int) channel {
     [[channels objectAtIndex: channel] setLevel: level];
 }
+
+-(void) up {
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] up];
+    }
+}
+
+-(void) down {
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] down];
+    }
+}
 @end
 
 
@@ -170,6 +190,11 @@
     box(win, 0, 0);
     [self print];
     return self;
+}
+
+-(void) dealloc {
+    delwin(win);
+    [super dealloc];
 }
 
 -(void) print {
@@ -191,9 +216,16 @@
     [self print];
 }
 
--(void) dealloc {
-    delwin(win);
-    [super dealloc];
+-(void) up {
+    if(highlight > 0) {
+        [self setCurrent: highlight - 1];
+    }
+}
+
+-(void) down {
+    if(highlight < [options count] - 1) {
+        [self setCurrent: highlight + 1];
+    }
 }
 @end
 
@@ -282,6 +314,18 @@
     wrefresh(win);
 }
 
+-(void) up {
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] up];
+    }
+}
+
+-(void) down {
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] down];
+    }
+}
+
 -(int) endPosition {
     return position + width;
 }
@@ -362,10 +406,10 @@
             @" i: inside mode "
             @"h/l: previous/next control "
             @"j/k: volume up/down or previous/next option "
-            @"Esc: Exit";
+            @"q: Exit";
     } else if(state == INSIDE) {
         line =
-            @" Esc: outside mode "
+            @" q: outside mode "
             @"h/l: previous/next channel "
             @"j/k: volume up/down or previous/next option ";
         mode = 'i';
@@ -433,5 +477,31 @@
     [[widgets objectAtIndex: highlight] setHighlight: NO];
     highlight = i;
     [[widgets objectAtIndex: highlight] setHighlight: YES];
+}
+
+-(void) previous {
+    if(highlight > 0) {
+        [self setCurrent: highlight - 1];
+    }
+}
+
+-(void) next {
+    if(highlight < [widgets count] - 1) {
+        [self setCurrent: highlight + 1];
+    }
+}
+
+-(void) up {
+    [[widgets objectAtIndex: highlight] up];
+}
+
+-(void) down {
+    [[widgets objectAtIndex: highlight] down];
+}
+
+-(void) upMore {
+}
+
+-(void) downMore {
 }
 @end
