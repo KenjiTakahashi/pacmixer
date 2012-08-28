@@ -227,11 +227,21 @@
     } else {
         wresize(win, height, width);
     }
+    [self printName];
+}
+
+-(void) printName {
+    int color;
+    if(highlight) {
+        color = COLOR_PAIR(6);
+    } else {
+        color = COLOR_PAIR(5);
+    }
     int length = (width - [name length]) / 2;
     if(length < 0) {
         length = 0;
     }
-    wattron(win, COLOR_PAIR(5) | A_BOLD);
+    wattron(win, color | A_BOLD);
     mvwprintw(win, height - 1, 0, "      ");
     mvwprintw(win, height - 1, 0, "%@",
         [@"" stringByPaddingToLength: width
@@ -239,7 +249,7 @@
                      startingAtIndex: 0]
     );
     mvwprintw(win, height - 1, length, "%@", name);
-    wattroff(win, COLOR_PAIR(5) | A_BOLD);
+    wattroff(win, color | A_BOLD);
 }
 
 -(Channels*) addChannels: (NSArray*) channels {
@@ -264,6 +274,12 @@
     [control release];
     wrefresh(win);
     return control;
+}
+
+-(void) setHighlight: (BOOL) active {
+    highlight = active;
+    [self printName];
+    wrefresh(win);
 }
 
 -(int) endPosition {
@@ -405,8 +421,17 @@
     int x = [[widgets lastObject] endPosition] + 1;
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name];
+    if(x == 1) {
+        [widget setHighlight: YES];
+    }
     [widgets addObject: widget];
     [widget release];
     return widget;
+}
+
+-(void) set: (int) i {
+    [[widgets objectAtIndex: highlight] setHighlight: NO];
+    highlight = i;
+    [[widgets objectAtIndex: highlight] setHighlight: YES];
 }
 @end

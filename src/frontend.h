@@ -79,14 +79,17 @@
         int width;
         NSString *name;
         NSMutableArray *controls;
+        BOOL highlight;
 }
 
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_;
 -(void) dealloc;
 -(void) printWithWidth: (int) width_;
+-(void) printName;
 -(Channels*) addChannels: (NSArray*) channels;
 -(Options*) addOptions: (NSArray*) options;
+-(void) setHighlight: (BOOL) highlight_;
 -(int) endPosition;
 @end
 
@@ -135,6 +138,7 @@ typedef enum {
         NSMutableArray *widgets;
         Top *top;
         Bottom *bottom;
+        int highlight;
 }
 
 -(TUI*) init;
