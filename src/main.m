@@ -59,10 +59,20 @@ int main(int argc, char const *argv[]) {
     NSArray *optw8 = [NSArray arrayWithObjects: @"opt3", @"opt4", nil];
     Options *o2 = [w8 addOptions: optw8];
     [o2 setCurrent: 1];
-    int ch;
     // TODO: move this away when event loop is done
-    while((ch = getch()) != 27 && ch != 'q') {
+    int ch;
+    BOOL quit = NO;
+    while(!quit) {
+        ch = getch();
         switch(ch) {
+            case 27:
+            case 'q':
+                if([tui isInside]) {
+                    [tui outside];
+                } else {
+                    quit = YES;
+                }
+                break;
             case 'h':
             case KEY_LEFT:
                 [tui previous];
@@ -81,6 +91,9 @@ int main(int argc, char const *argv[]) {
                 break;
             case 'm':
                 [tui mute];
+                break;
+            case 'i':
+                [tui inside];
                 break;
         }
     }

@@ -248,11 +248,11 @@
     for(int i = 0; i < dy; ++i) {
         NSString *obj = [options objectAtIndex: i];
         if(i == highlight) {
-            wattron(win, COLOR_PAIR(7));
+            wattron(win, COLOR_PAIR(6));
         }
         mvwprintw(win, i + 1, 1, "      ");
         mvwprintw(win, i + 1, 1, "%@", obj);
-        wattroff(win, COLOR_PAIR(7));
+        wattroff(win, COLOR_PAIR(6));
     }
     wrefresh(win);
 }
@@ -470,15 +470,35 @@
             @"j/k: volume down/up or previous/next option, "
             @"m: (un)mute";
         mode = 'i';
+        color = COLOR_PAIR(7);
     } else {
         line = @"";
         mode = '?';
     }
+    werase(win);
     wattron(win, color | A_BOLD);
     wprintw(win, " %c ", mode);
     wattroff(win, color | A_BOLD);
     wprintw(win, "%@", line);
     wrefresh(win);
+}
+
+-(void) inside {
+    if(state == OUTSIDE) {
+        state = INSIDE;
+        [self print];
+    }
+}
+
+-(void) outside {
+    if(state == INSIDE) {
+        state = OUTSIDE;
+        [self print];
+    }
+}
+
+-(BOOL) isInside {
+    return state == INSIDE;
 }
 @end
 
@@ -502,7 +522,7 @@
     init_pair(4, -1, COLOR_RED); // high level volume/muted
     init_pair(5, COLOR_BLACK, COLOR_MAGENTA); // extreme (>100%) level volume
     init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
-    init_pair(7, COLOR_BLACK, COLOR_CYAN); // inside mode
+    init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     refresh();
     bottom = [[Bottom alloc] init];
     top = [[Top alloc] init];
@@ -564,5 +584,17 @@
 
 -(void) mute {
     [[widgets objectAtIndex: highlight] mute];
+}
+
+-(void) inside {
+    [bottom inside];
+}
+
+-(void) outside {
+    [bottom outside];
+}
+
+-(BOOL) isInside {
+    return [bottom isInside];
 }
 @end
