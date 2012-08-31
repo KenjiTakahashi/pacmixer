@@ -504,7 +504,6 @@
 @implementation TUI
 -(TUI*) init {
     self = [super init];
-    pool = [[NSAutoreleasePool alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
     cbreak();
@@ -532,7 +531,6 @@
     [bottom release];
     [top release];
     [widgets release];
-    [pool drain];
     [super dealloc];
 }
 

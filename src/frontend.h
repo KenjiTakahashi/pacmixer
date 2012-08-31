@@ -1,6 +1,5 @@
 #import <Foundation/NSObject.h>
 #import <Foundation/NSArray.h>
-#import <Foundation/NSAutoreleasePool.h>
 #import <Foundation/NSString.h>
 #import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
@@ -148,7 +147,6 @@ typedef enum {
 
 @interface TUI: NSObject {
     @private
-        NSAutoreleasePool *pool;
         NSMutableArray *widgets;
         Top *top;
         Bottom *bottom;
