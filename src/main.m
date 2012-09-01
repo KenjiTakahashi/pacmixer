@@ -9,7 +9,11 @@
     tui = [[TUI alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(addWidget:)
-                                                 name: @"widgetAppeared"
+                                                 name: @"controlAppeared"
+                                               object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(removeWidget:)
+                                                 name: @"controlDisappeared"
                                                object: nil];
     [backend run];
     // TODO: removing widgets
@@ -34,6 +38,9 @@
     if(options != nil) {
         [w addOptions: options];
     }
+}
+
+-(void) removeWidget: (NSNotification*) notification {
 }
 
 -(void) run {

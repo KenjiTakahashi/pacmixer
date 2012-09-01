@@ -16,6 +16,7 @@
 -(Dispatcher*) init;
 -(void) dealloc;
 -(void) addWidget: (NSNotification*) notification;
+-(void) removeWidget: (NSNotification*) notification;
 -(void) run;
 @end
 

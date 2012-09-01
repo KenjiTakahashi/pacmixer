@@ -10,7 +10,7 @@
         nil];
     NSDictionary *s1 = [NSDictionary dictionaryWithObjectsAndKeys:
         @"test1", @"name", ch1, @"channels", nil];
-    NSString *name = [NSString stringWithString: @"widgetAppeared"];
+    NSString *name = [NSString stringWithString: @"controlAppeared"];
     [[NSNotificationCenter defaultCenter] postNotificationName: name
                                                         object: self
                                                       userInfo: s1];

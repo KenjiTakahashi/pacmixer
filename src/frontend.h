@@ -3,19 +3,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
-
-
-@interface channel_t: NSObject {
-    @private
-        NSNumber* maxLevel;
-        BOOL mutable;
-}
-
--(channel_t*) initWithMaxLevel: (NSNumber*) maxLevel_
-              andMutable: (BOOL) mutable_;
--(NSNumber*) maxLevel;
--(BOOL) mutable;
-@end
+#import "types.h"
 
 
 @interface Channel: NSObject {
