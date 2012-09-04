@@ -83,5 +83,11 @@
     [[NSNotificationCenter defaultCenter] postNotificationName: name
                                                         object: self
                                                       userInfo: s8];
+    NSString *name2 = [NSString stringWithString: @"controlDisappeared"];
+    NSDictionary *s9 = [NSDictionary dictionaryWithObjectsAndKeys:
+        @"test4", @"name", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: name2
+                                                        object: self
+                                                      userInfo: s9];
 }
 @end

@@ -27,6 +27,7 @@
 -(void) setLevel: (int) level_;
 -(void) up;
 -(void) down;
+-(void) moveLeftBy: (int) p;
 -(void) mute;
 @end
 
@@ -47,6 +48,7 @@
 -(void) setLevel: (int) level forChannel: (int) channel;
 -(void) up;
 -(void) down;
+-(void) moveLeftBy: (int) p;
 -(void) mute;
 @end
 
@@ -65,6 +67,7 @@
 -(void) setCurrent: (int) i;
 -(void) up;
 -(void) down;
+-(void) moveLeftBy: (int) p;
 @end
 
 
@@ -89,7 +92,11 @@
 -(void) setHighlight: (BOOL) highlight_;
 -(void) up;
 -(void) down;
+-(void) moveLeftBy: (int) p;
+-(int) height;
+-(int) width;
 -(int) endPosition;
+-(NSString*) name;
 @end
 
 
@@ -144,13 +151,12 @@ typedef enum {
 -(TUI*) init;
 -(void) dealloc;
 -(Widget*) addWidgetWithName: (NSString*) name;
+-(void) removeWidget: (NSString*) name;
 -(void) setCurrent: (int) i;
 -(void) previous;
 -(void) next;
 -(void) up;
 -(void) down;
--(void) upMore;
--(void) downMore;
 -(void) mute;
 -(void) inside;
 -(BOOL) outside;

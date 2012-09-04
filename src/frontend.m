@@ -83,6 +83,14 @@
     }
 }
 
+-(void) moveLeftBy: (int) p {
+    int by;
+    int bx;
+    getbegyx(win, by, bx);
+    mvwin(win, by, bx - p);
+    wrefresh(win);
+}
+
 -(void) mute {
     if(mutable) {
         if(mute) {
@@ -195,6 +203,12 @@
     }
 }
 
+-(void) moveLeftBy: (int) p {
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] moveLeftBy: p];
+    }
+}
+
 -(void) mute {
     for(int i = 0; i < [channels count]; ++i) {
         [[channels objectAtIndex: i] mute];
@@ -205,7 +219,7 @@
 
 @implementation Options
 -(Options*) initWithOptions: (NSArray*) options_
-                   andParent: (WINDOW*) parent {
+                  andParent: (WINDOW*) parent {
     self = [super init];
     options = options_;
     highlight = 0;
@@ -254,6 +268,14 @@
         [self setCurrent: highlight + 1];
     }
 }
+
+-(void) moveLeftBy: (int) p {
+    int by;
+    int bx;
+    getbegyx(win, by, bx);
+    mvwin(win, by, bx - p);
+    wrefresh(win);
+}
 @end
 
 
@@ -265,13 +287,12 @@
     position = p;
     name = name_;
     [self printWithWidth: 8];
-    wrefresh(win);
     return self;
 }
 
 -(void) dealloc {
-    delwin(win);
     [controls release];
+    delwin(win);
     [super dealloc];
 }
 
@@ -309,6 +330,7 @@
     );
     mvwprintw(win, height - 1, length, "%@", name);
     wattroff(win, color | A_BOLD);
+    wrefresh(win);
 }
 
 -(Channels*) addChannels: (NSArray*) channels {
@@ -322,13 +344,12 @@
                                                  andParent: win];
     [controls addObject: control];
     [control release];
-    wrefresh(win);
     return control;
 }
 
 -(Options*) addOptions: (NSArray*) options {
     Options *control = [[Options alloc] initWithOptions: options
-                                            andParent: win];
+                                              andParent: win];
     [controls addObject: control];
     [control release];
     wrefresh(win);
@@ -338,7 +359,6 @@
 -(void) setHighlight: (BOOL) active {
     highlight = active;
     [self printName];
-    wrefresh(win);
 }
 
 -(void) up {
@@ -362,8 +382,29 @@
     }
 }
 
+-(void) moveLeftBy: (int) p {
+    position -= p;
+    mvwin(win, 2, position);
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] moveLeftBy: p];
+    }
+    [self printName];
+}
+
+-(int) height {
+    return height;
+}
+
+-(int) width {
+    return width;
+}
+
 -(int) endPosition {
     return position + width;
+}
+
+-(NSString*) name {
+    return name;
 }
 @end
 
@@ -527,6 +568,31 @@
     return widget;
 }
 
+-(void) removeWidget: (NSString*) name {
+    int width = 0;
+    NSArray *copy = [widgets copy];
+    for(int i = 0; i < [copy count]; ++i) {
+        id widget = [copy objectAtIndex: i];
+        if([[widget name] isEqualToString: name]) {
+            width = [widget width];
+            [widgets removeObjectAtIndex: i];
+        } else if(width) {
+            [widget moveLeftBy: width + 1];
+            width = [widget width];
+        }
+    }
+    [copy release];
+    id widget = [widgets lastObject];
+    int start = [widget endPosition];
+    for(int i = 0; i < [widget height]; ++i) {
+        move(i + 2, start);
+        for(int j = 0; j < [widget width] + 1; ++j) {
+            addch(' ');
+        }
+    }
+    refresh();
+}
+
 -(void) setCurrent: (int) i {
     [[widgets objectAtIndex: highlight] setHighlight: NO];
     highlight = i;
@@ -551,12 +617,6 @@
 
 -(void) down {
     [[widgets objectAtIndex: highlight] down];
-}
-
--(void) upMore {
-}
-
--(void) downMore {
 }
 
 -(void) mute {

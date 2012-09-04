@@ -41,6 +41,8 @@
 }
 
 -(void) removeWidget: (NSNotification*) notification {
+    NSDictionary *info = [notification userInfo];
+    [tui removeWidget: [info objectForKey: @"name"]];
 }
 
 -(void) run {
