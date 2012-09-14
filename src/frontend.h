@@ -15,6 +15,7 @@
         BOOL mute;
         BOOL mutable;
         BOOL printMute;
+        BOOL inside;
 }
 
 -(Channel*) initWithIndex: (int) i
@@ -23,8 +24,11 @@
              andPrintMute: (BOOL) printMute_
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
+-(void) print;
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
+-(void) inside;
+-(void) outside;
 -(void) up;
 -(void) down;
 -(void) moveLeftBy: (int) p;
@@ -36,6 +40,8 @@
     @private
         WINDOW *win;
         NSMutableArray *channels;
+        BOOL inside;
+        int highlight;
 }
 
 -(Channels*) initWithChannels: (NSArray*) channels_
@@ -46,8 +52,12 @@
 -(void) setLevel: (int) level;
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
+-(BOOL) previous;
+-(BOOL) next;
 -(void) up;
 -(void) down;
+-(void) inside;
+-(void) outside;
 -(void) moveLeftBy: (int) p;
 -(void) mute;
 @end
@@ -79,7 +89,9 @@
         int width;
         NSString *name;
         NSMutableArray *controls;
-        BOOL highlight;
+        BOOL highlighted;
+        int highlight;
+        BOOL inside;
 }
 
 -(Widget*) initWithPosition: (int) p
@@ -89,7 +101,12 @@
 -(void) printName;
 -(Channels*) addChannels: (NSArray*) channels;
 -(Options*) addOptions: (NSArray*) options;
--(void) setHighlight: (BOOL) highlight_;
+-(void) setHighlighted: (BOOL) active;
+-(BOOL) canGoInside;
+-(void) inside;
+-(void) outside;
+-(void) previous;
+-(void) next;
 -(void) up;
 -(void) down;
 -(void) moveLeftBy: (int) p;
@@ -146,6 +163,7 @@ typedef enum {
         Top *top;
         Bottom *bottom;
         int highlight;
+        BOOL inside;
 }
 
 -(TUI*) init;

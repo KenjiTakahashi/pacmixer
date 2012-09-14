@@ -15,13 +15,13 @@
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
         mutable = YES;
-        [self setMute: [mute_ boolValue]];
     } else {
         mutable = NO;
     }
     if(mlevel_ != nil) {
         maxLevel = [mlevel_ intValue];
     }
+    [self print];
     return self;
 }
 
@@ -30,20 +30,12 @@
     [super dealloc];
 }
 
--(void) setMute: (BOOL) mute_ {
-    if(mutable) {
-        mute = mute_;
-        if(mute) {
-            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
-        } else {
-            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
-        }
+-(void) print {
+    if(mute) {
+        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
+    } else {
+        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
     }
-    wrefresh(win);
-}
-
--(void) setLevel: (int) level_ {
-    currentLevel = level_;
     int currentPos = my - 1;
     if(printMute) {
         currentPos -= 2;
@@ -69,6 +61,28 @@
         mvwaddch(win, currentPos - i, 0, ' ' | color);
     }
     wrefresh(win);
+}
+
+-(void) setMute: (BOOL) mute_ {
+    if(mutable) {
+        mute = mute_;
+    }
+    [self print];
+}
+
+-(void) setLevel: (int) level_ {
+    currentLevel = level_;
+    [self print];
+}
+
+-(void) inside {
+    wattron(win, A_BLINK);
+    [self print];
+}
+
+-(void) outside {
+    wattroff(win, A_BLINK);
+    [self print];
 }
 
 -(void) up {
@@ -108,6 +122,7 @@
                   andPosition: (int) position
                     andParent: (WINDOW*) parent {
     self = [super init];
+    highlight = 0;
     int my;
     int mx;
     getmaxyx(parent, my, mx);
@@ -191,15 +206,57 @@
     [[channels objectAtIndex: channel] setLevel: level];
 }
 
+-(BOOL) previous {
+    if(inside && highlight > 0) {
+        [[channels objectAtIndex: highlight] outside];
+        highlight -= 1;
+        [[channels objectAtIndex: highlight] inside];
+        return NO;
+    }
+    return YES;
+}
+
+-(BOOL) next {
+    if(inside && highlight < [channels count] - 1) {
+        [[channels objectAtIndex: highlight] outside];
+        highlight += 1;
+        [[channels objectAtIndex: highlight] inside];
+        return NO;
+    }
+    return YES;
+}
+
 -(void) up {
-    for(int i = 0; i < [channels count]; ++i) {
-        [[channels objectAtIndex: i] up];
+    if(inside) {
+        [[channels objectAtIndex: highlight] up];
+    } else {
+        for(int i = 0; i < [channels count]; ++i) {
+            [[channels objectAtIndex: i] up];
+        }
     }
 }
 
 -(void) down {
-    for(int i = 0; i < [channels count]; ++i) {
-        [[channels objectAtIndex: i] down];
+    if(inside) {
+        [[channels objectAtIndex: highlight] down];
+    } else {
+        for(int i = 0; i < [channels count]; ++i) {
+            [[channels objectAtIndex: i] down];
+        }
+    }
+}
+
+-(void) inside {
+    if(!inside) {
+        inside = YES;
+        [[channels objectAtIndex: highlight] inside];
+    }
+}
+
+-(void) outside {
+    if(inside) {
+        inside = NO;
+        [[channels objectAtIndex: highlight] outside];
     }
 }
 
@@ -210,8 +267,12 @@
 }
 
 -(void) mute {
-    for(int i = 0; i < [channels count]; ++i) {
-        [[channels objectAtIndex: i] mute];
+    if(inside) {
+        [[channels objectAtIndex: highlight] mute];
+    } else {
+        for(int i = 0; i < [channels count]; ++i) {
+            [[channels objectAtIndex: i] mute];
+        }
     }
 }
 @end
@@ -283,6 +344,7 @@
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_ {
     self = [super init];
+    highlight = 0;
     controls = [[NSMutableArray alloc] init];
     position = p;
     name = name_;
@@ -312,7 +374,7 @@
 
 -(void) printName {
     int color;
-    if(highlight) {
+    if(highlighted) {
         color = COLOR_PAIR(6);
     } else {
         color = COLOR_PAIR(5);
@@ -356,20 +418,81 @@
     return control;
 }
 
--(void) setHighlight: (BOOL) active {
-    highlight = active;
+-(void) setHighlighted: (BOOL) active {
+    highlighted = active;
     [self printName];
 }
 
--(void) up {
+-(BOOL) canGoInside {
+    BOOL can = NO;
     for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] up];
+        id control = [controls objectAtIndex: i];
+        if([control respondsToSelector:@selector(previous)] ||
+           [control respondsToSelector:@selector(next)]) {
+            can = YES;
+            break;
+        }
+    }
+    return can;
+}
+
+-(void) inside {
+    if(!inside) {
+        inside = YES;
+        [[controls objectAtIndex: highlight] inside];
+    }
+}
+
+-(void) outside {
+    if(inside) {
+        inside = NO;
+        [[controls objectAtIndex: highlight] outside];
+    }
+}
+
+-(void) previous {
+    if(inside) {
+        BOOL end = [[controls objectAtIndex: highlight] previous];
+        while(end) {
+            if(highlight == 0) {
+                break;
+            }
+            highlight -= 1;
+            end = [[controls objectAtIndex: highlight] previous];
+        }
+    }
+}
+
+-(void) next {
+    if(inside) {
+        BOOL end = [[controls objectAtIndex: highlight] next];
+        while(end) {
+            if(highlight == [controls count] - 1) {
+                break;
+            }
+            highlight += 1;
+            end = [[controls objectAtIndex: highlight] next];
+        }
+    }
+}
+
+-(void) up {
+    if(inside) {
+        [[controls objectAtIndex: highlight] up];
+    } else {
+        for(int i = 0; i < [controls count]; ++i) {
+            [[controls objectAtIndex: i] up];
+        }
     }
 }
 
 -(void) down {
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] down];
+    if(inside) {
+        [[controls objectAtIndex: highlight] down];
+    } else {
+        for(int i = 0; i < [controls count]; ++i) {
+            [[controls objectAtIndex: i] down];
+        }
     }
 }
 
@@ -489,7 +612,7 @@
         line =
             @" q: outside mode, "
             @"h/l: previous/next channel, "
-            @"j/k: volume down/up or previous/next option, "
+            @"j/k: volume down/up, "
             @"m: (un)mute";
         mode_ = 'i';
         color = COLOR_PAIR(7);
@@ -561,7 +684,7 @@
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name];
     if(x == 1) {
-        [widget setHighlight: YES];
+        [widget setHighlighted: YES];
     }
     [widgets addObject: widget];
     [widget release];
@@ -594,19 +717,23 @@
 }
 
 -(void) setCurrent: (int) i {
-    [[widgets objectAtIndex: highlight] setHighlight: NO];
+    [[widgets objectAtIndex: highlight] setHighlighted: NO];
     highlight = i;
-    [[widgets objectAtIndex: highlight] setHighlight: YES];
+    [[widgets objectAtIndex: highlight] setHighlighted: YES];
 }
 
 -(void) previous {
-    if(highlight > 0) {
+    if(inside) {
+        [[widgets objectAtIndex: highlight] previous];
+    } else if(highlight > 0) {
         [self setCurrent: highlight - 1];
     }
 }
 
 -(void) next {
-    if(highlight < [widgets count] - 1) {
+    if(inside) {
+        [[widgets objectAtIndex: highlight] next];
+    } else if(highlight < [widgets count] - 1) {
         [self setCurrent: highlight + 1];
     }
 }
@@ -624,10 +751,22 @@
 }
 
 -(void) inside {
-    [bottom inside];
+    Widget *widget = [widgets objectAtIndex: highlight];
+    if([widget canGoInside]) {
+        inside = YES;
+        [bottom inside];
+        [[widgets objectAtIndex: highlight] inside];
+    }
 }
 
 -(BOOL) outside {
-    return [bottom outside];
+    BOOL outside = [bottom outside];
+    if(!outside) {
+        // prevent "multiple -outside defs found"
+        inside = NO;
+        Widget *widget = [widgets objectAtIndex: highlight];
+        [widget outside];
+    }
+    return outside;
 }
 @end
