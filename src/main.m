@@ -5,7 +5,7 @@
 -(Dispatcher*) init {
     self = [super init];
     pool = [[NSAutoreleasePool alloc] init];
-    backend = [[Backend alloc] init];
+    middleware = [[Middleware alloc] init];
     tui = [[TUI alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(addWidget:)
@@ -15,14 +15,14 @@
                                              selector: @selector(removeWidget:)
                                                  name: @"controlDisappeared"
                                                object: nil];
-    [backend run];
+    [middleware run];
     // TODO: removing widgets
     return self;
 }
 
 -(void) dealloc {
     [tui release];
-    [backend release];
+    [middleware release];
     [pool drain];
     [super dealloc];
 }

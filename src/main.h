@@ -3,12 +3,12 @@
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import "frontend.h"
-#import "backend.h"
+#import "middleware.h"
 
 
 @interface Dispatcher: NSObject {
     @private
-        Backend *backend;
+        Middleware *middleware;
         TUI *tui;
         NSAutoreleasePool *pool;
 }
