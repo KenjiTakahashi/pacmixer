@@ -15,8 +15,7 @@
                                                object: nil];
     tui = [[TUI alloc] init];
     middleware = [[Middleware alloc] init];
-    //[middleware run];
-    // TODO: removing widgets
+    [middleware run];
     return self;
 }
 

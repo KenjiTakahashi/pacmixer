@@ -41,7 +41,7 @@ int backend_init(context_t *context, callback_t *callback) {
     pa_context_set_subscribe_callback(context->context, _cb_event, NULL);
     pa_context_subscribe(context->context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
     pa_context_get_sink_input_info_list(context->context, _cb_sink_input, callback);
-    pa_context_get_sink_info_list(context->context, _cb_sink, NULL);
+    pa_context_get_sink_info_list(context->context, _cb_sink, callback);
     return 0;
 }
 
@@ -67,7 +67,8 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
 
 void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
-        printf("%s\n", info->description);
+        callback_t *callback = userdata;
+        ((tcallback_func)(callback->callback))(callback->self, info->description);
     }
 }
 

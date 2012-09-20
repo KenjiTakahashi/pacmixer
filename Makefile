@@ -1,4 +1,4 @@
-CCC=gcc -std=c99
+CCC=gcc -std=c99 -g
 CCFLAGS=-lgnustep-base -lobjc -lcurses -lpulse
 OFLAGS=-fconstant-string-class=NSConstantString
 SOURCES=$(wildcard src/*.m) src/backend.c

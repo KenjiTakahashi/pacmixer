@@ -347,13 +347,14 @@
     highlight = 0;
     controls = [[NSMutableArray alloc] init];
     position = p;
-    name = name_;
+    name = [name_ copy];
     [self printWithWidth: 8];
     return self;
 }
 
 -(void) dealloc {
     [controls release];
+    [name release];
     delwin(win);
     [super dealloc];
 }
