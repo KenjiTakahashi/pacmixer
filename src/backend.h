@@ -33,7 +33,13 @@ typedef struct CALLBACK {
     void *self;
 } callback_t;
 
-typedef void (*tcallback_func)(void*, const char*);
+typedef struct BACKEND_CHANNEL {
+    int maxLevel;
+    int normLevel;
+    int mutable;
+} backend_channel_t;
+
+typedef void (*tcallback_func)(void*, const char*, const backend_channel_t*, uint8_t);
 
 context_t *backend_new();
 int backend_init(context_t*, callback_t*);

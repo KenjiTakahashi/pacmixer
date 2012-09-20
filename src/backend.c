@@ -61,14 +61,21 @@ void _cb_state_changed(pa_context *c, void *userdata) {
 void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
-        ((tcallback_func)(callback->callback))(callback->self, info->name);
+        /*((tcallback_func)(callback->callback))(callback->self, info->name);*/
     }
 }
 
 void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
-        ((tcallback_func)(callback->callback))(callback->self, info->description);
+        uint8_t chnum = info->volume.channels;
+        backend_channel_t channels[chnum];
+        for(int i = 0; i < chnum; ++i) {
+            channels[i].maxLevel = PA_VOLUME_UI_MAX;
+            channels[i].normLevel = PA_VOLUME_NORM;
+            channels[i].mutable = 1;
+        }
+        ((tcallback_func)(callback->callback))(callback->self, info->description, channels, chnum);
     }
 }
 

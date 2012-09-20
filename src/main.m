@@ -15,7 +15,7 @@
                                                object: nil];
     tui = [[TUI alloc] init];
     middleware = [[Middleware alloc] init];
-    [middleware run];
+    //[middleware run];
     return self;
 }
 

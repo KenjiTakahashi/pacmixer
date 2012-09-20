@@ -18,11 +18,21 @@
 #import "middleware.h"
 
 
-void callback_func(void *self_, const char *name) {
+void callback_func(void *self_, const char *name, const backend_channel_t *channels, uint8_t chnum) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
+    NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
+    for(int i = 0; i < chnum; ++i) {
+        NSNumber *lvl = [NSNumber numberWithInt: channels[i].maxLevel];
+        NSNumber *nlvl = [NSNumber numberWithInt: channels[i].normLevel];
+        BOOL mut = channels[i].mutable == 1 ? YES : NO;
+        [ch addObject: [[channel_t alloc] initWithMaxLevel: lvl
+                                              andNormLevel: nlvl
+                                                andMutable: mut]];
+    }
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSString stringWithUTF8String: name], @"name", nil];
+        [NSString stringWithUTF8String: name], @"name",
+        ch, @"channels",  nil];
     NSString *nname = [NSString stringWithString: @"controlAppeared"];
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self

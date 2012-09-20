@@ -24,7 +24,7 @@
 #import "backend.h"
 
 
-void callback_func(void*, const char*);
+void callback_func(void*, const char*, const backend_channel_t*, uint8_t);
 
 @interface Middleware: NSObject {
     context_t *context;
