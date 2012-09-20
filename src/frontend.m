@@ -751,11 +751,13 @@
 }
 
 -(void) inside {
-    Widget *widget = [widgets objectAtIndex: highlight];
-    if([widget canGoInside]) {
-        inside = YES;
-        [bottom inside];
-        [[widgets objectAtIndex: highlight] inside];
+    if([widgets count]) {
+        Widget *widget = [widgets objectAtIndex: highlight];
+        if([widget canGoInside]) {
+            inside = YES;
+            [bottom inside];
+            [[widgets objectAtIndex: highlight] inside];
+        }
     }
 }
 
