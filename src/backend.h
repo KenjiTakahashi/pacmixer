@@ -17,7 +17,7 @@
 */
 
 
-#include "pulse/pulseaudio.h"
+#include <pulse/pulseaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -28,9 +28,15 @@ typedef struct CONTEXT {
     pa_context_state_t state;
 } context_t;
 
+typedef struct CALLBACK {
+    void *callback;
+    void *self;
+} callback_t;
+
+typedef void (*tcallback_func)(void*, const char*);
 
 context_t *backend_new();
-int backend_init(context_t*);
+int backend_init(context_t*, callback_t*);
 void backend_destroy(context_t*);
 
 void _cb_state_changed(pa_context*, void*);

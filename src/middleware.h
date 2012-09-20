@@ -19,12 +19,16 @@
 #import <Foundation/NSDecimalNumber.h>
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSNotification.h>
+#import <Foundation/NSAutoreleasePool.h>
 #import "types.h"
 #import "backend.h"
 
 
+void callback_func(void*, const char*);
+
 @interface Middleware: NSObject {
     context_t *context;
+    callback_t *callback;
 }
 
 -(Middleware*) init;

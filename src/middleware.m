@@ -18,16 +18,32 @@
 #import "middleware.h"
 
 
+void callback_func(void *self_, const char *name) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    Middleware *self = self_;
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSString stringWithUTF8String: name], @"name", nil];
+    NSString *nname = [NSString stringWithString: @"controlAppeared"];
+    [[NSNotificationCenter defaultCenter] postNotificationName: nname
+                                                        object: self
+                                                      userInfo: s];
+    [pool drain];
+}
+
 @implementation Middleware
 -(Middleware*) init {
     self = [super init];
     context = backend_new();
-    backend_init(context);
+    callback = malloc(sizeof(callback_t));
+    callback->callback = callback_func;
+    callback->self = self;
+    backend_init(context, callback);
     return self;
 }
 
 -(void) dealloc {
     backend_destroy(context);
+    free(callback);
     [super dealloc];
 }
 

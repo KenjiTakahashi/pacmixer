@@ -1,7 +1,7 @@
 CCC=gcc -std=c99
-CCFLAGS=-lgnustep-base -lobjc -lcurses
+CCFLAGS=-lgnustep-base -lobjc -lcurses -lpulse
 OFLAGS=-fconstant-string-class=NSConstantString
-SOURCES=$(wildcard src/*.m)
+SOURCES=$(wildcard src/*.m) src/backend.c
 OBJECTS=$(SOURCES:.m=.o)
 EXEC=pacmixer
 

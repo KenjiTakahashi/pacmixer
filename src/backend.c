@@ -30,7 +30,7 @@ context_t *backend_new() {
     return context;
 }
 
-int backend_init(context_t *context) {
+int backend_init(context_t *context, callback_t *callback) {
     pa_threaded_mainloop_start(context->loop);
     while(context->state != PA_CONTEXT_READY) {
         if(context->state == PA_CONTEXT_FAILED || context->state == PA_CONTEXT_TERMINATED) {
@@ -40,7 +40,7 @@ int backend_init(context_t *context) {
     }
     pa_context_set_subscribe_callback(context->context, _cb_event, NULL);
     pa_context_subscribe(context->context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
-    pa_context_get_sink_input_info_list(context->context, _cb_sink_input, NULL);
+    pa_context_get_sink_input_info_list(context->context, _cb_sink_input, callback);
     pa_context_get_sink_info_list(context->context, _cb_sink, NULL);
     return 0;
 }
@@ -60,7 +60,8 @@ void _cb_state_changed(pa_context *c, void *userdata) {
 
 void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
-        printf("::%s\n", info->name);
+        callback_t *callback = userdata;
+        ((tcallback_func)(callback->callback))(callback->self, info->name);
     }
 }
 
@@ -74,28 +75,11 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
     if(!eol && info->index != PA_INVALID_INDEX) {
         /* TODO: We'll need this info->name once status line is done. */
         if(info->client != PA_INVALID_INDEX) {
-            pa_context_get_client_info(c, info->client, _cb_client, NULL);
+            pa_context_get_client_info(c, info->client, _cb_client, userdata);
         }
     }
 }
 
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
     printf("event\n");
-}
-
-int main() {
-    context_t *context = backend_new();
-    if(backend_init(context) != 0) {
-        return -1;
-    }
-    int running = 1;
-    while(running) {
-        char c;
-        scanf("%c", &c);
-        if(c == 'e') {
-            running = 0;
-        }
-    }
-    backend_destroy(context);
-    return 0;
 }
