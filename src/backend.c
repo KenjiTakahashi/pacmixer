@@ -37,7 +37,7 @@ int backend_init(context_t *context, callback_t *callback) {
             return -1;
         }
     }
-    pa_context_set_subscribe_callback(context->context, _cb_event, NULL);
+    pa_context_set_subscribe_callback(context->context, _cb_event, callback);
     pa_context_subscribe(context->context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
     pa_context_get_sink_input_info_list(context->context, _cb_sink_input, callback);
     pa_context_get_sink_info_list(context->context, _cb_sink, callback);
@@ -94,7 +94,34 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
     }
 }
 
+void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
+    if(!eol && info->index != PA_INVALID_INDEX) {
+    }
+}
+
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
+    int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
+    if(t__ == PA_SUBSCRIPTION_EVENT_SINK_INPUT) {
+        /* sink input changed */
+        int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
+        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
+            pa_context_get_sink_input_info(c, idx, _cb_u_sink_input, NULL);
+        }
+        /* sink input removed */
+        /*if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {*/
+        /*}*/
+        /* sink input added */
+        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
+            pa_context_get_sink_input_info(c, idx, _cb_sink_input, userdata);
+        }
+    }
+    /*if((t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK) == PA_SUBSCRIPTION_EVENT_SINK) {*/
+        /*[> sink changed <]*/
+        /*if((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_CHANGE) {*/
+            /*if(idx != PA_INVALID_INDEX)*/
+                /*pa_context_get_sink_info_by_index(c, idx, on_sink_update, NULL);*/
+        /*}*/
+    /*}*/
 }
 
 backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {

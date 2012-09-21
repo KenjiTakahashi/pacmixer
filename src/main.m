@@ -13,6 +13,10 @@
                                              selector: @selector(removeWidget:)
                                                  name: @"controlDisappeared"
                                                object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(updateWidget:)
+                                                 name: @"controlChanged"
+                                               object: nil];
     tui = [[TUI alloc] init];
     middleware = [[Middleware alloc] init];
     //[middleware run];
@@ -37,6 +41,9 @@
     if(options != nil) {
         [w addOptions: options];
     }
+}
+
+-(void) updateWidget: (NSNotification*) notification {
 }
 
 -(void) removeWidget: (NSNotification*) notification {

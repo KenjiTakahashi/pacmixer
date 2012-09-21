@@ -40,6 +40,9 @@ void callback_func(void *self_, const char *name, const backend_channel_t *chann
     [pool drain];
 }
 
+void ucallback_func(void *self_, int i, const backend_channel_t *channels, uint8_t chnum) {
+}
+
 @implementation Middleware
 -(Middleware*) init {
     self = [super init];

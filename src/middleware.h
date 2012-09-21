@@ -25,6 +25,7 @@
 
 
 void callback_func(void*, const char*, const backend_channel_t*, uint8_t);
+void ucallback_func(void*, int, const backend_channel_t*, uint8_t);
 
 @interface Middleware: NSObject {
     context_t *context;

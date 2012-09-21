@@ -46,6 +46,7 @@ typedef struct CLIENT_CALLBACK {
 } client_callback_t;
 
 typedef void (*tcallback_func)(void*, const char*, const backend_channel_t*, uint8_t);
+typedef void (*tucallback_func)(void*, int, const backend_channel_t*, uint8_t);
 
 context_t *backend_new();
 int backend_init(context_t*, callback_t*);
@@ -54,6 +55,8 @@ void backend_destroy(context_t*);
 void _cb_state_changed(pa_context*, void*);
 void _cb_client(pa_context*, const pa_client_info*, int, void*);
 void _cb_sink(pa_context*, const pa_sink_info*, int, void*);
+//void _cb_u_sink(pa_context*, const pa_sink_info*, int, void*);
 void _cb_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
+void _cb_u_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 void _cb_event(pa_context*, pa_subscription_event_type_t, uint32_t, void*);
 backend_channel_t *_do_channels(pa_cvolume, uint8_t chnum);
