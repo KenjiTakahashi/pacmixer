@@ -1,17 +1,23 @@
 CCC=gcc -std=c99 -g
-CCFLAGS=-lgnustep-base -lobjc -lcurses -lpulse
+CCFLAGS=-lpulse
+OBJCFLAGS=-lgnustep-base -lobjc -lcurses
 OFLAGS=-fconstant-string-class=NSConstantString
-SOURCES=$(wildcard src/*.m) src/backend.c
+SOURCES=$(wildcard src/*.m)
 OBJECTS=$(SOURCES:.m=.o)
+CSOURCES=src/backend.c
+COBJECTS=$(CSOURCES:.c=.o)
 EXEC=pacmixer
 
-all: $(SOURCES) $(EXEC)
+all: $(CSOURCES) $(SOURCES) $(EXEC)
 
-$(EXEC): $(OBJECTS)
-	$(CCC) -o $@ $(OBJECTS) $(CCFLAGS)
+$(EXEC): $(OBJECTS) $(COBJECTS)
+	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(CCFLAGS) $(OBJCFLAGS)
 
 clean:
-	rm -rf $(OBJECTS) $(EXEC)
+	rm -rf $(OBJECTS) $(COBJECTS) $(EXEC)
 
 %.o: %.m
 	$(CCC) $(OFLAGS) -c -o $@ $^
+
+%.o: %.c
+	$(CCC) -c -o $@ $^

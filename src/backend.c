@@ -34,7 +34,6 @@ int backend_init(context_t *context, callback_t *callback) {
     pa_threaded_mainloop_start(context->loop);
     while(context->state != PA_CONTEXT_READY) {
         if(context->state == PA_CONTEXT_FAILED || context->state == PA_CONTEXT_TERMINATED) {
-            printf("failed to connect to PA server!\n");
             return -1;
         }
     }
@@ -60,8 +59,12 @@ void _cb_state_changed(pa_context *c, void *userdata) {
 
 void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
-        /*((tcallback_func)(callback->callback))(callback->self, info->name);*/
+        client_callback_t *client_callback = userdata;
+        callback_t *callback = client_callback->callback;
+        ((tcallback_func)(callback->callback))(callback->self, info->name, client_callback->channels, client_callback->chnum);
+        free(client_callback->channels);
+        free(client_callback);
+        free(callback);
     }
 }
 
@@ -69,13 +72,9 @@ void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) 
     if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         uint8_t chnum = info->volume.channels;
-        backend_channel_t channels[chnum];
-        for(int i = 0; i < chnum; ++i) {
-            channels[i].maxLevel = PA_VOLUME_UI_MAX;
-            channels[i].normLevel = PA_VOLUME_NORM;
-            channels[i].mutable = 1;
-        }
+        backend_channel_t *channels = _do_channels(info->volume, chnum);
         ((tcallback_func)(callback->callback))(callback->self, info->description, channels, chnum);
+        free(channels);
     }
 }
 
@@ -83,11 +82,27 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
     if(!eol && info->index != PA_INVALID_INDEX) {
         /* TODO: We'll need this info->name once status line is done. */
         if(info->client != PA_INVALID_INDEX) {
-            pa_context_get_client_info(c, info->client, _cb_client, userdata);
+            callback_t *callback = userdata;
+            uint8_t chnum = info->volume.channels;
+            backend_channel_t *channels = _do_channels(info->volume, chnum);
+            client_callback_t *client_callback = malloc(sizeof(client_callback_t));
+            client_callback->callback = callback;
+            client_callback->channels = channels;
+            client_callback->chnum = chnum;
+            pa_context_get_client_info(c, info->client, _cb_client, client_callback);
         }
     }
 }
 
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
-    printf("event\n");
+}
+
+backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
+    backend_channel_t *channels = malloc(chnum * sizeof(backend_channel_t));
+    for(int i = 0; i < chnum; ++i) {
+        channels[i].maxLevel = PA_VOLUME_UI_MAX;
+        channels[i].normLevel = PA_VOLUME_NORM;
+        channels[i].mutable = 1;
+    }
+    return channels;
 }
