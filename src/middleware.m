@@ -45,21 +45,21 @@ void callback_add_func(void *self_, const char *name, uint32_t idx, const backen
 void callback_update_func(void *self_, uint32_t idx, const backend_volume_t *volumes, uint8_t chnum) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
-    NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
     for(int i = 0; i < chnum; ++i) {
         NSNumber *lvl = [NSNumber numberWithInt: volumes[i].level];
         BOOL mut = volumes[i].mute == 1 ? YES : NO;
-        [ch addObject: [[volume_t alloc] initWithLevel: lvl
-                                               andMute: mut]];
+        NSNumber *id_ = [NSNumber numberWithInt: idx];
+        volume_t *v = [[volume_t alloc] initWithLevel: lvl
+                                              andMute: mut];
+        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+            v, @"volumes", nil];
+        NSString *nname = [NSString stringWithFormat:
+        @"%@%@%d", @"controlChanged", id_, i];
+        [[NSNotificationCenter defaultCenter] postNotificationName: nname
+                                                            object: self
+                                                          userInfo: s];
+        [v release];
     }
-    NSNumber *id_ = [NSNumber numberWithInt: idx];
-    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        ch, @"volumes", nil];
-    NSString *nname = [NSString stringWithFormat:
-        @"%@%@", @"controlChanged", id_];
-    [[NSNotificationCenter defaultCenter] postNotificationName: nname
-                                                        object: self
-                                                      userInfo: s];
     [pool release];
 }
 

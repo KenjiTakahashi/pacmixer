@@ -93,6 +93,12 @@
     [self print];
 }
 
+-(void) setLevelAndMuteN: (NSNotification*) notification {
+    volume_t *info = [[notification userInfo] objectForKey: @"volumes"];
+    [self setLevel: [[info level] intValue]
+           andMute: [info mute]];
+}
+
 -(void) setLevel: (int) level_
          andMute: (BOOL) mute_ {
     currentLevel = level_;
@@ -145,6 +151,7 @@
 @implementation Channels
 -(Channels*) initWithChannels: (NSArray*) channels_
                   andPosition: (int) position
+                        andId: (NSNumber*) id_
                     andParent: (WINDOW*) parent {
     self = [super init];
     highlight = 0;
@@ -196,8 +203,13 @@
                                              andNormLevel: [obj normLevel]
                                                   andMute: mute
                                                 andParent: win];
-        NSNumber *level = [NSNumber numberWithInt: 100]; // FIXME
-        [channel setLevel: 100];
+        SEL selector = @selector(setLevelAndMuteN:);
+        NSString *nname = [NSString stringWithFormat:
+            @"%@%@%d", @"controlChanged", id_, i];
+        [[NSNotificationCenter defaultCenter] addObserver: channel
+                                                 selector: selector
+                                                     name: nname
+                                                   object: nil];
         [channels addObject: channel];
     }
     touchwin(parent);
@@ -209,18 +221,6 @@
     delwin(win);
     [channels release];
     [super dealloc];
-}
-
--(void) setLevelsAndMutesN: (NSNotification*) notification {
-    [self setLevelsAndMutes: [[notification userInfo] objectForKey: @"volumes"]];
-}
-
--(void) setLevelsAndMutes: (NSArray*) levelsAndMutes {
-    for(int i = 0; i < [channels count]; ++i) {
-        volume_t *levelAndMute = [levelsAndMutes objectAtIndex: i];
-        [[channels objectAtIndex: i] setLevel: [[levelAndMute level] intValue]
-                                      andMute: [levelAndMute mute]];
-    }
 }
 
 -(void) setMute: (BOOL) mute forChannel: (int) channel {
@@ -432,6 +432,7 @@
     int position_ = (width - width_) / 2;
     Channels *control = [[Channels alloc] initWithChannels: channels
                                                andPosition: position_
+                                                     andId: internalId
                                                  andParent: win];
     [controls addObject: control];
     [control release];

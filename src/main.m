@@ -33,13 +33,6 @@
     NSArray *channels = [info objectForKey: @"channels"];
     if(channels != nil) {
         Channels *channelsW = [w addChannels: channels];
-        NSString *nname = [NSString stringWithFormat:
-            @"%@%@", @"controlChanged", id_];
-        SEL selector = @selector(setLevelsAndMutesN:);
-        [[NSNotificationCenter defaultCenter] addObserver: channelsW
-                                                 selector: selector
-                                                     name: nname
-                                                   object: nil];
     }
     NSArray *options = [info objectForKey: @"options"];
     if(options != nil) {
