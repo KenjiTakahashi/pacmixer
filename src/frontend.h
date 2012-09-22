@@ -108,6 +108,7 @@
         int height;
         int width;
         NSString *name;
+        NSNumber *internalId;
         NSMutableArray *controls;
         BOOL highlighted;
         int highlight;
@@ -115,7 +116,8 @@
 }
 
 -(Widget*) initWithPosition: (int) p
-                    andName: (NSString*) name_;
+                    andName: (NSString*) name_
+                      andId: (NSNumber*) id_;
 -(void) dealloc;
 -(void) printWithWidth: (int) width_;
 -(void) printName;
@@ -134,6 +136,7 @@
 -(int) width;
 -(int) endPosition;
 -(NSString*) name;
+-(NSNumber*) internalId;
 @end
 
 
@@ -188,8 +191,9 @@ typedef enum {
 
 -(TUI*) init;
 -(void) dealloc;
--(Widget*) addWidgetWithName: (NSString*) name;
--(void) removeWidget: (NSString*) name;
+-(Widget*) addWidgetWithName: (NSString*) name
+                       andId: (NSNumber*) id_;
+-(void) removeWidget: (NSNumber*) id_;
 -(void) setCurrent: (int) i;
 -(void) previous;
 -(void) next;

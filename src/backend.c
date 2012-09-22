@@ -61,10 +61,9 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
     if(!eol && info->index != PA_INVALID_INDEX) {
         client_callback_t *client_callback = userdata;
         callback_t *callback = client_callback->callback;
-        ((tcallback_func)(callback->callback))(callback->self, info->name, client_callback->channels, client_callback->chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, info->name, client_callback->index, client_callback->channels, client_callback->chnum);
         free(client_callback->channels);
         free(client_callback);
-        free(callback);
     }
 }
 
@@ -73,7 +72,7 @@ void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) 
         callback_t *callback = userdata;
         uint8_t chnum = info->volume.channels;
         backend_channel_t *channels = _do_channels(info->volume, chnum);
-        ((tcallback_func)(callback->callback))(callback->self, info->description, channels, chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, info->description, info->index, channels, chnum);
         free(channels);
     }
 }
@@ -89,6 +88,7 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
             client_callback->callback = callback;
             client_callback->channels = channels;
             client_callback->chnum = chnum;
+            client_callback->index = info->index;
             pa_context_get_client_info(c, info->client, _cb_client, client_callback);
         }
     }
@@ -102,15 +102,14 @@ void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, vo
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
     if(t__ == PA_SUBSCRIPTION_EVENT_SINK_INPUT) {
-        /* sink input changed */
         int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
         if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
-            pa_context_get_sink_input_info(c, idx, _cb_u_sink_input, NULL);
+            pa_context_get_sink_input_info(c, idx, _cb_u_sink_input, userdata);
         }
-        /* sink input removed */
-        /*if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {*/
-        /*}*/
-        /* sink input added */
+        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
+            callback_t *callback = userdata;
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
+        }
         if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
             pa_context_get_sink_input_info(c, idx, _cb_sink_input, userdata);
         }

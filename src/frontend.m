@@ -363,12 +363,14 @@
 
 @implementation Widget
 -(Widget*) initWithPosition: (int) p
-                    andName: (NSString*) name_ {
+                    andName: (NSString*) name_
+                      andId: (NSNumber*) id_ {
     self = [super init];
     highlight = 0;
     controls = [[NSMutableArray alloc] init];
     position = p;
     name = [name_ copy];
+    internalId = [id_ copy];
     [self printWithWidth: 8];
     return self;
 }
@@ -376,6 +378,7 @@
 -(void) dealloc {
     [controls release];
     [name release];
+    [internalId release];
     delwin(win);
     [super dealloc];
 }
@@ -551,6 +554,10 @@
 -(NSString*) name {
     return name;
 }
+
+-(NSNumber*) internalId {
+    return internalId;
+}
 @end
 
 
@@ -701,10 +708,12 @@
     [super dealloc];
 }
 
--(Widget*) addWidgetWithName: (NSString*) name {
+-(Widget*) addWidgetWithName: (NSString*) name
+                       andId: (NSNumber*) id_ {
     int x = [[widgets lastObject] endPosition] + 1;
     Widget *widget = [[Widget alloc] initWithPosition: x
-                                              andName: name];
+                                              andName: name
+                                                andId: id_];
     if(x == 1) {
         [widget setHighlighted: YES];
     }
@@ -713,12 +722,12 @@
     return widget;
 }
 
--(void) removeWidget: (NSString*) name {
+-(void) removeWidget: (NSNumber*) id_ {
     int width = 0;
     NSArray *copy = [widgets copy];
     for(int i = 0; i < [copy count]; ++i) {
         id widget = [copy objectAtIndex: i];
-        if([[widget name] isEqualToString: name]) {
+        if([[widget internalId] isEqualToNumber: id_]) {
             width = [widget width];
             [widgets removeObjectAtIndex: i];
         } else if(width) {

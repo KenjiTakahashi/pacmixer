@@ -32,7 +32,8 @@
 
 -(void) addWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
-    Widget *w = [tui addWidgetWithName: [info objectForKey: @"name"]];
+    Widget *w = [tui addWidgetWithName: [info objectForKey: @"name"]
+                                 andId: [info objectForKey: @"id"]];
     NSArray *channels = [info objectForKey: @"channels"];
     if(channels != nil) {
         [w addChannels: channels];
@@ -48,7 +49,7 @@
 
 -(void) removeWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
-    [tui removeWidget: [info objectForKey: @"name"]];
+    [tui removeWidget: [info objectForKey: @"id"]];
 }
 
 -(void) run {

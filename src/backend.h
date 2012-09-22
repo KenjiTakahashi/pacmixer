@@ -20,6 +20,7 @@
 #include <pulse/pulseaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <curses.h>
 
 
 typedef struct CONTEXT {
@@ -29,7 +30,8 @@ typedef struct CONTEXT {
 } context_t;
 
 typedef struct CALLBACK {
-    void *callback;
+    void *add;
+    void *remove;
     void *self;
 } callback_t;
 
@@ -43,10 +45,12 @@ typedef struct CLIENT_CALLBACK {
     callback_t *callback;
     backend_channel_t *channels;
     uint8_t chnum;
+    uint32_t index;
 } client_callback_t;
 
-typedef void (*tcallback_func)(void*, const char*, const backend_channel_t*, uint8_t);
+typedef void (*tcallback_add_func)(void*, const char*, uint32_t, const backend_channel_t*, uint8_t);
 typedef void (*tucallback_func)(void*, int, const backend_channel_t*, uint8_t);
+typedef void (*tcallback_remove_func)(void*, uint32_t);
 
 context_t *backend_new();
 int backend_init(context_t*, callback_t*);
