@@ -47,10 +47,6 @@
     }
 }
 
--(void) updateWidget: (NSNotification*) notification {
-    NSDictionary *info = [notification userInfo];
-}
-
 -(void) removeWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
     [tui removeWidget: [info objectForKey: @"id"]];

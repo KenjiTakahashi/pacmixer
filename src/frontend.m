@@ -23,11 +23,9 @@
               andMaxLevel: (NSNumber*) mlevel_
              andNormLevel: (NSNumber*) nlevel_
                   andMute: (NSNumber*) mute_
-             andPrintMute: (BOOL) printMute_
                 andParent: (WINDOW*) parent {
     self = [super init];
     int mx;
-    printMute = printMute_;
     getmaxyx(parent, my, mx);
     my -= 1;
     win = derwin(parent, my, 1, 0, i + 1);
@@ -57,7 +55,7 @@
         mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
     }
     int currentPos = my - 1;
-    if(printMute) {
+    if(mutable) {
         currentPos -= 2;
     }
     float dy = (float)currentPos / (float)maxLevel;
@@ -197,7 +195,6 @@
                                               andMaxLevel: [obj maxLevel]
                                              andNormLevel: [obj normLevel]
                                                   andMute: mute
-                                             andPrintMute: hasMute
                                                 andParent: win];
         NSNumber *level = [NSNumber numberWithInt: 100]; // FIXME
         [channel setLevel: 100];

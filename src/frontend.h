@@ -34,7 +34,6 @@
         int delta;
         BOOL mute;
         BOOL mutable;
-        BOOL printMute;
         BOOL inside;
 }
 
@@ -42,7 +41,6 @@
               andMaxLevel: (NSNumber*) mlevel_
              andNormLevel: (NSNumber*) nlevel_
                   andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
-             andPrintMute: (BOOL) printMute_
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
