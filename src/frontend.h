@@ -19,6 +19,7 @@
 #import <Foundation/NSArray.h>
 #import <Foundation/NSString.h>
 #import <Foundation/NSDecimalNumber.h>
+#import <Foundation/NSNotification.h>
 #import <curses.h>
 #import "types.h"
 
@@ -47,6 +48,7 @@
 -(void) print;
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
+-(void) setLevel: (int) level_ andMute: (BOOL) mute_;
 -(void) inside;
 -(void) outside;
 -(void) up;
@@ -68,8 +70,8 @@
                   andPosition: (int) position
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
--(void) setMute: (BOOL) mute;
--(void) setLevel: (int) level;
+-(void) setLevelsAndMutesN: (NSNotification*) notification;
+-(void) setLevelsAndMutes: (NSArray*) levelsAndMutes;
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
 -(BOOL) previous;

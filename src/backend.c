@@ -62,7 +62,9 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
         client_callback_t *client_callback = userdata;
         callback_t *callback = client_callback->callback;
         ((tcallback_add_func)(callback->add))(callback->self, info->name, client_callback->index, client_callback->channels, client_callback->chnum);
+        ((tcallback_update_func)(callback->update))(callback->self, client_callback->index, client_callback->volumes, client_callback->chnum);
         free(client_callback->channels);
+        free(client_callback->volumes);
         free(client_callback);
     }
 }
@@ -73,7 +75,15 @@ void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) 
         uint8_t chnum = info->volume.channels;
         backend_channel_t *channels = _do_channels(info->volume, chnum);
         ((tcallback_add_func)(callback->add))(callback->self, info->description, info->index, channels, chnum);
+        backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);
+        ((tcallback_update_func)(callback->update))(callback->self, info->index, volumes, chnum);
         free(channels);
+        free(volumes);
+    }
+}
+
+void _cb_u_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
+    if(!eol && info->index != PA_INVALID_INDEX) {
     }
 }
 
@@ -84,9 +94,11 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
             callback_t *callback = userdata;
             uint8_t chnum = info->volume.channels;
             backend_channel_t *channels = _do_channels(info->volume, chnum);
+            backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);
             client_callback_t *client_callback = malloc(sizeof(client_callback_t));
             client_callback->callback = callback;
             client_callback->channels = channels;
+            client_callback->volumes = volumes;
             client_callback->chnum = chnum;
             client_callback->index = info->index;
             pa_context_get_client_info(c, info->client, _cb_client, client_callback);
@@ -96,6 +108,11 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
 
 void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
+        callback_t *callback = userdata;
+        uint8_t chnum = info->volume.channels;
+        backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);
+        ((tcallback_update_func)(callback->update))(callback->self, info->index, volumes, chnum);
+        free(volumes);
     }
 }
 
@@ -114,13 +131,12 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
             pa_context_get_sink_input_info(c, idx, _cb_sink_input, userdata);
         }
     }
-    /*if((t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK) == PA_SUBSCRIPTION_EVENT_SINK) {*/
-        /*[> sink changed <]*/
-        /*if((t & PA_SUBSCRIPTION_EVENT_TYPE_MASK) == PA_SUBSCRIPTION_EVENT_CHANGE) {*/
-            /*if(idx != PA_INVALID_INDEX)*/
-                /*pa_context_get_sink_info_by_index(c, idx, on_sink_update, NULL);*/
-        /*}*/
-    /*}*/
+    if(t__ == PA_SUBSCRIPTION_EVENT_SINK) {
+        int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
+        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
+            pa_context_get_sink_info_by_index(c, idx, _cb_u_sink, userdata);
+        }
+    }
 }
 
 backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
@@ -131,4 +147,13 @@ backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
         channels[i].mutable = 1;
     }
     return channels;
+}
+
+backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
+    backend_volume_t *volumes = malloc(chnum * sizeof(backend_volume_t));
+    for(int i = 0; i < chnum; ++i) {
+        volumes[i].level = volume.values[i];
+        volumes[i].mute = mute;
+    }
+    return volumes;
 }

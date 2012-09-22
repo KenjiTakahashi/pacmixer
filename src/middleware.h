@@ -25,7 +25,7 @@
 
 
 void callback_add_func(void*, const char*, uint32_t, const backend_channel_t*, uint8_t);
-void ucallback_func(void*, int, const backend_channel_t*, uint8_t);
+void callback_update_func(void*, uint32_t, const backend_volume_t*, uint8_t);
 void callback_remove_func(void*, uint32_t);
 
 @interface Middleware: NSObject {

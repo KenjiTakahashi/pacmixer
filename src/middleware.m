@@ -21,6 +21,7 @@
 void callback_add_func(void *self_, const char *name, uint32_t idx, const backend_channel_t *channels, uint8_t chnum) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
+    [self retain];
     NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
     for(int i = 0; i < chnum; ++i) {
         NSNumber *lvl = [NSNumber numberWithInt: channels[i].maxLevel];
@@ -38,10 +39,28 @@ void callback_add_func(void *self_, const char *name, uint32_t idx, const backen
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
-    [pool drain];
+    [pool release];
 }
 
-void ucallback_func(void *self_, int i, const backend_channel_t *channels, uint8_t chnum) {
+void callback_update_func(void *self_, uint32_t idx, const backend_volume_t *volumes, uint8_t chnum) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    Middleware *self = self_;
+    NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
+    for(int i = 0; i < chnum; ++i) {
+        NSNumber *lvl = [NSNumber numberWithInt: volumes[i].level];
+        BOOL mut = volumes[i].mute == 1 ? YES : NO;
+        [ch addObject: [[volume_t alloc] initWithLevel: lvl
+                                               andMute: mut]];
+    }
+    NSNumber *id_ = [NSNumber numberWithInt: idx];
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        ch, @"volumes", nil];
+    NSString *nname = [NSString stringWithFormat:
+        @"%@%@", @"controlChanged", id_];
+    [[NSNotificationCenter defaultCenter] postNotificationName: nname
+                                                        object: self
+                                                      userInfo: s];
+    [pool release];
 }
 
 void callback_remove_func(void *self_, uint32_t idx) {
@@ -53,7 +72,7 @@ void callback_remove_func(void *self_, uint32_t idx) {
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
-    [pool drain];
+    [pool release];
 }
 
 @implementation Middleware
@@ -62,6 +81,7 @@ void callback_remove_func(void *self_, uint32_t idx) {
     context = backend_new();
     callback = malloc(sizeof(callback_t));
     callback->add = callback_add_func;
+    callback->update = callback_update_func;
     callback->remove = callback_remove_func;
     callback->self = self;
     backend_init(context, callback);

@@ -95,6 +95,13 @@
     [self print];
 }
 
+-(void) setLevel: (int) level_
+         andMute: (BOOL) mute_ {
+    currentLevel = level_;
+    mute = mute_;
+    [self print];
+}
+
 -(void) inside {
     wattron(win, A_BLINK);
     [self print];
@@ -207,15 +214,15 @@
     [super dealloc];
 }
 
--(void) setMute: (BOOL) mute {
-    for(int i = 0; i < [channels count]; ++i) {
-        [self setMute: mute forChannel: i];
-    }
+-(void) setLevelsAndMutesN: (NSNotification*) notification {
+    [self setLevelsAndMutes: [[notification userInfo] objectForKey: @"volumes"]];
 }
 
--(void) setLevel: (int) level {
+-(void) setLevelsAndMutes: (NSArray*) levelsAndMutes {
     for(int i = 0; i < [channels count]; ++i) {
-        [self setLevel: level forChannel: i];
+        volume_t *levelAndMute = [levelsAndMutes objectAtIndex: i];
+        [[channels objectAtIndex: i] setLevel: [[levelAndMute level] intValue]
+                                      andMute: [levelAndMute mute]];
     }
 }
 

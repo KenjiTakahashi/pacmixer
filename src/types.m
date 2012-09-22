@@ -24,3 +24,22 @@
     return mutable;
 }
 @end
+
+
+@implementation volume_t
+-(volume_t*) initWithLevel: (NSNumber*) level_
+                  andMute: (BOOL) mute_ {
+    self = [super init];
+    level = level_;
+    mute = mute_;
+    return self;
+}
+
+-(NSNumber*) level {
+    return level;
+}
+
+-(BOOL) mute {
+    return mute;
+}
+@end

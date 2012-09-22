@@ -13,13 +13,8 @@
                                              selector: @selector(removeWidget:)
                                                  name: @"controlDisappeared"
                                                object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(updateWidget:)
-                                                 name: @"controlChanged"
-                                               object: nil];
     tui = [[TUI alloc] init];
     middleware = [[Middleware alloc] init];
-    //[middleware run];
     return self;
 }
 
@@ -32,11 +27,19 @@
 
 -(void) addWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
+    NSNumber *id_ = [info objectForKey: @"id"];
     Widget *w = [tui addWidgetWithName: [info objectForKey: @"name"]
-                                 andId: [info objectForKey: @"id"]];
+                                 andId: id_];
     NSArray *channels = [info objectForKey: @"channels"];
     if(channels != nil) {
-        [w addChannels: channels];
+        Channels *channelsW = [w addChannels: channels];
+        NSString *nname = [NSString stringWithFormat:
+            @"%@%@", @"controlChanged", id_];
+        SEL selector = @selector(setLevelsAndMutesN:);
+        [[NSNotificationCenter defaultCenter] addObserver: channelsW
+                                                 selector: selector
+                                                     name: nname
+                                                   object: nil];
     }
     NSArray *options = [info objectForKey: @"options"];
     if(options != nil) {
@@ -45,6 +48,7 @@
 }
 
 -(void) updateWidget: (NSNotification*) notification {
+    NSDictionary *info = [notification userInfo];
 }
 
 -(void) removeWidget: (NSNotification*) notification {

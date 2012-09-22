@@ -31,6 +31,7 @@ typedef struct CONTEXT {
 
 typedef struct CALLBACK {
     void *add;
+    void *update;
     void *remove;
     void *self;
 } callback_t;
@@ -41,15 +42,21 @@ typedef struct BACKEND_CHANNEL {
     int mutable;
 } backend_channel_t;
 
+typedef struct BACKEND_VOLUME {
+    int level;
+    int mute;
+} backend_volume_t;
+
 typedef struct CLIENT_CALLBACK {
     callback_t *callback;
     backend_channel_t *channels;
+    backend_volume_t *volumes;
     uint8_t chnum;
     uint32_t index;
 } client_callback_t;
 
 typedef void (*tcallback_add_func)(void*, const char*, uint32_t, const backend_channel_t*, uint8_t);
-typedef void (*tucallback_func)(void*, int, const backend_channel_t*, uint8_t);
+typedef void (*tcallback_update_func)(void*, uint32_t, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_remove_func)(void*, uint32_t);
 
 context_t *backend_new();
@@ -59,8 +66,9 @@ void backend_destroy(context_t*);
 void _cb_state_changed(pa_context*, void*);
 void _cb_client(pa_context*, const pa_client_info*, int, void*);
 void _cb_sink(pa_context*, const pa_sink_info*, int, void*);
-//void _cb_u_sink(pa_context*, const pa_sink_info*, int, void*);
+void _cb_u_sink(pa_context*, const pa_sink_info*, int, void*);
 void _cb_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 void _cb_u_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 void _cb_event(pa_context*, pa_subscription_event_type_t, uint32_t, void*);
 backend_channel_t *_do_channels(pa_cvolume, uint8_t chnum);
+backend_volume_t *_do_volumes(pa_cvolume, uint8_t chnum, int mute);
