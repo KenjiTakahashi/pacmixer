@@ -18,11 +18,12 @@
 #import "middleware.h"
 
 
-void callback_add_func(void *self_, const char *name, uint32_t idx, const backend_channel_t *channels, uint8_t chnum) {
+void callback_add_func(void *self_, const char *name, backend_entry_type type, uint32_t idx, const backend_channel_t *channels, uint8_t chnum) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     [self retain];
     NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     for(int i = 0; i < chnum; ++i) {
         NSNumber *lvl = [NSNumber numberWithInt: channels[i].maxLevel];
         NSNumber *nlvl = [NSNumber numberWithInt: channels[i].normLevel];
@@ -31,22 +32,32 @@ void callback_add_func(void *self_, const char *name, uint32_t idx, const backen
                                               andNormLevel: nlvl
                                                 andMutable: mut]];
         Block *block = [self addBlockWithId: idx
-                                   andIndex: i];
+                                   andIndex: i
+                                    andType: type];
         NSString *sname = [NSString stringWithFormat:
             @"%@%d%d", @"volumeChanged", idx, i];
-        [[NSNotificationCenter defaultCenter] addObserver: block
-                                                 selector: @selector(setVolume:)
-                                                     name: sname
-                                                   object: nil];
+        [center addObserver: block
+                   selector: @selector(setVolume:)
+                       name: sname
+                     object: nil];
     }
+    Block *block = [self addBlockWithId: idx
+                               andIndex: -1
+                                andType: type];
+    NSString *sname = [NSString stringWithFormat:
+        @"%@%d", @"volumeChanged", idx];
+    [center addObserver: block
+               selector: @selector(setVolumes:)
+                   name: sname
+                 object: nil];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSString stringWithUTF8String: name], @"name",
         [NSNumber numberWithInt: idx], @"id",
-        ch, @"channels",  nil];
+        ch, @"channels", [NSNumber numberWithInt: type], @"type",  nil];
     NSString *nname = [NSString stringWithString: @"controlAppeared"];
-    [[NSNotificationCenter defaultCenter] postNotificationName: nname
-                                                        object: self
-                                                      userInfo: s];
+    [center postNotificationName: nname
+                          object: self
+                        userInfo: s];
     [pool release];
 }
 
@@ -86,17 +97,29 @@ void callback_remove_func(void *self_, uint32_t idx) {
 @implementation Block
 -(Block*) initWithContext: (context_t*) context_
                     andId: (uint32_t) idx_
-                 andIndex: (int) i_ {
+                 andIndex: (int) i_
+                  andType: (backend_entry_type) type_ {
     self = [super init];
+    context = context_;
     idx = idx_;
     i = i_;
-    context = context_;
+    type = type_;
     return self;
 }
 
 -(void) setVolume: (NSNotification*) notification {
     NSNumber *v = [[notification userInfo] objectForKey: @"volume"];
-    backend_volume_set(context, idx, i, [v intValue]);
+    backend_volume_set(context, type, idx, i, [v intValue]);
+}
+
+-(void) setVolumes: (NSNotification*) notification {
+    NSArray *v = [[notification userInfo] objectForKey: @"volume"];
+    int count = [v count];
+    int *values = malloc(count * sizeof(int));
+    for(int j = 0; j < count; ++j) {
+        values[j] = [[v objectAtIndex: j] intValue];
+    }
+    backend_volume_setall(context, type, idx, values);
 }
 @end
 
@@ -122,10 +145,12 @@ void callback_remove_func(void *self_, uint32_t idx) {
 }
 
 -(Block*) addBlockWithId: (uint32_t) idx
-                andIndex: (int) i {
+                andIndex: (int) i
+                 andType: (backend_entry_type) type {
     Block *block = [[Block alloc] initWithContext: context
                                             andId: idx
-                                         andIndex: i];
+                                         andIndex: i
+                                          andType: type];
     [blocks addObject: block];
     [block release];
     return block;

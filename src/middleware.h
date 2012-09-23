@@ -25,7 +25,7 @@
 #import "backend.h"
 
 
-void callback_add_func(void*, const char*, uint32_t, const backend_channel_t*, uint8_t);
+void callback_add_func(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, uint8_t);
 void callback_update_func(void*, uint32_t, const backend_volume_t*, uint8_t);
 void callback_remove_func(void*, uint32_t);
 
@@ -34,12 +34,15 @@ void callback_remove_func(void*, uint32_t);
         context_t *context;
         uint32_t idx;
         int i;
+        backend_entry_type type;
 }
 
 -(Block*) initWithContext: (context_t*) context_
                     andId: (uint32_t) idx_
-                 andIndex: (int) i_;
+                 andIndex: (int) i_
+                  andType: (backend_entry_type) type_;
 -(void) setVolume: (NSNotification*) notification;
+-(void) setVolumes: (NSNotification*) notification;
 @end
 
 @interface Middleware: NSObject {
@@ -52,5 +55,6 @@ void callback_remove_func(void*, uint32_t);
 -(Middleware*) init;
 -(void) dealloc;
 -(Block*) addBlockWithId: (uint32_t) idx
-                andIndex: (int) i;
+                andIndex: (int) i
+                 andType: (backend_entry_type) type;
 @end

@@ -94,11 +94,17 @@
 -(void) setLevel: (int) level_ {
     currentLevel = level_;
     [self print];
-    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithInt: currentLevel], @"volume", nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName: signal
-                                                        object: self
-                                                      userInfo: s];
+    if(propagate) {
+        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSNumber numberWithInt: currentLevel], @"volume", nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName: signal
+                                                            object: self
+                                                          userInfo: s];
+    }
+}
+
+-(int) level {
+    return currentLevel;
 }
 
 -(void) setLevelAndMuteN: (NSNotification*) notification {
@@ -114,6 +120,10 @@
     [self print];
 }
 
+-(void) setPropagation: (BOOL) p {
+    propagate = p;
+}
+
 -(void) inside {
     wattron(win, A_BLINK);
     [self print];
@@ -125,14 +135,18 @@
 }
 
 -(void) up {
-    if(currentLevel < maxLevel) {
+    if(currentLevel < maxLevel + delta) {
         [self setLevel: currentLevel + delta];
+    } else if(currentLevel < maxLevel) {
+        [self setLevel: maxLevel];
     }
 }
 
 -(void) down {
-    if(currentLevel > 0) { // TODO: is minLevel always == 0?
+    if(currentLevel > delta) {
         [self setLevel: currentLevel - delta];
+    } else if(currentLevel > 0) {
+        [self setLevel: 0];
     }
 }
 
@@ -197,6 +211,8 @@
         mvwhline(win, my - 3, 1, 0, mx - 2);
         mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
     }
+    signal = [[NSString alloc] initWithFormat:
+        @"%@%@", @"volumeChanged", id_];
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
@@ -208,13 +224,13 @@
         }
         NSString *bname = [NSString stringWithFormat:
             @"%@%d", id_, i];
-        NSString *signal = [NSString stringWithFormat:
+        NSString *csignal = [NSString stringWithFormat:
             @"%@%@", @"volumeChanged", bname];
         Channel *channel = [[Channel alloc] initWithIndex: i
                                               andMaxLevel: [obj maxLevel]
                                              andNormLevel: [obj normLevel]
                                                   andMute: mute
-                                                andSignal: signal
+                                                andSignal: csignal
                                                 andParent: win];
         SEL selector = @selector(setLevelAndMuteN:);
         NSString *nname = [NSString stringWithFormat:
@@ -233,6 +249,7 @@
 -(void) dealloc {
     delwin(win);
     [channels release];
+    [signal release];
     [super dealloc];
 }
 
@@ -242,6 +259,14 @@
 
 -(void) setLevel: (int) level forChannel: (int) channel {
     [[channels objectAtIndex: channel] setLevel: level];
+}
+
+-(void) notify: (NSArray*) values {
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        values, @"volume", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: signal
+                                                        object: self
+                                                      userInfo: s];
 }
 
 -(BOOL) previous {
@@ -268,9 +293,16 @@
     if(inside) {
         [[channels objectAtIndex: highlight] up];
     } else {
-        for(int i = 0; i < [channels count]; ++i) {
-            [[channels objectAtIndex: i] up];
+        int count = [channels count];
+        NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
+        for(int i = 0; i < count; ++i) {
+            Channel *channel = [channels objectAtIndex: i];
+            [channel setPropagation: NO];
+            [channel up];
+            [values addObject: [NSNumber numberWithInt: [channel level]]];
+            [channel setPropagation: YES];
         }
+        [self notify: values];
     }
 }
 
@@ -278,9 +310,16 @@
     if(inside) {
         [[channels objectAtIndex: highlight] down];
     } else {
-        for(int i = 0; i < [channels count]; ++i) {
-            [[channels objectAtIndex: i] down];
+        int count = [channels count];
+        NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
+        for(int i = 0; i < count; ++i) {
+            Channel *channel = [channels objectAtIndex: i];
+            [channel setPropagation: NO];
+            [channel down];
+            [values addObject: [NSNumber numberWithInt: [channel level]]];
+            [channel setPropagation: YES];
         }
+        [self notify: values];
     }
 }
 

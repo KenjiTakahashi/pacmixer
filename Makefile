@@ -1,4 +1,4 @@
-CCC=gcc -std=c99 -g
+CCC=gcc -std=c99
 CCFLAGS=-lpulse
 OBJCFLAGS=-lgnustep-base -lobjc -lcurses
 OFLAGS=-fconstant-string-class=NSConstantString
@@ -8,7 +8,10 @@ CSOURCES=src/backend.c
 COBJECTS=$(CSOURCES:.c=.o)
 EXEC=pacmixer
 
+all: CCC += -O2
 all: $(CSOURCES) $(SOURCES) $(EXEC)
+debug: CCC += -g -O0
+debug: $(CSOURCES) $(SOURCES) $(EXEC)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)
 	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(CCFLAGS) $(OBJCFLAGS)
