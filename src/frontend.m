@@ -168,6 +168,10 @@
         }
     }
 }
+
+-(BOOL) isMuted {
+    return mute;
+}
 @end
 
 
@@ -212,8 +216,7 @@
         mvwhline(win, my - 3, 1, 0, mx - 2);
         mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
     }
-    signal = [[NSString alloc] initWithFormat:
-        @"%@%@", @"volumeChanged", id_];
+    internalId = [id_ copy];
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
@@ -250,7 +253,7 @@
 -(void) dealloc {
     delwin(win);
     [channels release];
-    [signal release];
+    [internalId release];
     [super dealloc];
 }
 
@@ -263,9 +266,11 @@
 }
 
 -(void) notify: (NSArray*) values {
+    NSString *nname = [NSString stringWithFormat:
+        @"%@%@", @"volumeChanged", internalId];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         values, @"volume", nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName: signal
+    [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
 }
@@ -345,13 +350,17 @@
 }
 
 -(void) mute {
-    if(inside) {
-        [[channels objectAtIndex: highlight] mute];
-    } else {
-        for(int i = 0; i < [channels count]; ++i) {
-            [[channels objectAtIndex: i] mute];
-        }
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] mute];
     }
+    NSString *nname = [NSString stringWithFormat:
+        @"%@%@", @"muteChanged", internalId];
+    BOOL muted = [[channels objectAtIndex: 0] isMuted];
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithBool: muted], @"mute", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: nname
+                                                        object: self
+                                                      userInfo: s];
 }
 @end
 

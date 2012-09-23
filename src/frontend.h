@@ -60,6 +60,7 @@
 -(void) down;
 -(void) moveLeftBy: (int) p;
 -(void) mute;
+-(BOOL) isMuted;
 @end
 
 
@@ -69,7 +70,7 @@
         NSMutableArray *channels;
         BOOL inside;
         int highlight;
-        NSString *signal;
+        NSNumber *internalId;
 }
 
 -(Channels*) initWithChannels: (NSArray*) channels_

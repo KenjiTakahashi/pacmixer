@@ -43,6 +43,7 @@ void callback_remove_func(void*, uint32_t);
                   andType: (backend_entry_type) type_;
 -(void) setVolume: (NSNotification*) notification;
 -(void) setVolumes: (NSNotification*) notification;
+-(void) setMute: (NSNotification*) notification;
 @end
 
 @interface Middleware: NSObject {

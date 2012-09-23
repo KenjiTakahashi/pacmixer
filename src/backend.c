@@ -82,6 +82,17 @@ void backend_volume_setall(context_t *c, backend_entry_type type, uint32_t idx, 
     }
 }
 
+void backend_mute_set(context_t* c, backend_entry_type type, uint32_t idx, int v) {
+    switch(type) {
+        case SINK:
+            pa_context_set_sink_mute_by_index(c->context, idx, v, NULL, NULL);
+            break;
+        case SINK_INPUT:
+            pa_context_set_sink_input_mute(c->context, idx, v, NULL, NULL);
+            break;
+    }
+}
+
 void _cb_state_changed(pa_context *c, void *userdata) {
     pa_context_state_t *_pa_state = userdata;
     *_pa_state = pa_context_get_state(c);

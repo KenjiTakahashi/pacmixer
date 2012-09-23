@@ -50,6 +50,12 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
                selector: @selector(setVolumes:)
                    name: sname
                  object: nil];
+    NSString *mname = [NSString stringWithFormat:
+        @"%@%d", @"muteChanged", idx];
+    [center addObserver: block
+               selector: @selector(setMute:)
+                   name: mname
+                 object: nil];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSString stringWithUTF8String: name], @"name",
         [NSNumber numberWithInt: idx], @"id",
@@ -120,6 +126,11 @@ void callback_remove_func(void *self_, uint32_t idx) {
         values[j] = [[v objectAtIndex: j] intValue];
     }
     backend_volume_setall(context, type, idx, values, count);
+}
+
+-(void) setMute: (NSNotification*) notification {
+    BOOL v = [[[notification userInfo] objectForKey: @"mute"] boolValue];
+    backend_mute_set(context, type, idx, v ? 1 : 0);
 }
 @end
 
