@@ -62,6 +62,7 @@ typedef void (*tcallback_remove_func)(void*, uint32_t);
 context_t *backend_new();
 int backend_init(context_t*, callback_t*);
 void backend_destroy(context_t*);
+void backend_volume_set(context_t*, uint32_t idx, int i, int v);
 
 void _cb_state_changed(pa_context*, void*);
 void _cb_client(pa_context*, const pa_client_info*, int, void*);

@@ -52,6 +52,9 @@ void backend_destroy(context_t *context) {
     free(context);
 }
 
+void backend_volume_set(context_t *c, uint32_t idx, int i, int v) {
+}
+
 void _cb_state_changed(pa_context *c, void *userdata) {
     pa_context_state_t *_pa_state = userdata;
     *_pa_state = pa_context_get_state(c);

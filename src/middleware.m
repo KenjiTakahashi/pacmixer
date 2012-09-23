@@ -30,6 +30,14 @@ void callback_add_func(void *self_, const char *name, uint32_t idx, const backen
         [ch addObject: [[channel_t alloc] initWithMaxLevel: lvl
                                               andNormLevel: nlvl
                                                 andMutable: mut]];
+        Block *block = [self addBlockWithId: idx
+                                   andIndex: i];
+        NSString *sname = [NSString stringWithFormat:
+            @"%@%d%d", @"volumeChanged", idx, i];
+        [[NSNotificationCenter defaultCenter] addObserver: block
+                                                 selector: @selector(setVolume:)
+                                                     name: sname
+                                                   object: nil];
     }
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSString stringWithUTF8String: name], @"name",
@@ -75,9 +83,27 @@ void callback_remove_func(void *self_, uint32_t idx) {
     [pool release];
 }
 
+@implementation Block
+-(Block*) initWithContext: (context_t*) context_
+                    andId: (uint32_t) idx_
+                 andIndex: (int) i_ {
+    self = [super init];
+    idx = idx_;
+    i = i_;
+    context = context_;
+    return self;
+}
+
+-(void) setVolume: (NSNotification*) notification {
+    NSNumber *v = [[notification userInfo] objectForKey: @"volume"];
+    backend_volume_set(context, idx, i, [v intValue]);
+}
+@end
+
 @implementation Middleware
 -(Middleware*) init {
     self = [super init];
+    blocks = [[NSMutableArray alloc] init];
     context = backend_new();
     callback = malloc(sizeof(callback_t));
     callback->add = callback_add_func;
@@ -89,8 +115,19 @@ void callback_remove_func(void *self_, uint32_t idx) {
 }
 
 -(void) dealloc {
+    [blocks release];
     backend_destroy(context);
     free(callback);
     [super dealloc];
+}
+
+-(Block*) addBlockWithId: (uint32_t) idx
+                andIndex: (int) i {
+    Block *block = [[Block alloc] initWithContext: context
+                                            andId: idx
+                                         andIndex: i];
+    [blocks addObject: block];
+    [block release];
+    return block;
 }
 @end

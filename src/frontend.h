@@ -36,12 +36,14 @@
         BOOL mute;
         BOOL mutable;
         BOOL inside;
+        NSString *signal;
 }
 
 -(Channel*) initWithIndex: (int) i
               andMaxLevel: (NSNumber*) mlevel_
              andNormLevel: (NSNumber*) nlevel_
                   andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
+                andSignal: (NSString*) signal_
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;

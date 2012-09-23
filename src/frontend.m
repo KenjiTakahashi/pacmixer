@@ -23,8 +23,10 @@
               andMaxLevel: (NSNumber*) mlevel_
              andNormLevel: (NSNumber*) nlevel_
                   andMute: (NSNumber*) mute_
+                andSignal: (NSString*) signal_
                 andParent: (WINDOW*) parent {
     self = [super init];
+    signal = [signal_ copy];
     int mx;
     getmaxyx(parent, my, mx);
     my -= 1;
@@ -45,6 +47,7 @@
 
 -(void) dealloc {
     delwin(win);
+    [signal release];
     [super dealloc];
 }
 
@@ -91,6 +94,11 @@
 -(void) setLevel: (int) level_ {
     currentLevel = level_;
     [self print];
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithInt: currentLevel], @"volume", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: signal
+                                                        object: self
+                                                      userInfo: s];
 }
 
 -(void) setLevelAndMuteN: (NSNotification*) notification {
@@ -198,14 +206,19 @@
         } else {
             mute = nil;
         }
+        NSString *bname = [NSString stringWithFormat:
+            @"%@%d", id_, i];
+        NSString *signal = [NSString stringWithFormat:
+            @"%@%@", @"volumeChanged", bname];
         Channel *channel = [[Channel alloc] initWithIndex: i
                                               andMaxLevel: [obj maxLevel]
                                              andNormLevel: [obj normLevel]
                                                   andMute: mute
+                                                andSignal: signal
                                                 andParent: win];
         SEL selector = @selector(setLevelAndMuteN:);
         NSString *nname = [NSString stringWithFormat:
-            @"%@%@%d", @"controlChanged", id_, i];
+            @"%@%@", @"controlChanged", bname];
         [[NSNotificationCenter defaultCenter] addObserver: channel
                                                  selector: selector
                                                      name: nname

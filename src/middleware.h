@@ -16,6 +16,7 @@
 
 
 #import <Foundation/NSObject.h>
+#import <Foundation/NSArray.h>
 #import <Foundation/NSDecimalNumber.h>
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSNotification.h>
@@ -28,11 +29,28 @@ void callback_add_func(void*, const char*, uint32_t, const backend_channel_t*, u
 void callback_update_func(void*, uint32_t, const backend_volume_t*, uint8_t);
 void callback_remove_func(void*, uint32_t);
 
+@interface Block: NSObject {
+    @private
+        context_t *context;
+        uint32_t idx;
+        int i;
+}
+
+-(Block*) initWithContext: (context_t*) context_
+                    andId: (uint32_t) idx_
+                 andIndex: (int) i_;
+-(void) setVolume: (NSNotification*) notification;
+@end
+
 @interface Middleware: NSObject {
-    context_t *context;
-    callback_t *callback;
+    @private
+        context_t *context;
+        callback_t *callback;
+        NSMutableArray *blocks;
 }
 
 -(Middleware*) init;
 -(void) dealloc;
+-(Block*) addBlockWithId: (uint32_t) idx
+                andIndex: (int) i;
 @end
