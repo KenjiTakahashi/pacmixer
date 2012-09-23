@@ -27,6 +27,7 @@
                 andParent: (WINDOW*) parent {
     self = [super init];
     signal = [signal_ copy];
+    propagate = YES;
     int mx;
     getmaxyx(parent, my, mx);
     my -= 1;

@@ -119,7 +119,7 @@ void callback_remove_func(void *self_, uint32_t idx) {
     for(int j = 0; j < count; ++j) {
         values[j] = [[v objectAtIndex: j] intValue];
     }
-    backend_volume_setall(context, type, idx, values);
+    backend_volume_setall(context, type, idx, values, count);
 }
 @end
 
