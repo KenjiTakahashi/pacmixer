@@ -49,7 +49,8 @@ typedef struct BACKEND_VOLUME {
 typedef enum {
     SINK,
     SINK_INPUT,
-    SOURCE
+    SOURCE,
+    SOURCE_OUTPUT
 } backend_entry_type;
 
 context_t *backend_new();
@@ -87,7 +88,12 @@ void _cb_s_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 void _cb_source(pa_context*, const pa_source_info*, int, void*);
 void _cb_u_source(pa_context*, const pa_source_info*, int, void*);
 void _cb_s_source(pa_context*, const pa_source_info*, int, void*);
+void _cb_source_output(pa_context*, const pa_source_output_info*, int, void*);
+void _cb_u_source_output(pa_context*, const pa_source_output_info*, int, void*);
+void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
 void _cb_event(pa_context*, pa_subscription_event_type_t, uint32_t, void*);
 backend_channel_t *_do_channels(pa_cvolume, uint8_t chnum);
 backend_volume_t *_do_volumes(pa_cvolume, uint8_t chnum, int mute);
 void _cb_u(uint32_t, pa_cvolume, int, void*);
+void _cb1(uint32_t, pa_cvolume, int, const char*, backend_entry_type, void*);
+void _cb2(pa_context*, uint32_t, pa_cvolume, int, const char*, backend_entry_type,  uint32_t, void*);
