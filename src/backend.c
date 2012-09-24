@@ -41,6 +41,7 @@ int backend_init(context_t *context, callback_t *callback) {
     pa_context_subscribe(context->context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
     pa_context_get_sink_input_info_list(context->context, _cb_sink_input, callback);
     pa_context_get_sink_info_list(context->context, _cb_sink, callback);
+    pa_context_get_source_info_list(context->context, _cb_source, callback);
     return 0;
 }
 
@@ -63,6 +64,9 @@ void backend_volume_set(context_t *c, backend_entry_type type, uint32_t idx, int
         case SINK_INPUT:
             pa_context_get_sink_input_info(c->context, idx, _cb_s_sink_input, volume);
             break;
+        case SOURCE:
+            pa_context_get_source_info_by_index(c->context, idx, _cb_s_source, volume);
+            break;
     }
 }
 
@@ -79,6 +83,9 @@ void backend_volume_setall(context_t *c, backend_entry_type type, uint32_t idx, 
         case SINK_INPUT:
             pa_context_set_sink_input_volume(c->context, idx, &volume, NULL, NULL);
             break;
+        case SOURCE:
+            pa_context_set_source_volume_by_index(c->context, idx, &volume, NULL, NULL);
+            break;
     }
 }
 
@@ -89,6 +96,9 @@ void backend_mute_set(context_t* c, backend_entry_type type, uint32_t idx, int v
             break;
         case SINK_INPUT:
             pa_context_set_sink_input_mute(c->context, idx, v, NULL, NULL);
+            break;
+        case SOURCE:
+            pa_context_set_source_mute_by_index(c->context, idx, v, NULL, NULL);
             break;
     }
 }
@@ -123,6 +133,12 @@ void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) 
     }
 }
 
+void _cb_u_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
+    if(!eol) {
+        _cb_u(info->index, info->volume, info->mute, userdata);
+    }
+}
+
 void _cb_s_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
     if(!eol) {
         volume_callback_t *volume = userdata;
@@ -132,16 +148,6 @@ void _cb_s_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata
             pa_context_set_sink_volume_by_index(c, info->index, &cvolume, NULL, NULL);
         }
         free(volume);
-    }
-}
-
-void _cb_u_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    if(!eol && info->index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
-        uint8_t chnum = info->volume.channels;
-        backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);
-        ((tcallback_update_func)(callback->update))(callback->self, info->index, volumes, chnum);
-        free(volumes);
     }
 }
 
@@ -165,12 +171,8 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
 }
 
 void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
-    if(!eol && info->index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
-        uint8_t chnum = info->volume.channels;
-        backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);
-        ((tcallback_update_func)(callback->update))(callback->self, info->index, volumes, chnum);
-        free(volumes);
+    if(!eol) {
+        _cb_u(info->index, info->volume, info->mute, userdata);
     }
 }
 
@@ -186,10 +188,41 @@ void _cb_s_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, vo
     }
 }
 
+void _cb_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
+    if(!eol && info->index != PA_INVALID_INDEX) {
+        callback_t *callback = userdata;
+        uint8_t chnum = info->volume.channels;
+        backend_channel_t *channels = _do_channels(info->volume, chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, info->description, SOURCE, info->index, channels, chnum);
+        backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);
+        ((tcallback_update_func)(callback->update))(callback->self, info->index, volumes, chnum);
+        free(channels);
+        free(volumes);
+    }
+}
+
+void _cb_u_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
+    if(!eol) {
+        _cb_u(info->index, info->volume, info->mute, userdata);
+    }
+}
+
+void _cb_s_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
+    if(!eol) {
+        volume_callback_t *volume = userdata;
+        if(info->index != PA_INVALID_INDEX) {
+            pa_cvolume cvolume = info->volume;
+            cvolume.values[volume->index] = volume->value;
+            pa_context_set_source_volume_by_index(c, info->index, &cvolume, NULL, NULL);
+        }
+        free(volume);
+    }
+}
+
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
+    int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
     if(t__ == PA_SUBSCRIPTION_EVENT_SINK_INPUT) {
-        int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
         if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
             pa_context_get_sink_input_info(c, idx, _cb_u_sink_input, userdata);
         }
@@ -202,9 +235,27 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
         }
     }
     if(t__ == PA_SUBSCRIPTION_EVENT_SINK) {
-        int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
         if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
             pa_context_get_sink_info_by_index(c, idx, _cb_u_sink, userdata);
+        }
+        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
+            callback_t *callback = userdata;
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
+        }
+        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
+            pa_context_get_sink_input_info(c, idx, _cb_sink_input, userdata);
+        }
+    }
+    if(t__ == PA_SUBSCRIPTION_EVENT_SOURCE) {
+        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
+            pa_context_get_source_info_by_index(c, idx, _cb_u_source, userdata);
+        }
+        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
+            callback_t *callback = userdata;
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
+        }
+        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
+            pa_context_get_source_info_by_index(c, idx, _cb_source, userdata);
         }
     }
 }
@@ -226,4 +277,14 @@ backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
         volumes[i].mute = mute;
     }
     return volumes;
+}
+
+void _cb_u(uint32_t index, pa_cvolume volume, int mute, void *userdata) {
+    if(index != PA_INVALID_INDEX) {
+        callback_t *callback = userdata;
+        uint8_t chnum = volume.channels;
+        backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
+        ((tcallback_update_func)(callback->update))(callback->self, index, volumes, chnum);
+        free(volumes);
+    }
 }

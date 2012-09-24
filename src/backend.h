@@ -48,7 +48,8 @@ typedef struct BACKEND_VOLUME {
 
 typedef enum {
     SINK,
-    SINK_INPUT
+    SINK_INPUT,
+    SOURCE
 } backend_entry_type;
 
 context_t *backend_new();
@@ -83,6 +84,10 @@ void _cb_s_sink(pa_context*, const pa_sink_info*, int, void*);
 void _cb_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 void _cb_u_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 void _cb_s_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
+void _cb_source(pa_context*, const pa_source_info*, int, void*);
+void _cb_u_source(pa_context*, const pa_source_info*, int, void*);
+void _cb_s_source(pa_context*, const pa_source_info*, int, void*);
 void _cb_event(pa_context*, pa_subscription_event_type_t, uint32_t, void*);
 backend_channel_t *_do_channels(pa_cvolume, uint8_t chnum);
 backend_volume_t *_do_volumes(pa_cvolume, uint8_t chnum, int mute);
+void _cb_u(uint32_t, pa_cvolume, int, void*);
