@@ -430,12 +430,14 @@
 @implementation Widget
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
+                    andType: (View) type_
                       andId: (NSNumber*) id_ {
     self = [super init];
     highlight = 0;
     controls = [[NSMutableArray alloc] init];
     position = p;
     name = [name_ copy];
+    type = type_;
     internalId = [id_ copy];
     [self printWithWidth: 8];
     return self;
@@ -631,7 +633,7 @@
 @implementation Top
 -(Top*) init {
     self = [super init];
-    view = PLAYBACK;
+    view = ALL;
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
@@ -646,11 +648,16 @@
 }
 
 -(void) print {
+    NSString *all = @"F1: All";
     NSString *playback = @"F2: Playback";
     NSString *recording = @"F3: Recording";
     NSString *outputs = @"F4: Outputs";
     NSString *inputs = @"F5: Inputs";
-    // FIXME: refactor this
+    if(view == ALL) {
+        wprintw(win, " [%@] ", all);
+    } else {
+        wprintw(win, " %@ ", all);
+    }
     if(view == PLAYBACK) {
         wprintw(win, " [%@] ", playback);
     } else {
@@ -776,10 +783,12 @@
 }
 
 -(Widget*) addWidgetWithName: (NSString*) name
+                     andType: (View) type
                        andId: (NSNumber*) id_ {
     int x = [[widgets lastObject] endPosition] + 1;
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name
+                                              andType: type
                                                 andId: id_];
     if(x == 1) {
         [widget setHighlighted: YES];

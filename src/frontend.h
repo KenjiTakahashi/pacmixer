@@ -110,6 +110,15 @@
 @end
 
 
+typedef enum {
+    ALL,
+    PLAYBACK,
+    RECORDING,
+    OUTPUTS,
+    INPUTS
+} View;
+
+
 @interface Widget: NSObject {
     @private
         WINDOW *win;
@@ -117,6 +126,7 @@
         int height;
         int width;
         NSString *name;
+        View type;
         NSNumber *internalId;
         NSMutableArray *controls;
         BOOL highlighted;
@@ -126,6 +136,7 @@
 
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
+                    andType: (View) type_
                       andId: (NSNumber*) id_;
 -(void) dealloc;
 -(void) printWithWidth: (int) width_;
@@ -147,14 +158,6 @@
 -(NSString*) name;
 -(NSNumber*) internalId;
 @end
-
-
-typedef enum {
-    PLAYBACK,
-    RECORDING,
-    OUTPUTS,
-    INPUTS
-} View;
 
 
 @interface Top: NSObject {
@@ -201,6 +204,7 @@ typedef enum {
 -(TUI*) init;
 -(void) dealloc;
 -(Widget*) addWidgetWithName: (NSString*) name
+                     andType: (View) type
                        andId: (NSNumber*) id_;
 -(void) removeWidget: (NSNumber*) id_;
 -(void) setCurrent: (int) i;
