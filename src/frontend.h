@@ -169,6 +169,7 @@ typedef enum {
 -(Top*) init;
 -(void) dealloc;
 -(void) print;
+-(void) setView: (View) type_;
 @end
 
 
@@ -208,6 +209,7 @@ typedef enum {
                        andId: (NSNumber*) id_;
 -(void) removeWidget: (NSNumber*) id_;
 -(void) setCurrent: (int) i;
+-(void) setFilter: (View) type;
 -(void) previous;
 -(void) next;
 -(void) up;

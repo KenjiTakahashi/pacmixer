@@ -648,6 +648,7 @@
 }
 
 -(void) print {
+    wmove(win, 0, 0);
     NSString *all = @"F1: All";
     NSString *playback = @"F2: Playback";
     NSString *recording = @"F3: Recording";
@@ -679,6 +680,11 @@
         wprintw(win, " %@ ", inputs);
     }
     wrefresh(win);
+}
+
+-(void) setView: (View) type_ {
+    view = type_;
+    [self print];
 }
 @end
 
@@ -827,6 +833,10 @@
     [[widgets objectAtIndex: highlight] setHighlighted: NO];
     highlight = i;
     [[widgets objectAtIndex: highlight] setHighlighted: YES];
+}
+
+-(void) setFilter: (View) type {
+    [top setView: type];
 }
 
 -(void) previous {

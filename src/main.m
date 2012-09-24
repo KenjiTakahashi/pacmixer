@@ -112,6 +112,21 @@
             case 'i':
                 [tui inside];
                 break;
+            case KEY_F(1):
+                [tui setFilter: ALL];
+                break;
+            case KEY_F(2):
+                [tui setFilter: PLAYBACK];
+                break;
+            case KEY_F(3):
+                [tui setFilter: RECORDING];
+                break;
+            case KEY_F(4):
+                [tui setFilter: OUTPUTS];
+                break;
+            case KEY_F(5):
+                [tui setFilter: INPUTS];
+                break;
         }
     }
 }
