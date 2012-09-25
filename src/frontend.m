@@ -180,13 +180,11 @@
                     andParent: (WINDOW*) parent {
     self = [super init];
     highlight = 0;
-    int my;
-    int mx;
     getmaxyx(parent, my, mx);
     my -= 1;
     mx = [channels_ count] + 2;
-    BOOL hasPeak = NO;
-    BOOL hasMute = NO;
+    hasPeak = NO;
+    hasMute = NO;
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
         if([obj maxLevel] != nil) {
@@ -208,12 +206,7 @@
         my = 3;
     }
     win = derwin(parent, my, mx, y, position);
-    box(win, 0, 0);
-    if(hasPeak && hasMute) {
-        mvwaddch(win, my - 3, 0, ACS_LTEE);
-        mvwhline(win, my - 3, 1, 0, mx - 2);
-        mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
-    }
+    [self print];
     internalId = [id_ copy];
     channels = [[NSMutableArray alloc] init];
     for(int i = 0; i < [channels_ count]; ++i) {
@@ -243,7 +236,6 @@
                                                    object: nil];
         [channels addObject: channel];
     }
-    touchwin(parent);
     return self;
 }
 
@@ -252,6 +244,22 @@
     [channels release];
     [internalId release];
     [super dealloc];
+}
+
+-(void) print {
+    box(win, 0, 0);
+    if(hasPeak && hasMute) {
+        mvwaddch(win, my - 3, 0, ACS_LTEE);
+        mvwhline(win, my - 3, 1, 0, mx - 2);
+        mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
+    }
+}
+
+-(void) show {
+    [self print];
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] print];
+    }
 }
 
 -(void) setMute: (BOOL) mute forChannel: (int) channel {
@@ -396,6 +404,10 @@
     }
 }
 
+-(void) show {
+    [self print];
+}
+
 -(void) setCurrent: (int) i {
     highlight = i;
     [self print];
@@ -436,7 +448,8 @@
     type = type_;
     internalId = [id_ copy];
     parent = parent_;
-    [self printWithWidth: 8];
+    width = 8;
+    [self print];
     return self;
 }
 
@@ -448,8 +461,7 @@
     [super dealloc];
 }
 
--(void) printWithWidth: (int) width_ {
-    width = width_;
+-(void) print {
     int mx;
     getmaxyx(parent, height, mx);
     wresize(parent, height, position + width);
@@ -458,7 +470,6 @@
     } else {
         wresize(win, height, width);
     }
-    [self printName];
 }
 
 -(void) printName {
@@ -483,10 +494,23 @@
     wattroff(win, color | A_BOLD);
 }
 
+-(void) show {
+    [self printName];
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] show];
+    }
+}
+
+-(void) hide {
+    werase(win);
+}
+
 -(Channels*) addChannels: (NSArray*) channels {
     int width_ = [channels count] + 2;
     if(width_ > 8) {
-        [self printWithWidth: width_];
+        width = width_;
+        [self print];
+        [self printName];
     }
     int position_ = (width - width_) / 2;
     Channels *control = [[Channels alloc] initWithChannels: channels
@@ -614,6 +638,10 @@
     return position + width;
 }
 
+-(View) type {
+    return type;
+}
+
 -(NSString*) name {
     return name;
 }
@@ -679,6 +707,10 @@
 -(void) setView: (View) type_ {
     view = type_;
     [self print];
+}
+
+-(View) view {
+    return view;
 }
 @end
 
@@ -752,6 +784,7 @@
 @implementation TUI
 -(TUI*) init {
     self = [super init];
+    allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
     cbreak();
@@ -790,6 +823,7 @@
     [bottom release];
     [top release];
     [widgets release];
+    [allWidgets release];
     [paddingStates release];
     [super dealloc];
 }
@@ -813,7 +847,11 @@
     if(x == 1) {
         [widget setHighlighted: YES];
     }
-    [widgets addObject: widget];
+    [allWidgets addObject: widget];
+    if([top view] == ALL || type == [top view]) {
+        [widgets addObject: widget];
+        [widget show];
+    }
     [widget release];
     return widget;
 }
@@ -851,6 +889,24 @@
 
 -(void) setFilter: (View) type {
     [top setView: type];
+    if([widgets count]) {
+        [[widgets objectAtIndex: highlight] setHighlighted: NO];
+    }
+    [widgets removeAllObjects];
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *w = [allWidgets objectAtIndex: i];
+        if([w type] == [top view]) {
+            [widgets addObject: w];
+            [w show];
+        } else {
+            [w hide];
+        }
+    }
+    highlight = 0;
+    if([widgets count]) {
+        [[widgets objectAtIndex: highlight] setHighlighted: YES];
+    }
+    [self refresh: nil];
 }
 
 -(void) previous {
@@ -872,7 +928,7 @@
 -(void) next {
     if(inside) {
         [[widgets objectAtIndex: highlight] next];
-    } else if(highlight < [widgets count] - 1) {
+    } else if(highlight < (int)[widgets count] - 1) {
         int start = [[widgets objectAtIndex: highlight] endPosition];
         [self setCurrent: highlight + 1];
         Widget *w = [widgets objectAtIndex: highlight];

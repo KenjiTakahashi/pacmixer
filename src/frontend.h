@@ -69,6 +69,10 @@
         WINDOW *win;
         NSMutableArray *channels;
         BOOL inside;
+        BOOL hasPeak;
+        BOOL hasMute;
+        int my;
+        int mx;
         int highlight;
         NSNumber *internalId;
 }
@@ -78,6 +82,8 @@
                         andId: (NSNumber*) id_
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
+-(void) print;
+-(void) show;
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
 -(void) notify: (NSArray*) values;
@@ -103,6 +109,7 @@
                    andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
+-(void) show;
 -(void) setCurrent: (int) i;
 -(void) up;
 -(void) down;
@@ -141,8 +148,10 @@ typedef enum {
                       andId: (NSNumber*) id_
                   andParent: (WINDOW*) parent_;
 -(void) dealloc;
--(void) printWithWidth: (int) width_;
+-(void) print;
 -(void) printName;
+-(void) show;
+-(void) hide;
 -(Channels*) addChannels: (NSArray*) channels;
 -(Options*) addOptions: (NSArray*) options;
 -(void) setHighlighted: (BOOL) active;
@@ -157,6 +166,7 @@ typedef enum {
 -(int) height;
 -(int) width;
 -(int) endPosition;
+-(View) type;
 -(NSString*) name;
 -(NSNumber*) internalId;
 @end
@@ -172,6 +182,7 @@ typedef enum {
 -(void) dealloc;
 -(void) print;
 -(void) setView: (View) type_;
+-(View) view;
 @end
 
 
@@ -197,6 +208,7 @@ typedef enum {
 
 @interface TUI: NSObject {
     @private
+        NSMutableArray *allWidgets;
         NSMutableArray *widgets;
         Top *top;
         Bottom *bottom;
