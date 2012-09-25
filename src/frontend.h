@@ -132,12 +132,14 @@ typedef enum {
         BOOL highlighted;
         int highlight;
         BOOL inside;
+        WINDOW *parent;
 }
 
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
                     andType: (View) type_
-                      andId: (NSNumber*) id_;
+                      andId: (NSNumber*) id_
+                  andParent: (WINDOW*) parent_;
 -(void) dealloc;
 -(void) printWithWidth: (int) width_;
 -(void) printName;
@@ -198,12 +200,16 @@ typedef enum {
         NSMutableArray *widgets;
         Top *top;
         Bottom *bottom;
+        WINDOW *win;
+        int padding;
+        NSMutableArray *paddingStates;
         int highlight;
         BOOL inside;
 }
 
 -(TUI*) init;
 -(void) dealloc;
+-(void) refresh: (NSNotification*) notification;
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
                        andId: (NSNumber*) id_;

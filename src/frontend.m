@@ -82,7 +82,6 @@
         }
         mvwaddch(win, currentPos - i, 0, ' ' | color);
     }
-    wrefresh(win);
 }
 
 -(void) setMute: (BOOL) mute_ {
@@ -156,7 +155,6 @@
     int bx;
     getbegyx(win, by, bx);
     mvwin(win, by, bx - p);
-    wrefresh(win);
 }
 
 -(void) mute {
@@ -246,7 +244,6 @@
         [channels addObject: channel];
     }
     touchwin(parent);
-    wrefresh(win);
     return self;
 }
 
@@ -397,7 +394,6 @@
         mvwprintw(win, i + 1, 1, "%@", obj);
         wattroff(win, COLOR_PAIR(6));
     }
-    wrefresh(win);
 }
 
 -(void) setCurrent: (int) i {
@@ -422,7 +418,6 @@
     int bx;
     getbegyx(win, by, bx);
     mvwin(win, by, bx - p);
-    wrefresh(win);
 }
 @end
 
@@ -431,7 +426,8 @@
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
                     andType: (View) type_
-                      andId: (NSNumber*) id_ {
+                      andId: (NSNumber*) id_
+                  andParent: (WINDOW*) parent_ {
     self = [super init];
     highlight = 0;
     controls = [[NSMutableArray alloc] init];
@@ -439,6 +435,7 @@
     name = [name_ copy];
     type = type_;
     internalId = [id_ copy];
+    parent = parent_;
     [self printWithWidth: 8];
     return self;
 }
@@ -453,12 +450,11 @@
 
 -(void) printWithWidth: (int) width_ {
     width = width_;
-    int my;
     int mx;
-    getmaxyx(stdscr, my, mx);
-    height = my - 4;
+    getmaxyx(parent, height, mx);
+    wresize(parent, height, position + width);
     if(win == NULL) {
-        win = newwin(height, width, 2, position);
+        win = derwin(parent, height, width, 0, position);
     } else {
         wresize(win, height, width);
     }
@@ -485,7 +481,6 @@
     );
     mvwprintw(win, height - 1, length, "%@", name);
     wattroff(win, color | A_BOLD);
-    wrefresh(win);
 }
 
 -(Channels*) addChannels: (NSArray*) channels {
@@ -508,7 +503,6 @@
                                               andParent: win];
     [controls addObject: control];
     [control release];
-    wrefresh(win);
     return control;
 }
 
@@ -775,17 +769,36 @@
     init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     refresh();
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    win = newpad(my - 4, 1);
+    padding = 0;
+    paddingStates = [[NSMutableArray alloc] init];
     bottom = [[Bottom alloc] init];
     top = [[Top alloc] init];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(refresh:)
+                                                 name: nil
+                                               object: nil];
     return self;
 }
 
 -(void) dealloc {
+    delwin(win);
     endwin();
     [bottom release];
     [top release];
     [widgets release];
+    [paddingStates release];
     [super dealloc];
+}
+
+-(void) refresh: (NSNotification*) notification {
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    prefresh(win, 0, padding, 2, 1, my - 2, mx - 1);
 }
 
 -(Widget*) addWidgetWithName: (NSString*) name
@@ -795,7 +808,8 @@
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name
                                               andType: type
-                                                andId: id_];
+                                                andId: id_
+                                            andParent: win];
     if(x == 1) {
         [widget setHighlighted: YES];
     }
@@ -826,7 +840,7 @@
             addch(' ');
         }
     }
-    refresh();
+    [self refresh: nil];
 }
 
 -(void) setCurrent: (int) i {
@@ -844,15 +858,34 @@
         [[widgets objectAtIndex: highlight] previous];
     } else if(highlight > 0) {
         [self setCurrent: highlight - 1];
+        Widget *w = [widgets objectAtIndex: highlight];
+        if([w endPosition] - [w width] <= padding) {
+            int count = [paddingStates count] - 1;
+            int delta = [[paddingStates objectAtIndex: count] intValue];
+            [paddingStates removeObjectAtIndex: count];
+            padding -= delta;
+        }
     }
+    [self refresh: nil];
 }
 
 -(void) next {
     if(inside) {
         [[widgets objectAtIndex: highlight] next];
     } else if(highlight < [widgets count] - 1) {
+        int start = [[widgets objectAtIndex: highlight] endPosition];
         [self setCurrent: highlight + 1];
+        Widget *w = [widgets objectAtIndex: highlight];
+        int my;
+        int mx;
+        getmaxyx(stdscr, my, mx);
+        if([w endPosition] - padding >= mx) {
+            int delta = [w width] - (mx - start - 3 + padding);
+            padding += delta;
+            [paddingStates addObject: [NSNumber numberWithInt: delta]];
+        }
     }
+    [self refresh: nil];
 }
 
 -(void) up {
@@ -875,16 +908,17 @@
             [bottom inside];
             [[widgets objectAtIndex: highlight] inside];
         }
+        [self refresh: nil];
     }
 }
 
 -(BOOL) outside {
     BOOL outside = [bottom outside];
     if(!outside) {
-        // prevent "multiple -outside defs found"
         inside = NO;
         Widget *widget = [widgets objectAtIndex: highlight];
         [widget outside];
+        [self refresh: nil];
     }
     return outside;
 }

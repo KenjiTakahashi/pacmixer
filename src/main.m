@@ -127,6 +127,8 @@
             case KEY_F(5):
                 [tui setFilter: INPUTS];
                 break;
+            case KEY_RESIZE:
+                break;
         }
     }
 }
