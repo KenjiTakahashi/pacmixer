@@ -84,6 +84,10 @@
     }
 }
 
+-(void) adjust: (int) i {
+    mvderwin(win, 0, i + 1);
+}
+
 -(void) setMute: (BOOL) mute_ {
     if(mutable) {
         mute = mute_;
@@ -200,7 +204,7 @@
     if(!hasMute) {
         my -= 2;
     }
-    int y = 0;
+    y = 0;
     if(!hasPeak) {
         y = my - 3;
         my = 3;
@@ -218,7 +222,7 @@
             mute = nil;
         }
         NSString *bname = [NSString stringWithFormat:
-            @"%@%d", id_, i];
+            @"%@_%d", id_, i];
         NSString *csignal = [NSString stringWithFormat:
             @"%@%@", @"volumeChanged", bname];
         Channel *channel = [[Channel alloc] initWithIndex: i
@@ -268,6 +272,14 @@
 
 -(void) setLevel: (int) level forChannel: (int) channel {
     [[channels objectAtIndex: channel] setLevel: level];
+}
+
+-(void) adjust {
+    int width = [channels count] + 2;
+    mvderwin(win, y, width / 2);
+    for(int i = 0; i < [channels count]; ++i) {
+        [[channels objectAtIndex: i] adjust: i];
+    }
 }
 
 -(void) notify: (NSArray*) values {
@@ -507,12 +519,12 @@
 
 -(Channels*) addChannels: (NSArray*) channels {
     int width_ = [channels count] + 2;
+    int position_ = (width - width_) / 2;
     if(width_ > 8) {
         width = width_;
         [self print];
         [self printName];
     }
-    int position_ = (width - width_) / 2;
     Channels *control = [[Channels alloc] initWithChannels: channels
                                                andPosition: position_
                                                      andId: internalId
@@ -533,6 +545,15 @@
 -(void) setHighlighted: (BOOL) active {
     highlighted = active;
     [self printName];
+}
+
+-(void) setPosition: (int) position_ {
+    [self hide];
+    position = position_;
+    mvderwin(win, 0, position);
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] adjust];
+    }
 }
 
 -(BOOL) canGoInside {
@@ -893,11 +914,14 @@
         [[widgets objectAtIndex: highlight] setHighlighted: NO];
     }
     [widgets removeAllObjects];
+    int x = 1;
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
-        if([w type] == [top view]) {
+        if([top view] == ALL || [w type] == [top view]) {
             [widgets addObject: w];
+            [w setPosition: x];
             [w show];
+            x = [w endPosition] + 1;
         } else {
             [w hide];
         }

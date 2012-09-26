@@ -35,7 +35,7 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
                                    andIndex: i
                                     andType: type];
         NSString *sname = [NSString stringWithFormat:
-            @"%@%d%d", @"volumeChanged", idx, i];
+            @"%@%d_%d", @"volumeChanged", idx, i];
         [center addObserver: block
                    selector: @selector(setVolume:)
                        name: sname
@@ -79,7 +79,7 @@ void callback_update_func(void *self_, uint32_t idx, const backend_volume_t *vol
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             v, @"volumes", nil];
         NSString *nname = [NSString stringWithFormat:
-        @"%@%@%d", @"controlChanged", id_, i];
+        @"%@%@_%d", @"controlChanged", id_, i];
         [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                             object: self
                                                           userInfo: s];
