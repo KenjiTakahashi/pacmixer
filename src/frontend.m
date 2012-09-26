@@ -476,7 +476,9 @@
 -(void) print {
     int mx;
     getmaxyx(parent, height, mx);
-    wresize(parent, height, position + width);
+    if(position + width > mx) {
+        wresize(parent, height, position + width);
+    }
     if(win == NULL) {
         win = derwin(parent, height, width, 0, position);
     } else {
@@ -548,7 +550,6 @@
 }
 
 -(void) setPosition: (int) position_ {
-    [self hide];
     position = position_;
     mvderwin(win, 0, position);
     for(int i = 0; i < [controls count]; ++i) {
@@ -919,10 +920,13 @@
         Widget *w = [allWidgets objectAtIndex: i];
         if([top view] == ALL || [w type] == [top view]) {
             [widgets addObject: w];
+            if([w endPosition] > x) {
+                [w hide];
+            }
             [w setPosition: x];
             [w show];
             x = [w endPosition] + 1;
-        } else {
+        } else if([w endPosition] > x) {
             [w hide];
         }
     }
