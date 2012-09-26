@@ -681,7 +681,7 @@
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    win = newwin(10, mx, 0, 0);
+    win = newwin(1, mx, 0, 0);
     [self print];
     return self;
 }
@@ -724,6 +724,14 @@
         wprintw(win, " %@ ", inputs);
     }
     wrefresh(win);
+}
+
+-(void) reprint {
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    wresize(win, 1, mx);
+    [self print];
 }
 
 -(void) setView: (View) type_ {
@@ -783,6 +791,17 @@
     wattroff(win, color | A_BOLD);
     wprintw(win, "%@", line);
     wrefresh(win);
+}
+
+-(void) reprint {
+    werase(win);
+    wrefresh(win);
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    mvwin(win, my - 1, 0);
+    wresize(win, 1, mx);
+    [self print];
 }
 
 -(void) inside {
@@ -848,6 +867,11 @@
     [allWidgets release];
     [paddingStates release];
     [super dealloc];
+}
+
+-(void) reprint {
+    [top reprint];
+    [bottom reprint];
 }
 
 -(void) refresh: (NSNotification*) notification {

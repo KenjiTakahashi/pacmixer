@@ -128,6 +128,7 @@
                 [tui setFilter: INPUTS];
                 break;
             case KEY_RESIZE:
+                [tui reprint];
                 break;
         }
     }

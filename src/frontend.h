@@ -185,6 +185,7 @@ typedef enum {
 -(Top*) init;
 -(void) dealloc;
 -(void) print;
+-(void) reprint;
 -(void) setView: (View) type_;
 -(View) view;
 @end
@@ -205,6 +206,7 @@ typedef enum {
 -(Bottom*) init;
 -(void) dealloc;
 -(void) print;
+-(void) reprint;
 -(void) inside;
 -(BOOL) outside;
 @end
@@ -225,6 +227,7 @@ typedef enum {
 
 -(TUI*) init;
 -(void) dealloc;
+-(void) reprint;
 -(void) refresh: (NSNotification*) notification;
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
