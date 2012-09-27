@@ -84,6 +84,12 @@
     }
 }
 
+-(void) reprint: (int) height {
+    my = height - 1;
+    wresize(win, my, 1);
+    [self print];
+}
+
 -(void) adjust: (int) i {
     mvderwin(win, 0, i + 1);
 }
@@ -179,11 +185,12 @@
 
 @implementation Channels
 -(Channels*) initWithChannels: (NSArray*) channels_
-                  andPosition: (int) position
+                  andPosition: (int) position_
                         andId: (NSNumber*) id_
                     andParent: (WINDOW*) parent {
     self = [super init];
     highlight = 0;
+    position = position_;
     getmaxyx(parent, my, mx);
     my -= 1;
     mx = [channels_ count] + 2;
@@ -259,19 +266,36 @@
     }
 }
 
+-(void) reprint: (int) height {
+    height -= 1;
+    if(!hasMute) {
+        height -= 2;
+    }
+    my = height;
+    for(int i = 0; i < [channels count]; ++i) {
+        [(Channel*)[channels objectAtIndex: i] reprint: height];
+    }
+    if(hasPeak) {
+        wresize(win, height, mx);
+    } else {
+        mvderwin(win, height - 4, position);
+    }
+    [self print];
+}
+
 -(void) show {
     [self print];
     for(int i = 0; i < [channels count]; ++i) {
-        [[channels objectAtIndex: i] print];
+        [(Channel*)[channels objectAtIndex: i] print];
     }
 }
 
 -(void) setMute: (BOOL) mute forChannel: (int) channel {
-    [[channels objectAtIndex: channel] setMute: mute];
+    [(Channel*)[channels objectAtIndex: channel] setMute: mute];
 }
 
 -(void) setLevel: (int) level forChannel: (int) channel {
-    [[channels objectAtIndex: channel] setLevel: level];
+    [(Channel*)[channels objectAtIndex: channel] setLevel: level];
 }
 
 -(void) adjust {
@@ -294,9 +318,9 @@
 
 -(BOOL) previous {
     if(inside && highlight > 0) {
-        [[channels objectAtIndex: highlight] outside];
+        [(Channel*)[channels objectAtIndex: highlight] outside];
         highlight -= 1;
-        [[channels objectAtIndex: highlight] inside];
+        [(Channel*)[channels objectAtIndex: highlight] inside];
         return NO;
     }
     return YES;
@@ -304,9 +328,9 @@
 
 -(BOOL) next {
     if(inside && highlight < [channels count] - 1) {
-        [[channels objectAtIndex: highlight] outside];
+        [(Channel*)[channels objectAtIndex: highlight] outside];
         highlight += 1;
-        [[channels objectAtIndex: highlight] inside];
+        [(Channel*)[channels objectAtIndex: highlight] inside];
         return NO;
     }
     return YES;
@@ -314,7 +338,7 @@
 
 -(void) up {
     if(inside) {
-        [[channels objectAtIndex: highlight] up];
+        [(Channel*)[channels objectAtIndex: highlight] up];
     } else {
         int count = [channels count];
         NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
@@ -331,7 +355,7 @@
 
 -(void) down {
     if(inside) {
-        [[channels objectAtIndex: highlight] down];
+        [(Channel*)[channels objectAtIndex: highlight] down];
     } else {
         int count = [channels count];
         NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
@@ -349,30 +373,30 @@
 -(void) inside {
     if(!inside) {
         inside = YES;
-        [[channels objectAtIndex: highlight] inside];
+        [(Channel*)[channels objectAtIndex: highlight] inside];
     }
 }
 
 -(void) outside {
     if(inside) {
         inside = NO;
-        [[channels objectAtIndex: highlight] outside];
+        [(Channel*)[channels objectAtIndex: highlight] outside];
     }
 }
 
 -(void) moveLeftBy: (int) p {
     for(int i = 0; i < [channels count]; ++i) {
-        [[channels objectAtIndex: i] moveLeftBy: p];
+        [(Channel*)[channels objectAtIndex: i] moveLeftBy: p];
     }
 }
 
 -(void) mute {
     for(int i = 0; i < [channels count]; ++i) {
-        [[channels objectAtIndex: i] mute];
+        [(Channel*)[channels objectAtIndex: i] mute];
     }
     NSString *nname = [NSString stringWithFormat:
         @"%@%@", @"muteChanged", internalId];
-    BOOL muted = [[channels objectAtIndex: 0] isMuted];
+    BOOL muted = [(Channel*)[channels objectAtIndex: 0] isMuted];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithBool: muted], @"mute", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
@@ -484,6 +508,16 @@
     } else {
         wresize(win, height, width);
     }
+}
+
+-(void) reprint: (int) height_ {
+    werase(win);
+    height = height_;
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] reprint: height];
+    }
+    wresize(win, height, width);
+    [self printName];
 }
 
 -(void) printName {
@@ -870,8 +904,19 @@
 }
 
 -(void) reprint {
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    int yy;
+    getmaxyx(win, yy, mx);
     [top reprint];
+    for(int i = 0; i < [widgets count]; ++i) {
+        Widget *w = [widgets objectAtIndex: i];
+        [w reprint: my - 4];
+    }
+    wresize(win, my - 4, mx);
     [bottom reprint];
+    [self refresh: nil];
 }
 
 -(void) refresh: (NSNotification*) notification {

@@ -48,6 +48,7 @@
                 andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
+-(void) reprint: (int) height;
 -(void) adjust: (int) i;
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
@@ -72,6 +73,7 @@
         BOOL inside;
         BOOL hasPeak;
         BOOL hasMute;
+        int position;
         int y;
         int my;
         int mx;
@@ -80,11 +82,12 @@
 }
 
 -(Channels*) initWithChannels: (NSArray*) channels_
-                  andPosition: (int) position
+                  andPosition: (int) position_
                         andId: (NSNumber*) id_
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
+-(void) reprint: (int) height;
 -(void) show;
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
@@ -152,6 +155,7 @@ typedef enum {
                   andParent: (WINDOW*) parent_;
 -(void) dealloc;
 -(void) print;
+-(void) reprint: (int) height_;
 -(void) printName;
 -(void) show;
 -(void) hide;
