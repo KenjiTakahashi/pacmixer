@@ -160,13 +160,6 @@
     }
 }
 
--(void) moveLeftBy: (int) p {
-    int by;
-    int bx;
-    getbegyx(win, by, bx);
-    mvwin(win, by, bx - p);
-}
-
 -(void) mute {
     if(mutable) {
         if(mute) {
@@ -384,12 +377,6 @@
     }
 }
 
--(void) moveLeftBy: (int) p {
-    for(int i = 0; i < [channels count]; ++i) {
-        [(Channel*)[channels objectAtIndex: i] moveLeftBy: p];
-    }
-}
-
 -(void) mute {
     for(int i = 0; i < [channels count]; ++i) {
         [(Channel*)[channels objectAtIndex: i] mute];
@@ -459,13 +446,6 @@
     if(highlight < [options count] - 1) {
         [self setCurrent: highlight + 1];
     }
-}
-
--(void) moveLeftBy: (int) p {
-    int by;
-    int bx;
-    getbegyx(win, by, bx);
-    mvwin(win, by, bx - p);
 }
 @end
 
@@ -671,15 +651,6 @@
             [obj mute];
         }
     }
-}
-
--(void) moveLeftBy: (int) p {
-    position -= p;
-    mvwin(win, 2, position);
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] moveLeftBy: p];
-    }
-    [self printName];
 }
 
 -(int) height {
@@ -948,27 +919,34 @@
 }
 
 -(void) removeWidget: (NSNumber*) id_ {
-    int width = 0;
     NSArray *copy = [widgets copy];
     for(int i = 0; i < [copy count]; ++i) {
-        id widget = [copy objectAtIndex: i];
+        Widget *widget = [copy objectAtIndex: i];
         if([[widget internalId] isEqualToNumber: id_]) {
-            width = [widget width];
+            [widget hide];
             [widgets removeObjectAtIndex: i];
-        } else if(width) {
-            [widget moveLeftBy: width + 1];
-            width = [widget width];
+            [allWidgets removeObject: widget];
+            if(highlight >= i) {
+                if(highlight > 0) {
+                    highlight -= 1;
+                } else if(highlight == 0 && [widgets count] > 1) {
+                    highlight += 1;
+                }
+            }
         }
     }
     [copy release];
-    id widget = [widgets lastObject];
-    int start = [widget endPosition];
-    for(int i = 0; i < [widget height]; ++i) {
-        move(i + 2, start);
-        for(int j = 0; j < [widget width] + 1; ++j) {
-            addch(' ');
+    int x = 1;
+    for(int i = 0; i < [widgets count]; ++i) {
+        Widget *w = [widgets objectAtIndex: i];
+        if([w endPosition] > x) {
+            [w hide];
         }
+        [w setPosition: x];
+        [w show];
+        x = [w endPosition] + 1;
     }
+    [[widgets objectAtIndex: highlight] setHighlighted: YES];
     [self refresh: nil];
 }
 

@@ -60,7 +60,6 @@
 -(void) outside;
 -(void) up;
 -(void) down;
--(void) moveLeftBy: (int) p;
 -(void) mute;
 -(BOOL) isMuted;
 @end
@@ -99,7 +98,6 @@
 -(void) down;
 -(void) inside;
 -(void) outside;
--(void) moveLeftBy: (int) p;
 -(void) mute;
 @end
 
@@ -119,7 +117,6 @@
 -(void) setCurrent: (int) i;
 -(void) up;
 -(void) down;
--(void) moveLeftBy: (int) p;
 @end
 
 
@@ -170,7 +167,6 @@ typedef enum {
 -(void) next;
 -(void) up;
 -(void) down;
--(void) moveLeftBy: (int) p;
 -(int) height;
 -(int) width;
 -(int) endPosition;

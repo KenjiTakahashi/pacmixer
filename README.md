@@ -12,6 +12,7 @@ Back in the old days, there were a good mixer for ALSA (alsamixer), so I thought
 ## requirements
 * libpulse
 * ncurses
+* gnustep-base
 * gcc-objc (for compilation)
 
 ## installation
@@ -35,6 +36,7 @@ k (or up arrow): increase the volume
 m: mute the volume
 i: go into the inside mode
 q: go outside the inside mode or exit the application
+F1-F5: change to all/playback/recording/outputs/inputs view, respectively
 ```
 
 #### inside mode
