@@ -6,6 +6,9 @@ It was also a good starting point to finally learn myself some ObjC :).
 
 Back in the old days, there were a good mixer for ALSA (alsamixer), so I thought about taking some of their ideas, mix it with mine, and see what happens.
 
+## screenshot
+![screenshot](http://dl.dropbox.com/u/20714377/pacmixer2.png)
+
 ## requirements
 * libpulse
 * ncurses
@@ -14,10 +17,12 @@ Back in the old days, there were a good mixer for ALSA (alsamixer), so I thought
 ## installation
 Type
 ```sh
-make
-make install
+$ make
+# make install
 ```
 and you're done.
+
+(Don't mind the "multiple method definitions" warnings).
 
 ## usage
 **pacmixer** comes with built-in help, but here's the shortcuts reference, just in case.
@@ -29,16 +34,13 @@ j (or down arrow): lower the volume
 k (or up arrow): increase the volume
 m: mute the volume
 i: go into the inside mode
-q: go outside the inside mode, or exit the application
+q: go outside the inside mode or exit the application
 ```
 
 #### inside mode
 Inside mode is used to adjust specific channel's volume.
 
 All shortcuts (besides ```q```) work the same, except that they affect single channels instead of the whole sink/source.
-
-## screenshot
-![screenshot](http://dl.dropbox.com/u/20714377/pacmixer2.png)
 
 [alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
 [CLI]: http://en.wikipedia.org/wiki/Command-line_interface

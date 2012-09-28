@@ -61,13 +61,16 @@
         case SOURCE_OUTPUT:
             type = RECORDING;
             break;
+        default:
+            type = ALL;
+            break;
     }
     Widget *w = [tui addWidgetWithName: [info objectForKey: @"name"]
                                andType: type
                                  andId: id_];
     NSArray *channels = [info objectForKey: @"channels"];
     if(channels != nil) {
-        Channels *channelsW = [w addChannels: channels];
+        [w addChannels: channels];
     }
     NSArray *options = [info objectForKey: @"options"];
     if(options != nil) {

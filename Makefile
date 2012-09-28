@@ -1,6 +1,8 @@
-CCC=gcc -std=c99
-CCFLAGS=-lpulse
-OBJCFLAGS=-lgnustep-base -lobjc -lcurses
+PREFIX=/usr/local
+
+CCC=gcc
+CFLAGS=-std=c99 -Wall
+LIBS=-lpulse -lgnustep-base -lobjc -lcurses
 OFLAGS=-fconstant-string-class=NSConstantString
 SOURCES=$(wildcard src/*.m)
 OBJECTS=$(SOURCES:.m=.o)
@@ -8,19 +10,25 @@ CSOURCES=src/backend.c
 COBJECTS=$(CSOURCES:.c=.o)
 EXEC=pacmixer
 
-all: CCC += -O2
+all: CFLAGS += -O2
 all: $(CSOURCES) $(SOURCES) $(EXEC)
-debug: CCC += -g -O0
+debug: CFLAGS += -g -O0
 debug: $(CSOURCES) $(SOURCES) $(EXEC)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)
-	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(CCFLAGS) $(OBJCFLAGS)
+	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(LIBS)
 
 clean:
 	rm -rf $(OBJECTS) $(COBJECTS) $(EXEC)
 
 %.o: %.m
-	$(CCC) $(OFLAGS) -c -o $@ $^
+	$(CCC) $(CFLAGS) $(OFLAGS) -c -o $@ $^
 
 %.o: %.c
-	$(CCC) -c -o $@ $^
+	$(CCC) $(CFLAGS) -c -o $@ $^
+
+install:
+	@echo "installing executable file into $(DESTDIR)$(PREFIX)/bin"
+	@mkdir -p $(DESTDIR)$(PREFIX)/bin
+	@cp -f pacmixer $(DESTDIR)$(PREFIX)/bin/
+	@chmod 755 $(DESTDIR)$(PREFIX)/bin/pacmixer
