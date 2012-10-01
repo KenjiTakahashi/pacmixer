@@ -1,7 +1,7 @@
 PREFIX=/usr/local
 
 CCC=gcc
-CFLAGS=-std=c99 -Wall
+CFLAGS=-std=gnu99 -Wall
 LIBS=-lpulse -lgnustep-base -lobjc -lcurses
 OFLAGS=-fconstant-string-class=NSConstantString
 SOURCES=$(wildcard src/*.m)

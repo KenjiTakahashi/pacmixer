@@ -1,2 +1,5 @@
 == 0.1:
 - Initial release.
+
+== 0.1.1:
+- Fixed infinite loop with -O2.

@@ -32,7 +32,11 @@ context_t *backend_new() {
 
 int backend_init(context_t *context, callback_t *callback) {
     pa_threaded_mainloop_start(context->loop);
+    struct timespec t, rt;
+    t.tv_sec = 0;
+    t.tv_nsec = 10;
     while(context->state != PA_CONTEXT_READY) {
+        nanosleep(&t, &rt);
         if(context->state == PA_CONTEXT_FAILED || context->state == PA_CONTEXT_TERMINATED) {
             return -1;
         }
