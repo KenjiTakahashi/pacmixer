@@ -56,6 +56,11 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
                selector: @selector(setMute:)
                    name: mname
                  object: nil];
+#ifdef DEBUG
+FILE *f = fopen(debug_filename, "a");
+fprintf(f, "%s(%s):m:%d:%s received\n", __TIME__, __func__, idx, name);
+fclose(f);
+#endif
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSString stringWithUTF8String: name], @"name",
         [NSNumber numberWithInt: idx], @"id",

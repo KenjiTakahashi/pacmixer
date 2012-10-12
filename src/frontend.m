@@ -466,6 +466,11 @@
     parent = parent_;
     width = 8;
     [self print];
+#ifdef DEBUG
+FILE *f = fopen(debug_filename, "a");
+fprintf(f, "%s(%s):f:%d:%s printed\n", __TIME__, __func__, [internalId intValue], [name UTF8String]);
+fclose(f);
+#endif
     return self;
 }
 
@@ -512,7 +517,6 @@
         length = 0;
     }
     wattron(win, color | A_BOLD);
-    mvwprintw(win, height - 1, 0, "      ");
     mvwprintw(win, height - 1, 0, "%@",
         [@"" stringByPaddingToLength: width
                           withString: @" "
@@ -829,6 +833,9 @@
 
 @implementation TUI
 -(TUI*) init {
+#ifdef DEBUG
+sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
+#endif
     self = [super init];
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];

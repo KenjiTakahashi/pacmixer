@@ -23,6 +23,11 @@
 #include <time.h>
 
 
+#ifdef DEBUG
+char debug_filename[255];
+#endif
+
+
 typedef struct CONTEXT {
     pa_threaded_mainloop *loop;
     pa_context *context;

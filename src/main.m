@@ -65,9 +65,15 @@
             type = ALL;
             break;
     }
-    Widget *w = [tui addWidgetWithName: [info objectForKey: @"name"]
+    NSString *name = [info objectForKey: @"name"];
+    Widget *w = [tui addWidgetWithName: name
                                andType: type
                                  andId: id_];
+#ifdef DEBUG
+FILE *f = fopen(debug_filename, "a");
+fprintf(f, "%s(%s):d:%d:%s passed\n", __TIME__, __func__, [id_ intValue], [name UTF8String]);
+fclose(f);
+#endif
     NSArray *channels = [info objectForKey: @"channels"];
     if(channels != nil) {
         [w addChannels: channels];

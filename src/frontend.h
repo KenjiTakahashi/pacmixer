@@ -25,6 +25,11 @@
 #import "types.h"
 
 
+#ifdef DEBUG
+char debug_filename[255];
+#endif
+
+
 @interface Channel: NSObject {
     @private
         int my;

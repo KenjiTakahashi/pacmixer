@@ -12,7 +12,7 @@ EXEC=pacmixer
 
 all: CFLAGS += -O2
 all: $(CSOURCES) $(SOURCES) $(EXEC)
-debug: CFLAGS += -g -O0
+debug: CFLAGS += -g -O0 -D DEBUG=1
 debug: $(CSOURCES) $(SOURCES) $(EXEC)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)
