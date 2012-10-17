@@ -506,13 +506,8 @@ fclose(f);
 }
 
 -(void) printName {
-    int color;
-    if(highlighted) {
-        color = COLOR_PAIR(6);
-    } else {
-        color = COLOR_PAIR(5);
-    }
-    int length = (width - [name length]) / 2;
+    int color = highlighted ? COLOR_PAIR(6) : COLOR_PAIR(5);
+    int length = (width - (int)[name length]) / 2;
     if(length < 0) {
         length = 0;
     }
