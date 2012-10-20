@@ -122,18 +122,23 @@ fclose(f);
                 [tui inside];
                 break;
             case KEY_F(1):
+            case '1':
                 [tui setFilter: ALL];
                 break;
             case KEY_F(2):
+            case '2':
                 [tui setFilter: PLAYBACK];
                 break;
             case KEY_F(3):
+            case '3':
                 [tui setFilter: RECORDING];
                 break;
             case KEY_F(4):
+            case '4':
                 [tui setFilter: OUTPUTS];
                 break;
             case KEY_F(5):
+            case '5':
                 [tui setFilter: INPUTS];
                 break;
             case KEY_RESIZE:
