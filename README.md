@@ -36,7 +36,7 @@ k (or up arrow): increase the volume
 m: mute the volume
 i: go into the inside mode
 q: go outside the inside mode or exit the application
-F1-F5: change to all/playback/recording/outputs/inputs view, respectively
+F1-F5 (or 1-5): change to all/playback/recording/outputs/inputs view, respectively
 ```
 
 #### inside mode
