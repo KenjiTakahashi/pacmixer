@@ -36,6 +36,7 @@
 }
 
 -(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     [tui release];
     [middleware release];
     [pool drain];

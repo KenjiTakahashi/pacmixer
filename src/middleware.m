@@ -118,6 +118,11 @@ void callback_remove_func(void *self_, uint32_t idx) {
     return self;
 }
 
+-(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [super dealloc];
+}
+
 -(void) setVolume: (NSNotification*) notification {
     NSNumber *v = [[notification userInfo] objectForKey: @"volume"];
     backend_volume_set(context, type, idx, i, [v intValue]);

@@ -42,6 +42,7 @@ void callback_remove_func(void*, uint32_t);
                     andId: (uint32_t) idx_
                  andIndex: (int) i_
                   andType: (backend_entry_type) type_;
+-(void) dealloc;
 -(void) setVolume: (NSNotification*) notification;
 -(void) setVolumes: (NSNotification*) notification;
 -(void) setMute: (NSNotification*) notification;

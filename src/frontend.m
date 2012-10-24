@@ -222,7 +222,7 @@
             mute = nil;
         }
         NSString *bname = [NSString stringWithFormat:
-            @"%@_%d", id_, i];
+            @"%@_%d", internalId, i];
         NSString *csignal = [NSString stringWithFormat:
             @"%@%@", @"volumeChanged", bname];
         Channel *channel = [[Channel alloc] initWithIndex: i
@@ -244,6 +244,10 @@
 }
 
 -(void) dealloc {
+    for(int i = 0; i < [channels count]; ++i) {
+        Channel *channel = [channels objectAtIndex: i];
+        [[NSNotificationCenter defaultCenter] removeObserver: channel];
+    }
     delwin(win);
     [channels release];
     [internalId release];
@@ -866,6 +870,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
 }
 
 -(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     delwin(win);
     endwin();
     [bottom release];
