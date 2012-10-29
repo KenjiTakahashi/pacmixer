@@ -46,3 +46,14 @@ All shortcuts (besides ```q```) work the same, except that they affect single ch
 
 [alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
 [CLI]: http://en.wikipedia.org/wiki/Command-line_interface
+
+
+## Something's broken?
+
+Please compile **pacmixer** using
+```sh
+$ make debug
+```
+then run it, reproduce the problem and send the contents of ```~/.pacmixer.log``` file with your bug report.
+
+That will make it easier to identify the problem.

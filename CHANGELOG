@@ -8,3 +8,5 @@
 - Fixed controls names sometimes not displayed on 32bit systems.
 - Added 1/2/3/4/5 as synonym for F1/F2/F3/F4/F5 (by @arandomuser).
 - Properly removing observers from notification center.
+
+== 0.2:
