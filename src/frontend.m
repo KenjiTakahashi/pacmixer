@@ -290,7 +290,10 @@
 }
 
 -(void) setLevel: (int) level forChannel: (int) channel {
-    [(Channel*)[channels objectAtIndex: channel] setLevel: level];
+    Channel *ch = [channels objectAtIndex: channel];
+    [ch setPropagation: NO];
+    [ch setLevel: level];
+    [ch setPropagation: YES];
 }
 
 -(void) adjust {

@@ -76,8 +76,16 @@ fprintf(f, "%s(%s):d:%d:%s passed\n", __TIME__, __func__, [id_ intValue], [name 
 fclose(f);
 #endif
     NSArray *channels = [info objectForKey: @"channels"];
+    NSArray *volumes = [info objectForKey: @"volumes"];
     if(channels != nil) {
-        [w addChannels: channels];
+        Channels *channelsWidgets = [w addChannels: channels];
+        for(int i = 0; i < [channels count]; ++i) {
+            volume_t *volume = [volumes objectAtIndex: i];
+            [channelsWidgets setLevel: [[volume level] intValue]
+                           forChannel: i];
+            [channelsWidgets setMute: [volume mute]
+                          forChannel: i];
+        }
     }
     NSArray *options = [info objectForKey: @"options"];
     if(options != nil) {

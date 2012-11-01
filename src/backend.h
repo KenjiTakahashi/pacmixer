@@ -66,7 +66,7 @@ void backend_volume_set(context_t*, backend_entry_type, uint32_t, int, int);
 void backend_volume_setall(context_t*, backend_entry_type, uint32_t, int*, int);
 void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 
-typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, uint8_t);
+typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_update_func)(void*, uint32_t, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_remove_func)(void*, uint32_t);
 

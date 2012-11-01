@@ -18,11 +18,12 @@
 #import "middleware.h"
 
 
-void callback_add_func(void *self_, const char *name, backend_entry_type type, uint32_t idx, const backend_channel_t *channels, uint8_t chnum) {
+void callback_add_func(void *self_, const char *name, backend_entry_type type, uint32_t idx, const backend_channel_t *channels, const backend_volume_t *volumes, uint8_t chnum) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     [self retain];
     NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
+    NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     for(int i = 0; i < chnum; ++i) {
         NSNumber *lvl = [NSNumber numberWithInt: channels[i].maxLevel];
@@ -31,6 +32,10 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
         [ch addObject: [[channel_t alloc] initWithMaxLevel: lvl
                                               andNormLevel: nlvl
                                                 andMutable: mut]];
+        NSNumber *vlvl = [NSNumber numberWithInt: volumes[i].level];
+        BOOL vmut = volumes[i].mute == 1 ? YES : NO;
+        [chv addObject: [[volume_t alloc] initWithLevel: vlvl
+                                                andMute: vmut]];
         Block *block = [self addBlockWithId: idx
                                    andIndex: i
                                     andType: type];
@@ -61,10 +66,12 @@ FILE *f = fopen(debug_filename, "a");
 fprintf(f, "%s(%s):m:%d:%s received\n", __TIME__, __func__, idx, name);
 fclose(f);
 #endif
+    NSString *volumesS = [NSString stringWithString: @"volumes"];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSString stringWithUTF8String: name], @"name",
         [NSNumber numberWithInt: idx], @"id",
-        ch, @"channels", [NSNumber numberWithInt: type], @"type",  nil];
+        ch, @"channels", chv, volumesS,
+        [NSNumber numberWithInt: type], @"type", nil];
     NSString *nname = [NSString stringWithString: @"controlAppeared"];
     [center postNotificationName: nname
                           object: self

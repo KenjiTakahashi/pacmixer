@@ -135,8 +135,7 @@ FILE *f = fopen(debug_filename, "a");
 fprintf(f, "%s(%s):%d:%s appeared\n", __TIME__, __func__, client_callback->index, info->name);
 fclose(f);
 #endif
-        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, client_callback->channels, client_callback->chnum);
-        ((tcallback_update_func)(callback->update))(callback->self, client_callback->index, client_callback->volumes, client_callback->chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, client_callback->channels, client_callback->volumes, client_callback->chnum);
         free(client_callback->channels);
         free(client_callback->volumes);
         free(client_callback);
@@ -331,9 +330,8 @@ FILE *f = fopen(debug_filename, "a");
 fprintf(f, "%s(%s):%d:%s appeared\n", __TIME__, __func__, index, description);
 fclose(f);
 #endif
-        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, channels, chnum);
         backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-        ((tcallback_update_func)(callback->update))(callback->self, index, volumes, chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, channels, volumes, chnum);
         free(channels);
         free(volumes);
     }
