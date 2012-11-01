@@ -28,9 +28,7 @@
     self = [super init];
     signal = [signal_ copy];
     propagate = YES;
-    int mx;
-    getmaxyx(parent, my, mx);
-    my -= 1;
+    my = getmaxy(parent) - 1;
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
         mutable = YES;
@@ -403,9 +401,7 @@
     self = [super init];
     options = options_;
     highlight = 0;
-    int my;
-    int mx;
-    getmaxyx(parent, my, mx);
+    int my = getmaxy(parent);
     int dy = [options count];
     win = derwin(parent, dy + 2, 8, my - dy - 3, 0);
     box(win, 0, 0);
@@ -686,9 +682,7 @@ fclose(f);
 -(Top*) init {
     self = [super init];
     view = ALL;
-    int my;
-    int mx;
-    getmaxyx(stdscr, my, mx);
+    int mx = getmaxx(stdscr);
     win = newwin(1, mx, 0, 0);
     [self print];
     return self;
@@ -735,9 +729,7 @@ fclose(f);
 }
 
 -(void) reprint {
-    int my;
-    int mx;
-    getmaxyx(stdscr, my, mx);
+    int mx = getmaxx(stdscr);
     wresize(win, 1, mx);
     [self print];
 }
@@ -854,9 +846,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
     init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     refresh();
-    int my;
-    int mx;
-    getmaxyx(stdscr, my, mx);
+    int my = getmaxy(stdscr);
     win = newpad(my - 4, 1);
     padding = 0;
     paddingStates = [[NSMutableArray alloc] init];
@@ -885,8 +875,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    int yy;
-    getmaxyx(win, yy, mx);
+    mx = getmaxx(win);
     [top reprint];
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
@@ -1014,9 +1003,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
         int start = [[widgets objectAtIndex: highlight] endPosition];
         [self setCurrent: highlight + 1];
         Widget *w = [widgets objectAtIndex: highlight];
-        int my;
-        int mx;
-        getmaxyx(stdscr, my, mx);
+        int mx = getmaxx(stdscr);
         if([w endPosition] - padding >= mx) {
             int delta = [w width] - (mx - start - 3 + padding);
             padding += delta;
