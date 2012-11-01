@@ -331,16 +331,17 @@
     return YES;
 }
 
--(void) up {
+-(void) upDown_: (NSString*) selname {
     if(inside) {
-        [(Channel*)[channels objectAtIndex: highlight] up];
+        Channel *channel = [channels objectAtIndex: highlight];
+        [channel performSelector: NSSelectorFromString(selname)];
     } else {
         int count = [channels count];
         NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
         for(int i = 0; i < count; ++i) {
             Channel *channel = [channels objectAtIndex: i];
             [channel setPropagation: NO];
-            [channel up];
+            [channel performSelector: NSSelectorFromString(selname)];
             [values addObject: [NSNumber numberWithInt: [channel level]]];
             [channel setPropagation: YES];
         }
@@ -348,21 +349,12 @@
     }
 }
 
+-(void) up {
+    [self upDown_: @"up"];
+}
+
 -(void) down {
-    if(inside) {
-        [(Channel*)[channels objectAtIndex: highlight] down];
-    } else {
-        int count = [channels count];
-        NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
-        for(int i = 0; i < count; ++i) {
-            Channel *channel = [channels objectAtIndex: i];
-            [channel setPropagation: NO];
-            [channel down];
-            [values addObject: [NSNumber numberWithInt: [channel level]]];
-            [channel setPropagation: YES];
-        }
-        [self notify: values];
-    }
+    [self upDown_: @"down"];
 }
 
 -(void) inside {

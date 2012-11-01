@@ -99,6 +99,7 @@ char debug_filename[255];
 -(void) notify: (NSArray*) values;
 -(BOOL) previous;
 -(BOOL) next;
+-(void) upDown_: (NSString*) selname;
 -(void) up;
 -(void) down;
 -(void) inside;
