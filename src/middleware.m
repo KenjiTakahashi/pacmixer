@@ -19,6 +19,9 @@
 
 
 void callback_add_func(void *self_, const char *name, backend_entry_type type, uint32_t idx, const backend_channel_t *channels, const backend_volume_t *volumes, uint8_t chnum) {
+#ifdef DEBUG
+FILE *f = fopen(debug_filename, "a");
+#endif
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     [self retain];
@@ -41,6 +44,9 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
                                     andType: type];
         NSString *sname = [NSString stringWithFormat:
             @"%@%d_%d", @"volumeChanged", idx, i];
+#ifdef DEBUG
+fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
+#endif
         [center addObserver: block
                    selector: @selector(setVolume:)
                        name: sname
@@ -51,18 +57,23 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
                                 andType: type];
     NSString *sname = [NSString stringWithFormat:
         @"%@%d", @"volumeChanged", idx];
+#ifdef DEBUG
+fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
+#endif
     [center addObserver: block
                selector: @selector(setVolumes:)
                    name: sname
                  object: nil];
     NSString *mname = [NSString stringWithFormat:
         @"%@%d", @"muteChanged", idx];
+#ifdef DEBUG
+fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [mname UTF8String]);
+#endif
     [center addObserver: block
                selector: @selector(setMute:)
                    name: mname
                  object: nil];
 #ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
 fprintf(f, "%s(%s):m:%d:%s received\n", __TIME__, __func__, idx, name);
 fclose(f);
 #endif
