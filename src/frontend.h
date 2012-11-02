@@ -82,12 +82,12 @@ char debug_filename[255];
         int my;
         int mx;
         int highlight;
-        NSNumber *internalId;
+        NSString *internalId;
 }
 
 -(Channels*) initWithChannels: (NSArray*) channels_
                   andPosition: (int) position_
-                        andId: (NSNumber*) id_
+                        andId: (NSString*) id_
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
@@ -143,7 +143,7 @@ typedef enum {
         int width;
         NSString *name;
         View type;
-        NSNumber *internalId;
+        NSString *internalId;
         NSMutableArray *controls;
         BOOL highlighted;
         int highlight;
@@ -154,7 +154,7 @@ typedef enum {
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
                     andType: (View) type_
-                      andId: (NSNumber*) id_
+                      andId: (NSString*) id_
                   andParent: (WINDOW*) parent_;
 -(void) dealloc;
 -(void) print;
@@ -237,7 +237,7 @@ typedef enum {
 -(void) refresh: (NSNotification*) notification;
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
-                       andId: (NSNumber*) id_;
+                       andId: (NSString*) id_;
 -(void) removeWidget: (NSNumber*) id_;
 -(void) setCurrent: (int) i;
 -(void) setFilter: (View) type;

@@ -177,7 +177,7 @@
 @implementation Channels
 -(Channels*) initWithChannels: (NSArray*) channels_
                   andPosition: (int) position_
-                        andId: (NSNumber*) id_
+                        andId: (NSString*) id_
                     andParent: (WINDOW*) parent {
     self = [super init];
     highlight = 0;
@@ -211,6 +211,9 @@
     [self print];
     internalId = [id_ copy];
     channels = [[NSMutableArray alloc] init];
+#ifdef DEBUG
+FILE *f = fopen(debug_filename, "a");
+#endif
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
         NSNumber *mute;
@@ -236,8 +239,14 @@
                                                  selector: selector
                                                      name: nname
                                                    object: nil];
+#ifdef DEBUG
+fprintf(f, "%s(%s):f:%s observer added\n", __TIME__, __func__, [nname UTF8String]);
+#endif
         [channels addObject: channel];
     }
+#ifdef DEBUG
+fclose(f);
+#endif
     return self;
 }
 
@@ -449,7 +458,7 @@
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
                     andType: (View) type_
-                      andId: (NSNumber*) id_
+                      andId: (NSString*) id_
                   andParent: (WINDOW*) parent_ {
     self = [super init];
     highlight = 0;
@@ -668,7 +677,9 @@ fclose(f);
 }
 
 -(NSNumber*) internalId {
-    return internalId;
+    NSArray *components = [internalId componentsSeparatedByString: @"_"];
+    int i = [[components objectAtIndex: 0] integerValue];
+    return [NSNumber numberWithInteger: i];
 }
 @end
 
@@ -890,7 +901,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
 
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
-                       andId: (NSNumber*) id_ {
+                       andId: (NSString*) id_ {
     int x = [[widgets lastObject] endPosition] + 1;
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name

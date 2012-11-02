@@ -67,7 +67,7 @@ void backend_volume_setall(context_t*, backend_entry_type, uint32_t, int*, int);
 void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);
-typedef void (*tcallback_update_func)(void*, uint32_t, const backend_volume_t*, uint8_t);
+typedef void (*tcallback_update_func)(void*, uint32_t, backend_entry_type, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_remove_func)(void*, uint32_t);
 
 typedef struct CLIENT_CALLBACK {
@@ -100,6 +100,6 @@ void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
 void _cb_event(pa_context*, pa_subscription_event_type_t, uint32_t, void*);
 backend_channel_t *_do_channels(pa_cvolume, uint8_t chnum);
 backend_volume_t *_do_volumes(pa_cvolume, uint8_t chnum, int mute);
-void _cb_u(uint32_t, pa_cvolume, int, void*);
+void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, void*);
 void _cb1(uint32_t, pa_cvolume, int, const char*, backend_entry_type, void*);
 void _cb2(pa_context*, uint32_t, pa_cvolume, int, const char*, backend_entry_type,  uint32_t, void*);

@@ -67,9 +67,11 @@
             break;
     }
     NSString *name = [info objectForKey: @"name"];
+    NSString *internalId = [NSString stringWithFormat:
+        @"%@_%d", id_, typeb];
     Widget *w = [tui addWidgetWithName: name
                                andType: type
-                                 andId: id_];
+                                 andId: internalId];
 #ifdef DEBUG
 FILE *f = fopen(debug_filename, "a");
 fprintf(f, "%s(%s):d:%d:%s passed\n", __TIME__, __func__, [id_ intValue], [name UTF8String]);

@@ -27,7 +27,7 @@
 
 
 void callback_add_func(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);
-void callback_update_func(void*, uint32_t, const backend_volume_t*, uint8_t);
+void callback_update_func(void*, uint32_t, backend_entry_type, const backend_volume_t*, uint8_t);
 void callback_remove_func(void*, uint32_t);
 
 @interface Block: NSObject {

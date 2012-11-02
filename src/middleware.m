@@ -43,37 +43,35 @@ FILE *f = fopen(debug_filename, "a");
                                    andIndex: i
                                     andType: type];
         NSString *sname = [NSString stringWithFormat:
-            @"%@%d_%d", @"volumeChanged", idx, i];
-#ifdef DEBUG
-fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
-#endif
+            @"%@%d_%d_%d", @"volumeChanged", idx, type, i];
         [center addObserver: block
                    selector: @selector(setVolume:)
                        name: sname
                      object: nil];
+#ifdef DEBUG
+fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
+#endif
     }
     Block *block = [self addBlockWithId: idx
                                andIndex: -1
                                 andType: type];
     NSString *sname = [NSString stringWithFormat:
-        @"%@%d", @"volumeChanged", idx];
-#ifdef DEBUG
-fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
-#endif
+        @"%@%d_%d", @"volumeChanged", idx, type];
     [center addObserver: block
                selector: @selector(setVolumes:)
                    name: sname
                  object: nil];
-    NSString *mname = [NSString stringWithFormat:
-        @"%@%d", @"muteChanged", idx];
 #ifdef DEBUG
-fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [mname UTF8String]);
+fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
 #endif
+    NSString *mname = [NSString stringWithFormat:
+        @"%@%d_%d", @"muteChanged", idx, type];
     [center addObserver: block
                selector: @selector(setMute:)
                    name: mname
                  object: nil];
 #ifdef DEBUG
+fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [mname UTF8String]);
 fprintf(f, "%s(%s):m:%d:%s received\n", __TIME__, __func__, idx, name);
 fclose(f);
 #endif
@@ -90,25 +88,33 @@ fclose(f);
     [pool release];
 }
 
-void callback_update_func(void *self_, uint32_t idx, const backend_volume_t *volumes, uint8_t chnum) {
+void callback_update_func(void *self_, uint32_t idx, backend_entry_type type, const backend_volume_t *volumes, uint8_t chnum) {
+#ifdef DEBUG
+FILE *f = fopen(debug_filename, "a");
+#endif
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     for(int i = 0; i < chnum; ++i) {
         NSNumber *lvl = [NSNumber numberWithInt: volumes[i].level];
         BOOL mut = volumes[i].mute == 1 ? YES : NO;
-        NSNumber *id_ = [NSNumber numberWithInt: idx];
         volume_t *v = [[volume_t alloc] initWithLevel: lvl
                                               andMute: mut];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             v, @"volumes", nil];
         NSString *nname = [NSString stringWithFormat:
-        @"%@%@_%d", @"controlChanged", id_, i];
+        @"%@%d_%d_%d", @"controlChanged", idx, type, i];
         [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                             object: self
                                                           userInfo: s];
+#ifdef DEBUG
+fprintf(f, "%s(%s):m:%s notification posted\n", __TIME__, __func__, [nname UTF8String]);
+#endif
         [v release];
     }
     [pool release];
+#ifdef DEBUG
+fclose(f);
+#endif
 }
 
 void callback_remove_func(void *self_, uint32_t idx) {
