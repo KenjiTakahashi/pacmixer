@@ -306,8 +306,7 @@ fclose(f);
 }
 
 -(void) adjust {
-    int width = [channels count] + 2;
-    mvderwin(win, y, width / 2);
+    mvderwin(win, y, position);
     for(int i = 0; i < [channels count]; ++i) {
         [[channels objectAtIndex: i] adjust: i];
     }
