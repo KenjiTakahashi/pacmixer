@@ -596,32 +596,35 @@ fclose(f);
 -(void) outside {
     if(inside) {
         inside = NO;
-        [[controls objectAtIndex: highlight] outside];
+        [(id<Controlling>)[controls objectAtIndex: highlight] outside];
     }
 }
 
 -(void) previous {
     if(inside) {
-        BOOL end = [[controls objectAtIndex: highlight] previous];
+        id<Controlling> control = [controls objectAtIndex: highlight];
+        BOOL end = [control previous];
         while(end) {
             if(highlight == 0) {
                 break;
             }
             highlight -= 1;
-            end = [[controls objectAtIndex: highlight] previous];
+            control = [controls objectAtIndex: highlight];
+            end = [control previous];
         }
     }
 }
 
 -(void) next {
     if(inside) {
-        BOOL end = [[controls objectAtIndex: highlight] next];
+        id<Controlling> control = [controls objectAtIndex: highlight];
+        BOOL end = [control next];
         while(end) {
             if(highlight == [controls count] - 1) {
                 break;
             }
             highlight += 1;
-            end = [[controls objectAtIndex: highlight] next];
+            end = [(id<Controlling>)[controls objectAtIndex: highlight] next];
         }
     }
 }
@@ -648,7 +651,7 @@ fclose(f);
 
 -(void) mute {
     for(int i = 0; i < [controls count]; ++i) {
-        id obj = [controls objectAtIndex: i];
+        id<Controlling> obj = [controls objectAtIndex: i];
         if([obj respondsToSelector: @selector(mute)]) {
             [obj mute];
         }
@@ -987,7 +990,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
 
 -(void) previous {
     if(inside) {
-        [[widgets objectAtIndex: highlight] previous];
+        [(id<Controlling>)[widgets objectAtIndex: highlight] previous];
     } else if(highlight > 0) {
         [self setCurrent: highlight - 1];
         Widget *w = [widgets objectAtIndex: highlight];
@@ -1003,7 +1006,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
 
 -(void) next {
     if(inside) {
-        [[widgets objectAtIndex: highlight] next];
+        [(id<Controlling>)[widgets objectAtIndex: highlight] next];
     } else if(highlight < (int)[widgets count] - 1) {
         int start = [[widgets objectAtIndex: highlight] endPosition];
         [self setCurrent: highlight + 1];
@@ -1027,7 +1030,7 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
 }
 
 -(void) mute {
-    [[widgets objectAtIndex: highlight] mute];
+    [(id<Controlling>)[widgets objectAtIndex: highlight] mute];
 }
 
 -(void) inside {

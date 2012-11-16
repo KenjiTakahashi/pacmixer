@@ -30,6 +30,14 @@ char debug_filename[255];
 #endif
 
 
+@protocol Controlling <NSObject>
+-(BOOL) previous;
+-(BOOL) next;
+-(void) outside;
+-(void) mute;
+@end
+
+
 @interface Channel: NSObject {
     @private
         int my;
@@ -70,7 +78,7 @@ char debug_filename[255];
 @end
 
 
-@interface Channels: NSObject {
+@interface Channels: NSObject <Controlling> {
     @private
         WINDOW *win;
         NSMutableArray *channels;
@@ -135,7 +143,7 @@ typedef enum {
 } View;
 
 
-@interface Widget: NSObject {
+@interface Widget: NSObject <Controlling> {
     @private
         WINDOW *win;
         int position;
@@ -218,7 +226,7 @@ typedef enum {
 @end
 
 
-@interface TUI: NSObject {
+@interface TUI: NSObject <Controlling> {
     @private
         NSMutableArray *allWidgets;
         NSMutableArray *widgets;

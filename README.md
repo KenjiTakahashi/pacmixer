@@ -23,8 +23,6 @@ $ make
 ```
 and you're done.
 
-(Don't mind the "multiple method definitions" warnings).
-
 ## usage
 **pacmixer** comes with built-in help, but here's the shortcuts reference, just in case.
 
