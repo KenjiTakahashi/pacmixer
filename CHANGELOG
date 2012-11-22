@@ -14,5 +14,6 @@
 - Fixed Monitor controls changing monitored sink values.
 - Using @protocol to avoid "multiple definitions" warnings.
 - Fixed single channel controls being printed too much to the left.
+- Fixed a corner case in disappearing controls removal.
 
 == 0.2:

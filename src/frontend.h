@@ -21,6 +21,7 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSDecimalNumber.h>
 #import <Foundation/NSNotification.h>
+#import <Foundation/NSIndexSet.h>
 #import <curses.h>
 #import "types.h"
 #ifdef DEBUG

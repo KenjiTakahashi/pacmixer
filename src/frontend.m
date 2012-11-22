@@ -872,7 +872,9 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    mx = getmaxx(win);
+#ifdef DEBUG
+debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
+#endif
     [top reprint];
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
@@ -912,12 +914,12 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) removeWidget: (NSNumber*) id_ {
-    NSArray *copy = [widgets copy];
-    for(int i = 0; i < [copy count]; ++i) {
-        Widget *widget = [copy objectAtIndex: i];
+    NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
+    for(int i = 0; i < [widgets count]; ++i) {
+        Widget *widget = [widgets objectAtIndex: i];
         if([[widget internalId] isEqualToNumber: id_]) {
             [widget hide];
-            [widgets removeObjectAtIndex: i];
+            [indexes addIndex: i];
             [allWidgets removeObject: widget];
 #ifdef DEBUG
 debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
@@ -925,13 +927,13 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
             if(highlight >= i) {
                 if(highlight > 0) {
                     highlight -= 1;
-                } else if(highlight == 0 && [widgets count] > 1) {
+                } else if(highlight == 0 && (int)[widgets count] - 1 > 1) {
                     highlight += 1;
                 }
             }
         }
     }
-    [copy release];
+    [widgets removeObjectsAtIndexes: indexes];
     int x = 1;
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
