@@ -211,9 +211,6 @@
     [self print];
     internalId = [id_ copy];
     channels = [[NSMutableArray alloc] init];
-#ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-#endif
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
         NSNumber *mute;
@@ -240,13 +237,10 @@ FILE *f = fopen(debug_filename, "a");
                                                      name: nname
                                                    object: nil];
 #ifdef DEBUG
-fprintf(f, "%s(%s):f:%s observer added\n", __TIME__, __func__, [nname UTF8String]);
+debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
 #endif
         [channels addObject: channel];
     }
-#ifdef DEBUG
-fclose(f);
-#endif
     return self;
 }
 
@@ -470,9 +464,7 @@ fclose(f);
     width = 8;
     [self print];
 #ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-fprintf(f, "%s(%s):f:%d:%s printed\n", __TIME__, __func__, [internalId intValue], [name UTF8String]);
-fclose(f);
+debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8String]);
 #endif
     return self;
 }
@@ -832,9 +824,6 @@ fclose(f);
 
 @implementation TUI
 -(TUI*) init {
-#ifdef DEBUG
-sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
-#endif
     self = [super init];
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
@@ -930,6 +919,9 @@ sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
             [widget hide];
             [widgets removeObjectAtIndex: i];
             [allWidgets removeObject: widget];
+#ifdef DEBUG
+debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
+#endif
             if(highlight >= i) {
                 if(highlight > 0) {
                     highlight -= 1;

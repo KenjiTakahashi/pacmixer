@@ -21,10 +21,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-
-
 #ifdef DEBUG
-char debug_filename[255];
+#include "debug.h"
 #endif
 
 

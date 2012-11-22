@@ -19,9 +19,6 @@
 
 
 void callback_add_func(void *self_, const char *name, backend_entry_type type, uint32_t idx, const backend_channel_t *channels, const backend_volume_t *volumes, uint8_t chnum) {
-#ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-#endif
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     [self retain];
@@ -49,7 +46,7 @@ FILE *f = fopen(debug_filename, "a");
                        name: sname
                      object: nil];
 #ifdef DEBUG
-fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
+debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
 #endif
     }
     Block *block = [self addBlockWithId: idx
@@ -62,7 +59,7 @@ fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String
                    name: sname
                  object: nil];
 #ifdef DEBUG
-fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String]);
+debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
 #endif
     NSString *mname = [NSString stringWithFormat:
         @"%@%d_%d", @"muteChanged", idx, type];
@@ -71,9 +68,8 @@ fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [sname UTF8String
                    name: mname
                  object: nil];
 #ifdef DEBUG
-fprintf(f, "%s(%s):m:%s observer added\n", __TIME__, __func__, [mname UTF8String]);
-fprintf(f, "%s(%s):m:%d:%s received\n", __TIME__, __func__, idx, name);
-fclose(f);
+debug_fprintf(__func__, "m:%s observer added", [mname UTF8String]);
+debug_fprintf(__func__, ":m:%d:%s received", idx, name);
 #endif
     NSString *volumesS = [NSString stringWithString: @"volumes"];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -89,9 +85,6 @@ fclose(f);
 }
 
 void callback_update_func(void *self_, uint32_t idx, backend_entry_type type, const backend_volume_t *volumes, uint8_t chnum) {
-#ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-#endif
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     for(int i = 0; i < chnum; ++i) {
@@ -107,14 +100,11 @@ FILE *f = fopen(debug_filename, "a");
                                                             object: self
                                                           userInfo: s];
 #ifdef DEBUG
-fprintf(f, "%s(%s):m:%s notification posted\n", __TIME__, __func__, [nname UTF8String]);
+debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
 #endif
         [v release];
     }
     [pool release];
-#ifdef DEBUG
-fclose(f);
-#endif
 }
 
 void callback_remove_func(void *self_, uint32_t idx) {

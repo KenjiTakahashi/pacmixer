@@ -12,5 +12,7 @@
 == 0.1.3:
 - Fixed controls sometimes displaying wrong values at start.
 - Fixed Monitor controls changing monitored sink values.
+- Using @protocol to avoid "multiple definitions" warnings.
+- Fixed single channel controls being printed too much to the left.
 
 == 0.2:

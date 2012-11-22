@@ -4,6 +4,9 @@
 #import <Foundation/NSAutoreleasePool.h>
 #import "frontend.h"
 #import "middleware.h"
+#ifdef DEBUG
+#import "debug.h"
+#endif
 
 
 @interface Dispatcher: NSObject {

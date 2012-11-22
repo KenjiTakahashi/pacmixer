@@ -23,10 +23,8 @@
 #import <Foundation/NSNotification.h>
 #import <curses.h>
 #import "types.h"
-
-
 #ifdef DEBUG
-char debug_filename[255];
+#import "debug.h"
 #endif
 
 

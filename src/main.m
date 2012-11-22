@@ -73,9 +73,7 @@
                                andType: type
                                  andId: internalId];
 #ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-fprintf(f, "%s(%s):d:%d:%s passed\n", __TIME__, __func__, [id_ intValue], [name UTF8String]);
-fclose(f);
+debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
 #endif
     NSArray *channels = [info objectForKey: @"channels"];
     NSArray *volumes = [info objectForKey: @"volumes"];

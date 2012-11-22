@@ -24,6 +24,9 @@
 #import <Foundation/NSAutoreleasePool.h>
 #import "types.h"
 #import "backend.h"
+#ifdef DEBUG
+#import "debug.h"
+#endif
 
 
 void callback_add_func(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);

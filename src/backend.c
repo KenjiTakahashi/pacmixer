@@ -21,9 +21,6 @@
 
 
 context_t *backend_new() {
-#ifdef DEBUG
-sprintf(debug_filename, "%s%s", getenv("HOME"), "/.pacmixer.log");
-#endif
     context_t *context = malloc(sizeof(context_t));
     context->loop = pa_threaded_mainloop_new();
     context->state = PA_CONTEXT_UNCONNECTED;
@@ -131,9 +128,7 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
         client_callback_t *client_callback = userdata;
         callback_t *callback = client_callback->callback;
 #ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-fprintf(f, "%s(%s):%d:%s appeared\n", __TIME__, __func__, client_callback->index, info->name);
-fclose(f);
+debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
 #endif
         ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, client_callback->channels, client_callback->volumes, client_callback->chnum);
         free(client_callback->channels);
@@ -326,9 +321,7 @@ void _cb1(uint32_t index, pa_cvolume volume, int mute, const char *description, 
         uint8_t chnum = volume.channels;
         backend_channel_t *channels = _do_channels(volume, chnum);
 #ifdef DEBUG
-FILE *f = fopen(debug_filename, "a");
-fprintf(f, "%s(%s):%d:%s appeared\n", __TIME__, __func__, index, description);
-fclose(f);
+debug_fprintf(__func__, "%d:%s appeared", index, description);
 #endif
         backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
         ((tcallback_add_func)(callback->add))(callback->self, description, type, index, channels, volumes, chnum);
