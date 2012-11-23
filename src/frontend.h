@@ -36,8 +36,13 @@
 -(void) mute;
 @end
 
+@protocol Hiding <NSObject>
+-(void) show;
+-(void) hide;
+@end
 
-@interface Channel: NSObject {
+
+@interface Channel: NSObject <Hiding> {
     @private
         int my;
         WINDOW *win;
@@ -49,6 +54,7 @@
         BOOL mutable;
         BOOL inside;
         BOOL propagate;
+        BOOL hidden;
         NSString *signal;
 }
 
@@ -74,10 +80,12 @@
 -(void) down;
 -(void) mute;
 -(BOOL) isMuted;
+-(void) show;
+-(void) hide;
 @end
 
 
-@interface Channels: NSObject <Controlling> {
+@interface Channels: NSObject <Controlling, Hiding> {
     @private
         WINDOW *win;
         NSMutableArray *channels;
@@ -99,7 +107,6 @@
 -(void) dealloc;
 -(void) print;
 -(void) reprint: (int) height;
--(void) show;
 -(void) setMute: (BOOL) mute forChannel: (int) channel;
 -(void) setLevel: (int) level forChannel: (int) channel;
 -(void) adjust;
@@ -112,6 +119,8 @@
 -(void) inside;
 -(void) outside;
 -(void) mute;
+-(void) show;
+-(void) hide;
 @end
 
 
@@ -142,7 +151,7 @@ typedef enum {
 } View;
 
 
-@interface Widget: NSObject <Controlling> {
+@interface Widget: NSObject <Controlling, Hiding> {
     @private
         WINDOW *win;
         int position;
@@ -167,8 +176,6 @@ typedef enum {
 -(void) print;
 -(void) reprint: (int) height_;
 -(void) printName;
--(void) show;
--(void) hide;
 -(Channels*) addChannels: (NSArray*) channels;
 -(Options*) addOptions: (NSArray*) options;
 -(void) setHighlighted: (BOOL) active;
@@ -186,6 +193,8 @@ typedef enum {
 -(View) type;
 -(NSString*) name;
 -(NSNumber*) internalId;
+-(void) show;
+-(void) hide;
 @end
 
 

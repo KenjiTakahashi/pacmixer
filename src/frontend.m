@@ -28,6 +28,7 @@
     self = [super init];
     signal = [signal_ copy];
     propagate = YES;
+    hidden = NO;
     my = getmaxy(parent) - 1;
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
@@ -125,7 +126,9 @@
          andMute: (BOOL) mute_ {
     currentLevel = level_;
     mute = mute_;
-    [self print];
+    if(!hidden) {
+        [self print];
+    }
 }
 
 -(void) setPropagation: (BOOL) p {
@@ -170,6 +173,14 @@
 
 -(BOOL) isMuted {
     return mute;
+}
+
+-(void) show {
+    hidden = NO;
+}
+
+-(void) hide {
+    hidden = YES;
 }
 @end
 
@@ -281,13 +292,6 @@ debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
     [self print];
 }
 
--(void) show {
-    [self print];
-    for(int i = 0; i < [channels count]; ++i) {
-        [(Channel*)[channels objectAtIndex: i] print];
-    }
-}
-
 -(void) setMute: (BOOL) mute forChannel: (int) channel {
     [(Channel*)[channels objectAtIndex: channel] setMute: mute];
 }
@@ -388,6 +392,21 @@ debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
+}
+
+-(void) show {
+    [self print];
+    for(int i = 0; i < [channels count]; ++i) {
+        Channel *channel = [channels objectAtIndex: i];
+        [channel print];
+        [channel show];
+    }
+}
+
+-(void) hide {
+    for(int i = 0; i < [channels count]; ++i) {
+        [(Channel*)[channels objectAtIndex: i] hide];
+    }
 }
 @end
 
@@ -512,17 +531,6 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     );
     mvwprintw(win, height - 1, length, "%@", name);
     wattroff(win, color | A_BOLD);
-}
-
--(void) show {
-    [self printName];
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] show];
-    }
-}
-
--(void) hide {
-    werase(win);
 }
 
 -(Channels*) addChannels: (NSArray*) channels {
@@ -672,6 +680,19 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     NSArray *components = [internalId componentsSeparatedByString: @"_"];
     int i = [[components objectAtIndex: 0] integerValue];
     return [NSNumber numberWithInteger: i];
+}
+
+-(void) show {
+    [self printName];
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] show];
+    }
+}
+
+-(void) hide {
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] hide];
+    }
 }
 @end
 
@@ -913,10 +934,10 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 
 -(void) removeWidget: (NSNumber*) id_ {
     NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
+    wclear(win);
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *widget = [widgets objectAtIndex: i];
         if([[widget internalId] isEqualToNumber: id_]) {
-            [widget hide];
             [indexes addIndex: i];
             [allWidgets removeObject: widget];
 #ifdef DEBUG
@@ -935,9 +956,6 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     int x = 1;
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
-        if([w endPosition] > x) {
-            [w hide];
-        }
         [w setPosition: x];
         [w show];
         x = [w endPosition] + 1;
@@ -969,6 +987,8 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
             [w setPosition: x];
             [w show];
             x = [w endPosition] + 1;
+        } else {
+            [w hide];
         }
     }
     highlight = 0;

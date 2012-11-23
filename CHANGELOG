@@ -16,5 +16,6 @@
 - Fixed single channel controls being printed too much to the left.
 - Fixed a corner case in disappearing controls removal.
 - Fixed some setFilter corner cases causing screen corruptions.
+- Fixed hidden widgets getting reprinted when changed outside the app.
 
 == 0.2:
