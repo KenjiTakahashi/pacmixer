@@ -15,5 +15,6 @@
 - Using @protocol to avoid "multiple definitions" warnings.
 - Fixed single channel controls being printed too much to the left.
 - Fixed a corner case in disappearing controls removal.
+- Fixed some setFilter corner cases causing screen corruptions.
 
 == 0.2:

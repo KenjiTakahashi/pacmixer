@@ -480,9 +480,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(void) print {
     int mx;
     getmaxyx(parent, height, mx);
-    if(position + width > mx) {
-        wresize(parent, height, position + width);
-    }
+    wresize(parent, height, mx + width + 1);
     if(win == NULL) {
         win = derwin(parent, height, width, 0, position);
     } else {
@@ -944,7 +942,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         [w show];
         x = [w endPosition] + 1;
     }
-    if([widgets count] != 0) {
+    if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
     [self refresh: nil];
@@ -961,20 +959,16 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: NO];
     }
+    wclear(win);
     [widgets removeAllObjects];
     int x = 1;
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
         if([top view] == ALL || [w type] == [top view]) {
             [widgets addObject: w];
-            if([w endPosition] > x) {
-                [w hide];
-            }
             [w setPosition: x];
             [w show];
             x = [w endPosition] + 1;
-        } else if([w endPosition] > x) {
-            [w hide];
         }
     }
     highlight = 0;
