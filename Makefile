@@ -6,7 +6,7 @@ LIBS=-lpulse -lgnustep-base -lobjc -lcurses
 OFLAGS=-fconstant-string-class=NSConstantString
 SOURCES=$(wildcard src/*.m)
 OBJECTS=$(SOURCES:.m=.o)
-CSOURCES=src/backend.c src/debug.c
+CSOURCES=src/backend.c
 COBJECTS=$(CSOURCES:.c=.o)
 EXEC=pacmixer
 
@@ -14,13 +14,15 @@ all: CFLAGS += -O2
 all: $(CSOURCES) $(SOURCES) $(EXEC)
 debug: CFLAGS += -g -O0 -D DEBUG=1
 debug: LIBS += -lrt
-debug: $(CSOURCES) $(SOURCES) $(EXEC)
+debug: $(OBJECTS) $(COBJECTS)
+	$(CCC) $(CFLAGS) -c -o src/debug.o src/debug.c
+	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) src/debug.o $(LIBS)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)
 	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(LIBS)
 
 clean:
-	rm -rf $(OBJECTS) $(COBJECTS) $(EXEC)
+	rm -rf $(OBJECTS) $(COBJECTS) src/debug.o $(EXEC)
 
 %.o: %.m
 	$(CCC) $(CFLAGS) $(OFLAGS) -c -o $@ $^

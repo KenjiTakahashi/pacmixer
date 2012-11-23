@@ -944,7 +944,9 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         [w show];
         x = [w endPosition] + 1;
     }
-    [[widgets objectAtIndex: highlight] setHighlighted: YES];
+    if([widgets count] != 0) {
+        [[widgets objectAtIndex: highlight] setHighlighted: YES];
+    }
     [self refresh: nil];
 }
 
