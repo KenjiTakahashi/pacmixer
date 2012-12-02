@@ -16,48 +16,42 @@
 
 
 #import <Foundation/NSObject.h>
-#import <Foundation/NSArray.h>
 #import <Foundation/NSString.h>
-#import <Foundation/NSDecimalNumber.h>
-#import <Foundation/NSNotification.h>
-#import <Foundation/NSIndexSet.h>
 #import <curses.h>
-#import "widgets/menu.h"
-#import "widgets/widget.h"
-#import "widgets/misc.h"
-#ifdef DEBUG
-#import "debug.h"
-#endif
+#import "misc.h"
 
 
-@interface TUI: NSObject <Controlling> {
+@interface Top: NSObject {
     @private
-        NSMutableArray *allWidgets;
-        NSMutableArray *widgets;
-        Top *top;
-        Bottom *bottom;
         WINDOW *win;
-        int padding;
-        NSMutableArray *paddingStates;
-        int highlight;
-        BOOL inside;
+        View view;
 }
 
--(TUI*) init;
+-(Top*) init;
 -(void) dealloc;
+-(void) print;
 -(void) reprint;
--(void) refresh: (NSNotification*) notification;
--(Widget*) addWidgetWithName: (NSString*) name
-                     andType: (View) type
-                       andId: (NSString*) id_;
--(void) removeWidget: (NSNumber*) id_;
--(void) setCurrent: (int) i;
--(void) setFilter: (View) type;
--(void) previous;
--(void) next;
--(void) up;
--(void) down;
--(void) mute;
+-(void) setView: (View) type_;
+-(View) view;
+@end
+
+
+typedef enum {
+    INSIDE,
+    OUTSIDE
+} Mode;
+
+
+@interface Bottom: NSObject {
+    @private
+        WINDOW *win;
+        Mode mode;
+}
+
+-(Bottom*) init;
+-(void) dealloc;
+-(void) print;
+-(void) reprint;
 -(void) inside;
 -(BOOL) outside;
 @end

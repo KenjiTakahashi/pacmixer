@@ -17,47 +17,22 @@
 
 #import <Foundation/NSObject.h>
 #import <Foundation/NSArray.h>
-#import <Foundation/NSString.h>
-#import <Foundation/NSDecimalNumber.h>
-#import <Foundation/NSNotification.h>
-#import <Foundation/NSIndexSet.h>
 #import <curses.h>
-#import "widgets/menu.h"
-#import "widgets/widget.h"
-#import "widgets/misc.h"
-#ifdef DEBUG
-#import "debug.h"
-#endif
 
 
-@interface TUI: NSObject <Controlling> {
+@interface Options: NSObject {
     @private
-        NSMutableArray *allWidgets;
-        NSMutableArray *widgets;
-        Top *top;
-        Bottom *bottom;
         WINDOW *win;
-        int padding;
-        NSMutableArray *paddingStates;
+        NSArray *options;
         int highlight;
-        BOOL inside;
 }
 
--(TUI*) init;
+-(Options*) initWithOptions: (NSArray*) options_
+                   andParent: (WINDOW*) parent;
 -(void) dealloc;
--(void) reprint;
--(void) refresh: (NSNotification*) notification;
--(Widget*) addWidgetWithName: (NSString*) name
-                     andType: (View) type
-                       andId: (NSString*) id_;
--(void) removeWidget: (NSNumber*) id_;
+-(void) print;
+-(void) show;
 -(void) setCurrent: (int) i;
--(void) setFilter: (View) type;
--(void) previous;
--(void) next;
 -(void) up;
 -(void) down;
--(void) mute;
--(void) inside;
--(BOOL) outside;
 @end
