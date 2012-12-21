@@ -29,6 +29,8 @@
 
 -(Top*) init;
 -(void) dealloc;
+-(void) printString: (NSString*) str
+           withView: (View) view_;
 -(void) print;
 -(void) reprint;
 -(void) setView: (View) type_;

@@ -33,6 +33,15 @@
     [super dealloc];
 }
 
+-(void) printString: (NSString*) str
+           withView: (View) view_ {
+    if(view == view_) {
+        wprintw(win, " [%@] ", str);
+    } else {
+        wprintw(win, " %@ ", str);
+    }
+}
+
 -(void) print {
     wmove(win, 0, 0);
     NSString *all = @"F1: All";
@@ -40,31 +49,13 @@
     NSString *recording = @"F3: Recording";
     NSString *outputs = @"F4: Outputs";
     NSString *inputs = @"F5: Inputs";
-    if(view == ALL) {
-        wprintw(win, " [%@] ", all);
-    } else {
-        wprintw(win, " %@ ", all);
-    }
-    if(view == PLAYBACK) {
-        wprintw(win, " [%@] ", playback);
-    } else {
-        wprintw(win, " %@ ", playback);
-    }
-    if(view == RECORDING) {
-        wprintw(win, " [%@] ", recording);
-    } else {
-        wprintw(win, " %@ ", recording);
-    }
-    if(view == OUTPUTS) {
-        wprintw(win, " [%@] ", outputs);
-    } else {
-        wprintw(win, " %@ ", outputs);
-    }
-    if(view == INPUTS) {
-        wprintw(win, " [%@] ", inputs);
-    } else {
-        wprintw(win, " %@ ", inputs);
-    }
+    NSString *settings = @"F12: Settings";
+    [self printString: all withView: ALL];
+    [self printString: playback withView: PLAYBACK];
+    [self printString: recording withView: RECORDING];
+    [self printString: outputs withView: OUTPUTS];
+    [self printString: inputs withView: INPUTS];
+    [self printString: settings withView: SETTINGS];
     wrefresh(win);
 }
 

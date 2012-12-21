@@ -23,7 +23,8 @@ typedef enum {
     PLAYBACK,
     RECORDING,
     OUTPUTS,
-    INPUTS
+    INPUTS,
+    SETTINGS
 } View;
 
 

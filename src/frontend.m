@@ -175,6 +175,10 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [self refresh: nil];
 }
 
+-(void) showSettings {
+    [top setView: SETTINGS];
+}
+
 -(void) previous {
     if(inside) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] previous];

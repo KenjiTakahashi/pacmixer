@@ -53,6 +53,7 @@
 -(void) removeWidget: (NSNumber*) id_;
 -(void) setCurrent: (int) i;
 -(void) setFilter: (View) type;
+-(void) showSettings;
 -(void) previous;
 -(void) next;
 -(void) up;
