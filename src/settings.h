@@ -18,7 +18,24 @@
 #import <Foundation/NSUserDefaults.h>
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSArray.h>
+#import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
+#import "widgets/checkbox.h"
+
+
+@interface Values: NSObject {
+    @private
+        NSMutableArray *values;
+        Class type;
+}
+
+-(Values*) initWithType: (Class) type_
+                andValues: (NSString*) firstString, ...;
+-(int) count;
+-(id) objectAtIndex: (int) i;
+-(Class) type;
+-(void) dealloc;
+@end
 
 
 @interface Settings: NSObject {
@@ -40,9 +57,11 @@
         WINDOW *win;
         Settings *settings;
         NSMutableArray *widgets;
+        NSDictionary *values;
 }
 
 -(SettingsWidget*) initWithSettings: (Settings*) settings_
                           andParent: (WINDOW*) parent;
+-(void) print;
 -(void) dealloc;
 @end

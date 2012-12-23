@@ -18,13 +18,46 @@
 #import "settings.h"
 
 
+@implementation Values
+-(Values*) initWithType: (Class) type_
+                andValues: (NSString*) firstString, ... {
+    self = [super init];
+    va_list args;
+    va_start(args, firstString);
+    for(NSString *str = firstString; str != nil; str = va_arg(args, NSString*)) {
+        [values addObject: str];
+    }
+    type = type_;
+    va_end(args);
+    return self;
+}
+
+-(int) count {
+    return [values count];
+}
+
+-(id) objectAtIndex: (int) i {
+    return [values objectAtIndex: i];
+}
+
+-(Class) type {
+    return type;
+}
+
+-(void) dealloc {
+    [super dealloc];
+}
+@end
+
+
 @implementation Settings
 -(Settings*) init {
     self = [super init];
     storage = [NSUserDefaults standardUserDefaults];
     defaults = [NSDictionary dictionaryWithObjectsAndKeys:
-        nil
-    ];
+        [NSNumber numberWithInt: 1], @"Filter/PulseAudio internals",
+        [NSNumber numberWithInt: 0], @"Filter/Monitors",
+        nil];
     return self;
 }
 
@@ -58,11 +91,21 @@
     self = [super init];
     settings = [settings_ retain];
     widgets = [[NSMutableArray alloc] init];
+    Values *filters = [[Values alloc] initWithType: [CheckBox class]
+                                             andValues: @"PulseAudio internals",
+                                                        @"Monitors"];
+    values = [NSDictionary dictionaryWithObjectsAndKeys:
+        filters, @"Filter",
+        nil];
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
     win = derwin(parent, my - 2, mx, 1, 0); // FIXME (Kenji): Maybe subwin?
+    [self print];
     return self;
+}
+
+-(void) print {
 }
 
 -(void) dealloc {
