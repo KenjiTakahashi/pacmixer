@@ -19,8 +19,42 @@
 
 
 @implementation CheckBox
--(CheckBox*) init {
+-(CheckBox*) initWithLabel: (NSString*) label_
+                 andValues: (NSArray*) values_
+              andYPosition: (int) ypos
+              andXPosition: (int) xpos
+                 andParent: (WINDOW*) parent {
     self = [super init];
+    label = [label_ copy];
+    values = [values_ retain];
+    width = 0;
+    for(int i = 0; i < [values count]; ++i) {
+        int length = [[values objectAtIndex: i] length];
+        if(length > width) {
+            width = length;
+        }
+    }
+    win = derwin(parent, [values count] + 2, width + 5, ypos, xpos);
+    [self print];
     return self;
+}
+
+-(void) print {
+    box(win, 0, 0);
+    mvwprintw(win, 0, 1, "%@", label);
+    for(int i = 0; i < [values count]; ++i) {
+        mvwprintw(win, i + 1, 1, "[ ]%@", [values objectAtIndex: i]);
+    }
+}
+
+-(int) endPosition {
+    return width;
+}
+
+-(void) dealloc {
+    delwin(win);
+    [values release];
+    [label release];
+    [super dealloc];
 }
 @end

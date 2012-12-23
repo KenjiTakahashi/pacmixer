@@ -20,8 +20,9 @@
 
 @implementation Values
 -(Values*) initWithType: (Class) type_
-                andValues: (NSString*) firstString, ... {
+              andValues: (NSString*) firstString, ... {
     self = [super init];
+    values = [[NSMutableArray alloc] init];
     va_list args;
     va_start(args, firstString);
     for(NSString *str = firstString; str != nil; str = va_arg(args, NSString*)) {
@@ -44,7 +45,12 @@
     return type;
 }
 
+-(NSArray*) values {
+    return values;
+}
+
 -(void) dealloc {
+    [values release];
     [super dealloc];
 }
 @end
@@ -92,26 +98,37 @@
     settings = [settings_ retain];
     widgets = [[NSMutableArray alloc] init];
     Values *filters = [[Values alloc] initWithType: [CheckBox class]
-                                             andValues: @"PulseAudio internals",
-                                                        @"Monitors"];
+                                         andValues: @"PulseAudio internals",
+                                                    @"Monitors",
+                                                    nil];
     values = [NSDictionary dictionaryWithObjectsAndKeys:
         filters, @"Filter",
         nil];
+    [filters release];
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    win = derwin(parent, my - 2, mx, 1, 0); // FIXME (Kenji): Maybe subwin?
+    wresize(parent, my, mx);
+    win = derwin(parent, my - 2, mx, 0, 0); // FIXME (Kenji): Maybe subwin?
     [self print];
     return self;
 }
 
 -(void) print {
     NSArray *keys = [values allKeys];
+    int ypos = 0;
+    int xpos = 0;
     for(int i = 0; i < [keys count]; ++i) {
         NSString *key = [keys objectAtIndex: i];
         Values *value = [values objectForKey: key];
-        id widget = [[[value type] alloc] init];
+        id widget = [[[value type] alloc] initWithLabel: key
+                                              andValues: [value values]
+                                           andYPosition: ypos
+                                           andXPosition: xpos
+                                              andParent: win];
+        xpos += [widget endPosition];
         [widgets addObject: widget];
+        [widget release];
     }
 }
 

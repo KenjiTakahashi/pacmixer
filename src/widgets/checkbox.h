@@ -15,11 +15,25 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#import <Foundation/NSObject.h>
+#import <Foundation/NSArray.h>
+#import <Foundation/NSString.h>
+#import <curses.h>
 
 
 @interface CheckBox: NSObject {
+    @private
+        WINDOW *win;
+        NSString *label;
+        NSArray *values;
+        int width;
 }
 
--(CheckBox*) init;
+-(CheckBox*) initWithLabel: (NSString*) label_
+                 andValues: (NSArray*) values_
+              andYPosition: (int) ypos
+              andXPosition: (int) xpos
+                 andParent: (WINDOW*) parent;
+-(void) print;
+-(int) endPosition;
+-(void) dealloc;
 @end

@@ -30,10 +30,11 @@
 }
 
 -(Values*) initWithType: (Class) type_
-                andValues: (NSString*) firstString, ...;
+              andValues: (NSString*) firstString, ...;
 -(int) count;
 -(id) objectAtIndex: (int) i;
 -(Class) type;
+-(NSArray*) values;
 -(void) dealloc;
 @end
 
