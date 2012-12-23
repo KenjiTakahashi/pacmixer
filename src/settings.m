@@ -106,6 +106,13 @@
 }
 
 -(void) print {
+    NSArray *keys = [values allKeys];
+    for(int i = 0; i < [keys count]; ++i) {
+        NSString *key = [keys objectAtIndex: i];
+        Values *value = [values objectForKey: key];
+        id widget = [[[value type] alloc] init];
+        [widgets addObject: widget];
+    }
 }
 
 -(void) dealloc {
