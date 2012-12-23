@@ -43,26 +43,15 @@
     @private
         NSUserDefaults *storage;
         NSDictionary *defaults;
+        NSDictionary *names;
 }
 
 -(Settings*) init;
+-(int) count;
+-(id) objectForKey: (NSString*) key;
+-(NSArray*) allKeys;
 -(void) setValue: (id) value
           forKey: (NSString*) key;
 -(id) getValue: (NSString*) key;
--(void) dealloc;
-@end
-
-
-@interface SettingsWidget: NSObject {
-    @private
-        WINDOW *win;
-        Settings *settings;
-        NSMutableArray *widgets;
-        NSDictionary *values;
-}
-
--(SettingsWidget*) initWithSettings: (Settings*) settings_
-                          andParent: (WINDOW*) parent;
--(void) print;
 -(void) dealloc;
 @end

@@ -17,6 +17,7 @@
 
 #import <Foundation/NSArray.h>
 #import <Foundation/NSString.h>
+#import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
 
 
@@ -24,16 +25,25 @@
     @private
         WINDOW *win;
         NSString *label;
-        NSArray *values;
+        NSArray *names;
+        NSMutableArray *values;
+        BOOL highlighted;
+        int highlight;
         int width;
 }
 
 -(CheckBox*) initWithLabel: (NSString*) label_
-                 andValues: (NSArray*) values_
+                  andNames: (NSArray*) names_
               andYPosition: (int) ypos
               andXPosition: (int) xpos
                  andParent: (WINDOW*) parent;
 -(void) print;
+-(void) printCheck;
+-(void) setCurrent: (int) i;
+-(void) up;
+-(void) down;
+-(void) setHighlighted: (BOOL) active;
+-(void) switchValue;
 -(int) endPosition;
 -(void) dealloc;
 @end

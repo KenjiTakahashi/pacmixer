@@ -154,6 +154,9 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             case '0':
                 [tui showSettings];
                 break;
+            case ' ':
+                [tui switchSetting];
+                break;
             case KEY_RESIZE:
                 [tui reprint];
                 break;

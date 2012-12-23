@@ -89,6 +89,14 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     getmaxyx(stdscr, my, mx);
     prefresh(win, 0, padding, 2, 1, my - 2, mx - 1);
 }
+-(void) clear {
+    if([widgets count]) {
+        id widget = [widgets objectAtIndex: highlight];
+        [widget setHighlighted: NO];
+    }
+    wclear(win);
+    [widgets removeAllObjects];
+}
 
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
@@ -151,16 +159,16 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [[widgets objectAtIndex: highlight] setHighlighted: YES];
 }
 
+-(void) setFirst {
+    highlight = 0;
+    if([widgets count]) {
+        [[widgets objectAtIndex: highlight] setHighlighted: YES];
+    }
+}
+
 -(void) setFilter: (View) type {
     [top setView: type];
-    if([widgets count]) {
-        id widget = [widgets objectAtIndex: highlight];
-        if([widget respondsToSelector: @selector(setHighlighted:)]) {
-            [widget setHighlighted: NO];
-        }
-    }
-    wclear(win);
-    [widgets removeAllObjects];
+    [self clear];
     int x = 1;
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
@@ -173,21 +181,41 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
             [w hide];
         }
     }
-    highlight = 0;
-    if([widgets count]) {
-        [[widgets objectAtIndex: highlight] setHighlighted: YES];
-    }
+    [self setFirst];
     [self refresh: nil];
 }
 
 -(void) showSettings {
     [top setView: SETTINGS];
-    wclear(win);
-    [widgets removeAllObjects];
-    SettingsWidget *sw = [[SettingsWidget alloc] initWithSettings: settings
-                                                        andParent: win];
-    [widgets addObject: sw];
-    [sw release];
+    [self clear];
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *w = [allWidgets objectAtIndex: i];
+        [w hide];
+    }
+    NSArray *keys = [settings allKeys];
+    int ypos = 0;
+    int xpos = 0;
+    for(int i = 0; i < [keys count]; ++i) {
+        NSString *key = [keys objectAtIndex: i];
+        Values *value = [settings objectForKey: key];
+        id widget = [[[value type] alloc] initWithLabel: key
+                                               andNames: [value values]
+                                           andYPosition: ypos
+                                           andXPosition: xpos
+                                              andParent: win];
+        [widgets addObject: widget];
+        xpos += [widget endPosition];
+        [widget release];
+    }
+    [self setFirst];
+    [self refresh: nil];
+}
+
+-(void) switchSetting {
+    id widget = [widgets objectAtIndex: highlight];
+    if([widget respondsToSelector: @selector(switchValue)]) {
+        [widget switchValue];
+    }
     [self refresh: nil];
 }
 
@@ -226,10 +254,12 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 
 -(void) up {
     [[widgets objectAtIndex: highlight] up];
+    [self refresh: nil];
 }
 
 -(void) down {
     [[widgets objectAtIndex: highlight] down];
+    [self refresh: nil];
 }
 
 -(void) mute {

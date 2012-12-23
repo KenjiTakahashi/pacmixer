@@ -49,13 +49,16 @@
 -(void) dealloc;
 -(void) reprint;
 -(void) refresh: (NSNotification*) notification;
+-(void) clear;
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
                        andId: (NSString*) id_;
 -(void) removeWidget: (NSNumber*) id_;
 -(void) setCurrent: (int) i;
+-(void) setFirst;
 -(void) setFilter: (View) type;
 -(void) showSettings;
+-(void) switchSetting;
 -(void) previous;
 -(void) next;
 -(void) up;

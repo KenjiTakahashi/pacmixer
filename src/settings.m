@@ -64,7 +64,27 @@
         [NSNumber numberWithInt: 1], @"Filter/PulseAudio internals",
         [NSNumber numberWithInt: 0], @"Filter/Monitors",
         nil];
+    Values *filters = [[Values alloc] initWithType: [CheckBox class]
+                                         andValues: @"PulseAudio internals",
+                                                    @"Monitors",
+                                                    nil];
+    names = [NSDictionary dictionaryWithObjectsAndKeys:
+        filters, @"Filter",
+        nil];
+    [filters release];
     return self;
+}
+
+-(int) count {
+    return [names count];
+}
+
+-(id) objectForKey: (NSString*) key {
+    return [names objectForKey: key];
+}
+
+-(NSArray*) allKeys {
+    return [names allKeys];
 }
 
 -(void) setValue: (id) value
@@ -86,56 +106,6 @@
 
 -(void) dealloc {
     [storage synchronize];
-    [super dealloc];
-}
-@end
-
-
-@implementation SettingsWidget
--(SettingsWidget*) initWithSettings: (Settings*) settings_
-                          andParent: (WINDOW*) parent {
-    self = [super init];
-    settings = [settings_ retain];
-    widgets = [[NSMutableArray alloc] init];
-    Values *filters = [[Values alloc] initWithType: [CheckBox class]
-                                         andValues: @"PulseAudio internals",
-                                                    @"Monitors",
-                                                    nil];
-    values = [NSDictionary dictionaryWithObjectsAndKeys:
-        filters, @"Filter",
-        nil];
-    [filters release];
-    int my;
-    int mx;
-    getmaxyx(stdscr, my, mx);
-    wresize(parent, my, mx);
-    win = derwin(parent, my - 2, mx, 0, 0); // FIXME (Kenji): Maybe subwin?
-    [self print];
-    return self;
-}
-
--(void) print {
-    NSArray *keys = [values allKeys];
-    int ypos = 0;
-    int xpos = 0;
-    for(int i = 0; i < [keys count]; ++i) {
-        NSString *key = [keys objectAtIndex: i];
-        Values *value = [values objectForKey: key];
-        id widget = [[[value type] alloc] initWithLabel: key
-                                              andValues: [value values]
-                                           andYPosition: ypos
-                                           andXPosition: xpos
-                                              andParent: win];
-        xpos += [widget endPosition];
-        [widgets addObject: widget];
-        [widget release];
-    }
-}
-
--(void) dealloc {
-    [widgets release];
-    [settings release];
-    delwin(win);
     [super dealloc];
 }
 @end

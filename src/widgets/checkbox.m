@@ -20,19 +20,23 @@
 
 @implementation CheckBox
 -(CheckBox*) initWithLabel: (NSString*) label_
-                 andValues: (NSArray*) values_
+                  andNames: (NSArray*) names_
               andYPosition: (int) ypos
               andXPosition: (int) xpos
                  andParent: (WINDOW*) parent {
     self = [super init];
     label = [label_ copy];
-    values = [values_ retain];
+    names = [names_ retain];
+    values = [[NSMutableArray alloc] init];
+    highlighted = NO;
+    highlight = 0;
     width = 0;
-    for(int i = 0; i < [values count]; ++i) {
-        int length = [[values objectAtIndex: i] length];
+    for(int i = 0; i < [names count]; ++i) {
+        int length = [[names objectAtIndex: i] length];
         if(length > width) {
             width = length;
         }
+        [values addObject: [NSNumber numberWithBool: NO]];
     }
     win = derwin(parent, [values count] + 2, width + 5, ypos, xpos);
     [self print];
@@ -43,8 +47,50 @@
     box(win, 0, 0);
     mvwprintw(win, 0, 1, "%@", label);
     for(int i = 0; i < [values count]; ++i) {
-        mvwprintw(win, i + 1, 1, "[ ]%@", [values objectAtIndex: i]);
+        mvwprintw(win, i + 1, 1, "[ ]%@", [names objectAtIndex: i]);
     }
+}
+
+-(void) printCheck {
+    if(highlighted) {
+        wattron(win, A_REVERSE);
+    }
+    mvwaddch(win, highlight + 1, 2,
+        [[values objectAtIndex: highlight] boolValue] ? 'X' : ' '
+    );
+    wattroff(win, A_REVERSE);
+}
+
+-(void) setCurrent: (int) i {
+    mvwaddch(win, highlight + 1, 2,
+        [[values objectAtIndex: highlight] boolValue] ? 'X' : ' ' | A_NORMAL
+    );
+    highlight = i;
+    [self printCheck];
+}
+
+-(void) up {
+    if(highlight > 0) {
+        [self setCurrent: highlight - 1];
+    }
+}
+
+-(void) down {
+    if(highlight < [names count] - 1) {
+        [self setCurrent: highlight + 1];
+    }
+}
+
+-(void) setHighlighted: (BOOL) active {
+    highlighted = active;
+    [self setCurrent: highlight];
+}
+
+-(void) switchValue {
+    BOOL currentValue = [[values objectAtIndex: highlight] boolValue];
+    NSNumber *newValue = [NSNumber numberWithBool: !currentValue];
+    [values replaceObjectAtIndex: highlight withObject: newValue];
+    [self printCheck];
 }
 
 -(int) endPosition {
@@ -54,6 +100,7 @@
 -(void) dealloc {
     delwin(win);
     [values release];
+    [names release];
     [label release];
     [super dealloc];
 }
