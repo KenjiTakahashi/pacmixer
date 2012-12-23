@@ -17,6 +17,8 @@
 
 #import <Foundation/NSUserDefaults.h>
 #import <Foundation/NSDictionary.h>
+#import <Foundation/NSArray.h>
+#import <curses.h>
 
 
 @interface Settings: NSObject {
@@ -29,5 +31,18 @@
 -(void) setValue: (id) value
           forKey: (NSString*) key;
 -(id) getValue: (NSString*) key;
+-(void) dealloc;
+@end
+
+
+@interface SettingsWidget: NSObject {
+    @private
+        WINDOW *win;
+        Settings *settings;
+        NSMutableArray *widgets;
+}
+
+-(SettingsWidget*) initWithSettings: (Settings*) settings_
+                          andParent: (WINDOW*) parent;
 -(void) dealloc;
 @end

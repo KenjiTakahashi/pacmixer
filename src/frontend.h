@@ -25,6 +25,7 @@
 #import "widgets/menu.h"
 #import "widgets/widget.h"
 #import "widgets/misc.h"
+#import "settings.h"
 #ifdef DEBUG
 #import "debug.h"
 #endif
@@ -34,6 +35,7 @@
     @private
         NSMutableArray *allWidgets;
         NSMutableArray *widgets;
+        Settings *settings;
         Top *top;
         Bottom *bottom;
         WINDOW *win;

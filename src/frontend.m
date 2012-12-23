@@ -23,6 +23,7 @@
     self = [super init];
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
+    settings = [[Settings alloc] init];
     initscr();
     cbreak();
     noecho();
@@ -59,6 +60,7 @@
     [bottom release];
     [top release];
     [widgets release];
+    [settings release];
     [allWidgets release];
     [paddingStates release];
     [super dealloc];
@@ -152,7 +154,10 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 -(void) setFilter: (View) type {
     [top setView: type];
     if([widgets count]) {
-        [[widgets objectAtIndex: highlight] setHighlighted: NO];
+        id widget = [widgets objectAtIndex: highlight];
+        if([widget respondsToSelector: @selector(setHighlighted:)]) {
+            [widget setHighlighted: NO];
+        }
     }
     wclear(win);
     [widgets removeAllObjects];
@@ -177,6 +182,13 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 
 -(void) showSettings {
     [top setView: SETTINGS];
+    wclear(win);
+    [widgets removeAllObjects];
+    SettingsWidget *sw = [[SettingsWidget alloc] initWithSettings: settings
+                                                        andParent: win];
+    [widgets addObject: sw];
+    [sw release];
+    [self refresh: nil];
 }
 
 -(void) previous {

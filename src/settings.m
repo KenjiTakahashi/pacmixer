@@ -50,3 +50,25 @@
     [super dealloc];
 }
 @end
+
+
+@implementation SettingsWidget
+-(SettingsWidget*) initWithSettings: (Settings*) settings_
+                          andParent: (WINDOW*) parent {
+    self = [super init];
+    settings = [settings_ retain];
+    widgets = [[NSMutableArray alloc] init];
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    win = derwin(parent, my - 2, mx, 1, 0); // FIXME (Kenji): Maybe subwin?
+    return self;
+}
+
+-(void) dealloc {
+    [widgets release];
+    [settings release];
+    delwin(win);
+    [super dealloc];
+}
+@end
