@@ -50,6 +50,7 @@
 -(void) reprint;
 -(void) refresh: (NSNotification*) notification;
 -(void) clear;
+-(BOOL) applySettings: (NSString*) name;
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
                        andId: (NSString*) id_;

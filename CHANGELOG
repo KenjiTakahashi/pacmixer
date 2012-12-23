@@ -19,3 +19,4 @@
 - Fixed hidden widgets getting reprinted when changed outside the app.
 
 == 0.2:
+- Ability to filter out PA internals/Monitors.

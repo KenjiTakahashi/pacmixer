@@ -89,6 +89,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     getmaxyx(stdscr, my, mx);
     prefresh(win, 0, padding, 2, 1, my - 2, mx - 1);
 }
+
 -(void) clear {
     if([widgets count]) {
         id widget = [widgets objectAtIndex: highlight];
@@ -96,6 +97,16 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     }
     wclear(win);
     [widgets removeAllObjects];
+}
+
+-(BOOL) applySettings: (NSString*) name {
+    NSString *key = @"Filter/PulseAudio internals";
+    BOOL filter1 = [[settings getValue: key] boolValue];
+    key = @"Filter/Monitors";
+    BOOL filter2 = [[settings getValue: key] boolValue];
+    filter1 = filter1 && [name hasPrefix: @"PulseAudio"];
+    filter2 = filter2 && [name hasPrefix: @"Monitor of"];
+    return !filter1 && !filter2;
 }
 
 -(Widget*) addWidgetWithName: (NSString*) name
@@ -111,7 +122,10 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
         [widget setHighlighted: YES];
     }
     [allWidgets addObject: widget];
-    if([top view] == ALL || type == [top view]) {
+    if(
+        ([top view] == ALL || type == [top view])
+        && [self applySettings: [widget name]]
+    ) {
         [widgets addObject: widget];
         [widget show];
     }
@@ -172,7 +186,10 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     int x = 1;
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
-        if([top view] == ALL || [w type] == [top view]) {
+        if(
+            ([top view] == ALL || [w type] == [top view])
+            && [self applySettings: [w name]]
+        ) {
             [widgets addObject: w];
             [w setPosition: x];
             [w show];
