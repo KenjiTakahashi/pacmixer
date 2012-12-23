@@ -48,6 +48,7 @@ typedef enum {
     @private
         WINDOW *win;
         Mode mode;
+        View view;
 }
 
 -(Bottom*) init;
@@ -56,4 +57,5 @@ typedef enum {
 -(void) reprint;
 -(void) inside;
 -(BOOL) outside;
+-(void) setView: (View) view_;
 @end

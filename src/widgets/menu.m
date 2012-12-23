@@ -97,11 +97,17 @@
     NSString *line;
     char mode_ = 'o';
     int color = COLOR_PAIR(6);
-    if(mode == OUTSIDE) {
+    if(view == SETTINGS) {
+        line =
+            @" h/l: previous/next group, "
+            @"j/k: previous/next option, "
+            @"space: switch option, "
+            @"q: Exit";
+    } else if(mode == OUTSIDE) {
         line =
             @" i: inside mode, "
             @"h/l: previous/next control, "
-            @"j/k: volume down/up or previous/next option, "
+            @"j/k: volume down/up, "
             @"m: (un)mute, "
             @"q: Exit";
     } else if(mode == INSIDE) {
@@ -149,5 +155,10 @@
         return NO;
     }
     return YES;
+}
+
+-(void) setView: (View) view_ {
+    view = view_;
+    [self print];
 }
 @end

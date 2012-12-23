@@ -182,6 +182,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 
 -(void) setFilter: (View) type {
     [top setView: type];
+    [bottom setView: ALL];
     [self clear];
     int x = 1;
     for(int i = 0; i < [allWidgets count]; ++i) {
@@ -204,6 +205,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 
 -(void) showSettings {
     [top setView: SETTINGS];
+    [bottom setView: SETTINGS];
     [self clear];
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
