@@ -203,6 +203,12 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                                            andYPosition: ypos
                                            andXPosition: xpos
                                               andParent: win];
+        for(int i = 0; i < [value count]; ++i) {
+            NSString *fullkey = [NSString stringWithFormat:
+                @"%@/%@", key, [value objectAtIndex: i]];
+            [widget setValue: [[settings getValue: fullkey] boolValue]
+                     atIndex: i];
+        }
         [widgets addObject: widget];
         xpos += [widget endPosition];
         [widget release];

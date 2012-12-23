@@ -86,11 +86,15 @@
     [self setCurrent: highlight];
 }
 
+-(void) setValue: (BOOL) value atIndex: (int) index {
+    NSNumber *newValue = [NSNumber numberWithBool: value];
+    [values replaceObjectAtIndex: index withObject: newValue];
+    [self printCheck];
+}
+
 -(void) switchValue {
     BOOL currentValue = [[values objectAtIndex: highlight] boolValue];
-    NSNumber *newValue = [NSNumber numberWithBool: !currentValue];
-    [values replaceObjectAtIndex: highlight withObject: newValue];
-    [self printCheck];
+    [self setValue: !currentValue atIndex: highlight];
 }
 
 -(int) endPosition {

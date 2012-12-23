@@ -43,6 +43,7 @@
 -(void) up;
 -(void) down;
 -(void) setHighlighted: (BOOL) active;
+-(void) setValue: (BOOL) value atIndex: (int) index;
 -(void) switchValue;
 -(int) endPosition;
 -(void) dealloc;
