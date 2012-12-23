@@ -51,12 +51,12 @@
     }
 }
 
--(void) printCheck {
+-(void) printCheck: (int) i {
     if(highlighted) {
         wattron(win, A_REVERSE);
     }
-    mvwaddch(win, highlight + 1, 2,
-        [[values objectAtIndex: highlight] boolValue] ? 'X' : ' '
+    mvwaddch(win, i + 1, 2,
+        [[values objectAtIndex: i] boolValue] ? 'X' : ' '
     );
     wattroff(win, A_REVERSE);
 }
@@ -66,7 +66,7 @@
         [[values objectAtIndex: highlight] boolValue] ? 'X' : ' ' | A_NORMAL
     );
     highlight = i;
-    [self printCheck];
+    [self printCheck: highlight];
 }
 
 -(void) up {
@@ -89,7 +89,15 @@
 -(void) setValue: (BOOL) value atIndex: (int) index {
     NSNumber *newValue = [NSNumber numberWithBool: value];
     [values replaceObjectAtIndex: index withObject: newValue];
-    [self printCheck];
+    NSString *name = @"SettingChanged";
+    NSString *fullkey = [NSString stringWithFormat:
+        @"%@/%@", label, [names objectAtIndex: index]];
+    NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+        [NSNumber numberWithBool: value], fullkey, nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: name
+                                                        object: self
+                                                      userInfo: info];
+    [self printCheck: index];
 }
 
 -(void) switchValue {

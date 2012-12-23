@@ -72,6 +72,11 @@
         filters, @"Filter",
         nil];
     [filters release];
+    NSString *name = @"SettingChanged";
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(setValueN:)
+                                                 name: name
+                                               object: nil];
     return self;
 }
 
@@ -85,6 +90,15 @@
 
 -(NSArray*) allKeys {
     return [names allKeys];
+}
+
+-(void) setValueN: (NSNotification*) notification {
+    NSDictionary *info = [notification userInfo];
+    NSArray *keys = [info allKeys];
+    for(int i = 0; i < [keys count]; ++i) {
+        NSString *key = [keys objectAtIndex: i];
+        [self setValue: [info objectForKey: key] forKey: key];
+    }
 }
 
 -(void) setValue: (id) value
@@ -105,6 +119,7 @@
 }
 
 -(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     [storage synchronize];
     [super dealloc];
 }

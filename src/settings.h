@@ -19,6 +19,7 @@
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSArray.h>
 #import <Foundation/NSDecimalNumber.h>
+#import <Foundation/NSNotification.h>
 #import <curses.h>
 #import "widgets/checkbox.h"
 
@@ -50,6 +51,7 @@
 -(int) count;
 -(id) objectForKey: (NSString*) key;
 -(NSArray*) allKeys;
+-(void) setValueN: (NSNotification*) notification;
 -(void) setValue: (id) value
           forKey: (NSString*) key;
 -(id) getValue: (NSString*) key;

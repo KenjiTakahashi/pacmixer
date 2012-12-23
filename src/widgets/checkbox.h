@@ -17,7 +17,9 @@
 
 #import <Foundation/NSArray.h>
 #import <Foundation/NSString.h>
+#import <Foundation/NSDictionary.h>
 #import <Foundation/NSDecimalNumber.h>
+#import <Foundation/NSNotification.h>
 #import <curses.h>
 
 
@@ -38,7 +40,7 @@
               andXPosition: (int) xpos
                  andParent: (WINDOW*) parent;
 -(void) print;
--(void) printCheck;
+-(void) printCheck: (int) i;
 -(void) setCurrent: (int) i;
 -(void) up;
 -(void) down;
