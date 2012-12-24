@@ -35,16 +35,26 @@ m: mute the volume
 i: go into the inside mode
 q (or Esc): go outside the inside mode or exit the application
 F1-F5 (or 1-5): change to all/playback/recording/outputs/inputs view, respectively
+F12 (or 0): switch to settings view
 ```
+
+#### settings view
+
+```
+h (or left arrow): move to the previous group of settings
+l (or right arrow): move to the next group of settings
+l (or up arrow): move to the previous setting within group
+j (or down arrow): move to the next setting within group
+space: (un)check highlighted setting
+q (or Esc): exit the application
+```
+
+**Note:** All settings are applied and saved automatically.
 
 #### inside mode
 Inside mode is used to adjust specific channel's volume.
 
 All shortcuts (besides ```q```) work the same, except that they affect single channels instead of the whole sink/source.
-
-[alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
-[CLI]: http://en.wikipedia.org/wiki/Command-line_interface
-
 
 ## Something's broken?
 
@@ -55,3 +65,6 @@ $ make debug
 then run it, reproduce the problem and send the contents of ```~/.pacmixer.log``` file with your bug report.
 
 That will make it easier to identify the problem.
+
+[alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
+[CLI]: http://en.wikipedia.org/wiki/Command-line_interface

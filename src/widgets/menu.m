@@ -100,8 +100,8 @@
     if(view == SETTINGS) {
         line =
             @" h/l: previous/next group, "
-            @"j/k: previous/next option, "
-            @"space: switch option, "
+            @"j/k: previous/next setting, "
+            @"space: (un)check setting, "
             @"q: Exit";
     } else if(mode == OUTSIDE) {
         line =
