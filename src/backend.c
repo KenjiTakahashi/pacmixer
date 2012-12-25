@@ -26,7 +26,16 @@ context_t *backend_new() {
     context->state = PA_CONTEXT_UNCONNECTED;
     pa_mainloop_api *api = pa_threaded_mainloop_get_api(context->loop);
     context->context = pa_context_new(api, "pacmixer");
-    pa_context_connect(context->context, NULL, 0, NULL);
+    int r = pa_context_connect(context->context, NULL, 0, NULL);
+    struct timespec t, rt;
+    t.tv_sec = 0;
+    t.tv_nsec = 100000000;
+    while(r == -1) {
+        nanosleep(&t, &rt);
+        pa_context_unref(context->context);
+        context->context = pa_context_new(api, "pacmixer");
+        r = pa_context_connect(context->context, NULL, 0, NULL);
+    }
     pa_context_set_state_callback(context->context, _cb_state_changed, &context->state);
     return context;
 }
@@ -35,7 +44,7 @@ int backend_init(context_t *context, callback_t *callback) {
     pa_threaded_mainloop_start(context->loop);
     struct timespec t, rt;
     t.tv_sec = 0;
-    t.tv_nsec = 10;
+    t.tv_nsec = 10000000;
     while(context->state != PA_CONTEXT_READY) {
         nanosleep(&t, &rt);
         if(context->state == PA_CONTEXT_FAILED || context->state == PA_CONTEXT_TERMINATED) {

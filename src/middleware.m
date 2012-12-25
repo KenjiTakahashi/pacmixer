@@ -162,14 +162,20 @@ void callback_remove_func(void *self_, uint32_t idx) {
 -(Middleware*) init {
     self = [super init];
     blocks = [[NSMutableArray alloc] init];
-    context = backend_new();
     callback = malloc(sizeof(callback_t));
     callback->add = callback_add_func;
     callback->update = callback_update_func;
     callback->remove = callback_remove_func;
     callback->self = self;
-    backend_init(context, callback);
+    [NSThread detachNewThreadSelector: @selector(initContext)
+                             toTarget: self
+                           withObject: nil];
     return self;
+}
+
+-(void) initContext {
+    context = backend_new();
+    backend_init(context, callback);
 }
 
 -(void) dealloc {

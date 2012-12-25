@@ -56,7 +56,7 @@ Inside mode is used to adjust specific channel's volume.
 
 All shortcuts (besides ```q```) work the same, except that they affect single channels instead of the whole sink/source.
 
-## Something's broken?
+## something's broken?
 
 Please compile **pacmixer** using
 ```sh

@@ -22,6 +22,7 @@
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSAutoreleasePool.h>
+#import <Foundation/NSThread.h>
 #import "types.h"
 #import "backend.h"
 #ifdef DEBUG
@@ -59,6 +60,7 @@ void callback_remove_func(void*, uint32_t);
 }
 
 -(Middleware*) init;
+-(void) initContext;
 -(void) dealloc;
 -(Block*) addBlockWithId: (uint32_t) idx
                 andIndex: (int) i
