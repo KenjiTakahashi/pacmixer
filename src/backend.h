@@ -58,7 +58,7 @@ typedef enum {
 } backend_entry_type;
 
 context_t *backend_new();
-int backend_init(context_t*, callback_t*);
+void backend_init(context_t*, callback_t*);
 void backend_destroy(context_t*);
 void backend_volume_set(context_t*, backend_entry_type, uint32_t, int, int);
 void backend_volume_setall(context_t*, backend_entry_type, uint32_t, int*, int);

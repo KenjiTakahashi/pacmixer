@@ -40,16 +40,17 @@ context_t *backend_new() {
     return context;
 }
 
-int backend_init(context_t *context, callback_t *callback) {
+void backend_init(context_t *context, callback_t *callback) {
     pa_threaded_mainloop_start(context->loop);
     struct timespec t, rt;
     t.tv_sec = 0;
     t.tv_nsec = 10000000;
-    while(context->state != PA_CONTEXT_READY) {
+    while(
+        context->state != PA_CONTEXT_READY ||
+        context->state == PA_CONTEXT_FAILED ||
+        context->state == PA_CONTEXT_TERMINATED
+    ) {
         nanosleep(&t, &rt);
-        if(context->state == PA_CONTEXT_FAILED || context->state == PA_CONTEXT_TERMINATED) {
-            return -1;
-        }
     }
     pa_context_set_subscribe_callback(context->context, _cb_event, callback);
     pa_context_subscribe(context->context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
@@ -57,7 +58,6 @@ int backend_init(context_t *context, callback_t *callback) {
     pa_context_get_sink_info_list(context->context, _cb_sink, callback);
     pa_context_get_source_info_list(context->context, _cb_source, callback);
     pa_context_get_source_output_info_list(context->context, _cb_source_output, callback);
-    return 0;
 }
 
 void backend_destroy(context_t *context) {
