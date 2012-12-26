@@ -38,6 +38,12 @@
         }
         [values addObject: [NSNumber numberWithBool: NO]];
     }
+    int my;
+    int mx;
+    getmaxyx(parent, my, mx);
+    if(xpos + width + 5 >= mx) {
+        wresize(parent, my, mx + width + 4);
+    }
     win = derwin(parent, [values count] + 2, width + 5, ypos, xpos);
     [self print];
     return self;
