@@ -20,7 +20,7 @@
 #include "backend.h"
 
 
-context_t *backend_new() {
+context_t *backend_new(state_callback_t *state_callback) {
     context_t *context = malloc(sizeof(context_t));
     context->loop = pa_threaded_mainloop_new();
     context->state = PA_CONTEXT_UNCONNECTED;
@@ -36,7 +36,8 @@ context_t *backend_new() {
         context->context = pa_context_new(api, "pacmixer");
         r = pa_context_connect(context->context, NULL, 0, NULL);
     }
-    pa_context_set_state_callback(context->context, _cb_state_changed, &context->state);
+    state_callback->state = &context->state;
+    pa_context_set_state_callback(context->context, _cb_state_changed, state_callback);
     return context;
 }
 
@@ -128,8 +129,12 @@ void backend_mute_set(context_t* c, backend_entry_type type, uint32_t idx, int v
 }
 
 void _cb_state_changed(pa_context *c, void *userdata) {
-    pa_context_state_t *_pa_state = userdata;
-    *_pa_state = pa_context_get_state(c);
+    state_callback_t *state_callback = userdata;
+    pa_context_state_t nstate = pa_context_get_state(c);
+    *state_callback->state = nstate;
+    if(nstate == PA_CONTEXT_FAILED || nstate == PA_CONTEXT_TERMINATED) {
+        ((tstate_callback_func)(state_callback->func))(state_callback->self);
+    }
 }
 
 void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userdata) {

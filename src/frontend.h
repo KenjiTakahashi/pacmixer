@@ -25,6 +25,7 @@
 #import "widgets/menu.h"
 #import "widgets/widget.h"
 #import "widgets/misc.h"
+#import "widgets/notice.h"
 #import "settings.h"
 #ifdef DEBUG
 #import "debug.h"
@@ -43,12 +44,15 @@
         NSMutableArray *paddingStates;
         int highlight;
         BOOL inside;
+        Notice *notice;
 }
 
 -(TUI*) init;
 -(void) dealloc;
+-(void) addWaiter: (NSNotification*) _;
+-(void) removeWaiter: (NSNotification*) _;
 -(void) reprint;
--(void) refresh: (NSNotification*) notification;
+-(void) refresh;
 -(void) clear;
 -(BOOL) applySettings: (NSString*) name;
 -(Widget*) addWidgetWithName: (NSString*) name

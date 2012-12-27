@@ -39,6 +39,12 @@ typedef struct CALLBACK {
     void *self;
 } callback_t;
 
+typedef struct STATE_CALLBACK {
+    pa_context_state_t *state;
+    void *func;
+    void *self;
+} state_callback_t;
+
 typedef struct BACKEND_CHANNEL {
     int maxLevel;
     int normLevel;
@@ -57,7 +63,7 @@ typedef enum {
     SOURCE_OUTPUT
 } backend_entry_type;
 
-context_t *backend_new();
+context_t *backend_new(state_callback_t*);
 void backend_init(context_t*, callback_t*);
 void backend_destroy(context_t*);
 void backend_volume_set(context_t*, backend_entry_type, uint32_t, int, int);
@@ -67,6 +73,7 @@ void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_update_func)(void*, uint32_t, backend_entry_type, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_remove_func)(void*, uint32_t);
+typedef void (*tstate_callback_func)(void*);
 
 typedef struct CLIENT_CALLBACK {
     callback_t *callback;

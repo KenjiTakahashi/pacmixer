@@ -91,6 +91,7 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
     if(options != nil) {
         [w addOptions: options];
     }
+    [tui refresh];
 }
 
 -(void) removeWidget: (NSNotification*) notification {

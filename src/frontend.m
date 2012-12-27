@@ -47,9 +47,14 @@
     bottom = [[Bottom alloc] init];
     top = [[Top alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(refresh:)
-                                                 name: nil
+                                             selector: @selector(removeWaiter:)
+                                                 name: @"backendAppeared"
                                                object: nil];
+    [[NSNotificationCenter defaultCenter] addObserver: self
+                                             selector: @selector(addWaiter:)
+                                                 name: @"backendGone"
+                                               object: nil];
+    [self addWaiter: nil];
     return self;
 }
 
@@ -66,6 +71,21 @@
     [super dealloc];
 }
 
+-(void) addWaiter: (NSNotification*) _ {
+    wclear(win);
+    NSString *message = @"Waiting for connection...";
+    notice = [[Notice alloc] initWithMessage: message
+                                   andParent: win];
+    [self refresh];
+}
+
+-(void) removeWaiter: (NSNotification*) _ {
+    [notice release];
+    notice = nil;
+    wclear(win);
+    [self refresh];
+}
+
 -(void) reprint {
     int my;
     int mx;
@@ -80,10 +100,10 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     }
     wresize(win, my - 4, mx);
     [bottom reprint];
-    [self refresh: nil];
+    [self refresh];
 }
 
--(void) refresh: (NSNotification*) notification {
+-(void) refresh {
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
@@ -164,7 +184,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
-    [self refresh: nil];
+    [self refresh];
 }
 
 -(void) setCurrent: (int) i {
@@ -178,6 +198,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
+    [self refresh];
 }
 
 -(void) setFilter: (View) type {
@@ -185,22 +206,26 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [bottom setView: ALL];
     [self clear];
     int x = 1;
-    for(int i = 0; i < [allWidgets count]; ++i) {
-        Widget *w = [allWidgets objectAtIndex: i];
-        if(
-            ([top view] == ALL || [w type] == [top view])
-            && [self applySettings: [w name]]
-        ) {
-            [widgets addObject: w];
-            [w setPosition: x];
-            [w show];
-            x = [w endPosition] + 1;
-        } else {
-            [w hide];
+    if(notice != nil) {
+        [notice print];
+        [self refresh];
+    } else {
+        for(int i = 0; i < [allWidgets count]; ++i) {
+            Widget *w = [allWidgets objectAtIndex: i];
+            if(
+                ([top view] == ALL || [w type] == [top view])
+                && [self applySettings: [w name]]
+            ) {
+                [widgets addObject: w];
+                [w setPosition: x];
+                [w show];
+                x = [w endPosition] + 1;
+            } else {
+                [w hide];
+            }
         }
+        [self setFirst];
     }
-    [self setFirst];
-    [self refresh: nil];
 }
 
 -(void) showSettings {
@@ -233,7 +258,6 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         [widget release];
     }
     [self setFirst];
-    [self refresh: nil];
 }
 
 -(void) switchSetting {
@@ -241,7 +265,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     if([widget respondsToSelector: @selector(switchValue)]) {
         [widget switchValue];
     }
-    [self refresh: nil];
+    [self refresh];
 }
 
 -(void) previous {
@@ -257,7 +281,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
             padding -= delta;
         }
     }
-    [self refresh: nil];
+    [self refresh];
 }
 
 -(void) next {
@@ -274,21 +298,22 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
             [paddingStates addObject: [NSNumber numberWithInt: delta]];
         }
     }
-    [self refresh: nil];
+    [self refresh];
 }
 
 -(void) up {
     [[widgets objectAtIndex: highlight] up];
-    [self refresh: nil];
+    [self refresh];
 }
 
 -(void) down {
     [[widgets objectAtIndex: highlight] down];
-    [self refresh: nil];
+    [self refresh];
 }
 
 -(void) mute {
     [(id<Controlling>)[widgets objectAtIndex: highlight] mute];
+    [self refresh];
 }
 
 -(void) inside {
@@ -299,7 +324,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
             [bottom inside];
             [[widgets objectAtIndex: highlight] inside];
         }
-        [self refresh: nil];
+        [self refresh];
     }
 }
 
@@ -309,7 +334,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         inside = NO;
         Widget *widget = [widgets objectAtIndex: highlight];
         [widget outside];
-        [self refresh: nil];
+        [self refresh];
     }
     return outside;
 }

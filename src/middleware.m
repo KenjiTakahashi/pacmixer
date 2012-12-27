@@ -119,6 +119,13 @@ void callback_remove_func(void *self_, uint32_t idx) {
     [pool release];
 }
 
+void callback_state_func(void *self_) {
+    Middleware *self = self_;
+    [[NSNotificationCenter defaultCenter] postNotificationName: @"backendGone"
+                                                        object: self
+                                                      userInfo: nil];
+}
+
 @implementation Block
 -(Block*) initWithContext: (context_t*) context_
                     andId: (uint32_t) idx_
@@ -167,6 +174,9 @@ void callback_remove_func(void *self_, uint32_t idx) {
     callback->update = callback_update_func;
     callback->remove = callback_remove_func;
     callback->self = self;
+    state_callback = malloc(sizeof(state_callback_t));
+    state_callback->func = callback_state_func;
+    state_callback->self = self;
     [NSThread detachNewThreadSelector: @selector(initContext)
                              toTarget: self
                            withObject: nil];
@@ -174,13 +184,18 @@ void callback_remove_func(void *self_, uint32_t idx) {
 }
 
 -(void) initContext {
-    context = backend_new();
+    context = backend_new(state_callback);
     backend_init(context, callback);
+    NSString *name = @"backendAppeared";
+    [[NSNotificationCenter defaultCenter] postNotificationName: name
+                                                        object: self
+                                                      userInfo: nil];
 }
 
 -(void) dealloc {
     [blocks release];
     backend_destroy(context);
+    free(state_callback);
     free(callback);
     [super dealloc];
 }
