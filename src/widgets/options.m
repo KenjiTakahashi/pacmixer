@@ -28,7 +28,8 @@
     options = [options_ retain];
     highlighted = NO;
     highlight = 0;
-    width = 0;
+    int width = 0;
+    int height = [options count] + 2;
     for(int i = 0; i < [options count]; ++i) {
         int length = [[options objectAtIndex: i] length];
         if(length > width) {
@@ -39,16 +40,28 @@
     int mx;
     getmaxyx(parent, my, mx);
     width += 2;
-    if(width >= mx) {
-        wresize(parent, my, mx + width);
+    BOOL resizeParent = NO;
+    if(width > mx) {
+        mx = width;
+        resizeParent = YES;
     }
-    win = derwin(parent, [options count] + 2, width, ypos, 0);
+    if(ypos + height > my) {
+        my = ypos + height;
+        resizeParent = YES;
+    }
+    if(resizeParent) {
+        wresize(parent, my, mx);
+    }
+    position = ypos;
+    win = derwin(parent, height, width, position, 0);
     [self print];
     return self;
 }
 
 -(void) dealloc {
     delwin(win);
+    [options release];
+    [label release];
     [super dealloc];
 }
 
@@ -92,11 +105,11 @@
     [self print];
 }
 
--(int) width {
-    return width;
+-(int) height {
+    return [options count] + 2;
 }
 
 -(int) endPosition {
-    return [options count] + 2;
+    return position + [self height];
 }
 @end

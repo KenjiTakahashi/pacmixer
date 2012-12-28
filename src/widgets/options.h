@@ -27,7 +27,7 @@
         NSArray *options;
         BOOL highlighted;
         int highlight;
-        int width;
+        int position;
 }
 
 -(Options*) initWithLabel: (NSString*) label_
@@ -40,6 +40,6 @@
 -(void) up;
 -(void) down;
 -(void) setHighlighted: (BOOL) active;
--(int) width;
+-(int) height;
 -(int) endPosition;
 @end

@@ -41,8 +41,10 @@
         Top *top;
         Bottom *bottom;
         WINDOW *win;
-        int padding;
-        NSMutableArray *paddingStates;
+        int xpadding;
+        int ypadding;
+        NSMutableArray *xpaddingStates;
+        NSMutableArray *ypaddingStates;
         int highlight;
         BOOL inside;
         Notice *notice;

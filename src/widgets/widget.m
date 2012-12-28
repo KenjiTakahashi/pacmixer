@@ -102,14 +102,6 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     return control;
 }
 
--(Options*) addOptions: (NSArray*) options {
-    Options *control = [[Options alloc] initWithOptions: options
-                                              andParent: win];
-    [controls addObject: control];
-    [control release];
-    return control;
-}
-
 -(void) setHighlighted: (BOOL) active {
     highlighted = active;
     [self printName];
@@ -206,10 +198,6 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
             [obj mute];
         }
     }
-}
-
--(int) height {
-    return height;
 }
 
 -(int) width {

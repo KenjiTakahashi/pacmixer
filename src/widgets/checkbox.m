@@ -29,7 +29,8 @@
     values = [[NSMutableArray alloc] init];
     highlighted = NO;
     highlight = 0;
-    width = 0;
+    int width = 0;
+    int height = [names count] + 2;
     for(int i = 0; i < [names count]; ++i) {
         int length = [[names objectAtIndex: i] length];
         if(length > width) {
@@ -41,10 +42,20 @@
     int mx;
     getmaxyx(parent, my, mx);
     width += 5;
-    if(width >= mx) {
-        wresize(parent, my, mx + width);
+    BOOL resizeParent = NO;
+    if(width > mx) {
+        width = mx;
+        resizeParent = YES;
     }
-    win = derwin(parent, [values count] + 2, width, ypos, 0);
+    if(ypos + height > my) {
+        mx = ypos + height;
+        resizeParent = YES;
+    }
+    if(resizeParent) {
+        wresize(parent, my, mx);
+    }
+    position = ypos;
+    win = derwin(parent, [values count] + 2, width, position, 0);
     [self print];
     return self;
 }
@@ -111,12 +122,12 @@
     [self setValue: !currentValue atIndex: highlight];
 }
 
--(int) width {
-    return width;
+-(int) height {
+    return [names count] + 2;
 }
 
 -(int) endPosition {
-    return [names count] + 2;
+    return position + [names count] + 2;
 }
 
 -(void) dealloc {

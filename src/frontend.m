@@ -42,8 +42,10 @@
     refresh();
     int my = getmaxy(stdscr);
     win = newpad(my - 4, 1);
-    padding = 0;
-    paddingStates = [[NSMutableArray alloc] init];
+    xpadding = 0;
+    ypadding = 0;
+    xpaddingStates = [[NSMutableArray alloc] init];
+    ypaddingStates = [[NSMutableArray alloc] init];
     bottom = [[Bottom alloc] init];
     top = [[Top alloc] init];
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -67,7 +69,8 @@
     [widgets release];
     [settings release];
     [allWidgets release];
-    [paddingStates release];
+    [ypaddingStates release];
+    [xpaddingStates release];
     [super dealloc];
 }
 
@@ -107,7 +110,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    prefresh(win, 0, padding, 2, 1, my - 2, mx - 1);
+    prefresh(win, ypadding, xpadding, 2, 1, my - 2, mx - 1);
 }
 
 -(void) clear {
@@ -252,7 +255,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                      atIndex: i];
         }
         [widgets addObject: widget];
-        ypos += [widget endPosition];
+        ypos = [widget endPosition];
         [widget release];
     }
     [self setFirst];
@@ -271,14 +274,24 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         [(id<Controlling>)[widgets objectAtIndex: highlight] previous];
     } else if(highlight > 0) {
         [self setCurrent: highlight - 1];
-        Widget *w = [widgets objectAtIndex: highlight];
-        if([w endPosition] - [w width] <= padding) {
-            int count = [paddingStates count] - 1;
-            if(count >= 0) {
-                int delta = [[paddingStates objectAtIndex: count] intValue];
-                [paddingStates removeObjectAtIndex: count];
-                padding -= delta;
-            }
+        id w = [widgets objectAtIndex: highlight];
+        if(
+            [w respondsToSelector: @selector(width)] &&
+            [w endPosition] - [w width] <= xpadding
+        ) {
+            int count = [xpaddingStates count] - 1;
+            int delta = [[xpaddingStates objectAtIndex: count] intValue];
+            [xpaddingStates removeObjectAtIndex: count];
+            xpadding -= delta;
+        }
+        if(
+            [w respondsToSelector: @selector(height)] &&
+            [w endPosition] - [w height] < ypadding
+        ) {
+            int count = [ypaddingStates count] - 1;
+            int delta = [[ypaddingStates objectAtIndex: count] intValue];
+            [ypaddingStates removeObjectAtIndex: count];
+            ypadding -= delta;
         }
     }
     [self refresh];
@@ -290,12 +303,25 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     } else if(highlight < (int)[widgets count] - 1) {
         int start = [[widgets objectAtIndex: highlight] endPosition];
         [self setCurrent: highlight + 1];
-        Widget *w = [widgets objectAtIndex: highlight];
-        int mx = getmaxx(stdscr);
-        if([w endPosition] - padding >= mx) {
-            int delta = [w width] - (mx - start - 3 + padding);
-            padding += delta;
-            [paddingStates addObject: [NSNumber numberWithInt: delta]];
+        id w = [widgets objectAtIndex: highlight];
+        int my;
+        int mx;
+        getmaxyx(stdscr, my, mx);
+        if(
+            [w respondsToSelector: @selector(width)] &&
+            [w endPosition] - xpadding >= mx
+        ) {
+            int delta = [w width] - (mx - start - 3 + xpadding);
+            xpadding += delta;
+            [xpaddingStates addObject: [NSNumber numberWithInt: delta]];
+        }
+        if(
+            [w respondsToSelector: @selector(height)] &&
+            [w endPosition] - ypadding >= my - 1
+        ) {
+            int delta = [w height] - (my - start - 3 + ypadding);
+            ypadding += delta;
+            [ypaddingStates addObject: [NSNumber numberWithInt: delta]];
         }
     }
     [self refresh];

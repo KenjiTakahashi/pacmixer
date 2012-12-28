@@ -31,7 +31,7 @@
         NSMutableArray *values;
         BOOL highlighted;
         int highlight;
-        int width;
+        int position;
 }
 
 -(CheckBox*) initWithLabel: (NSString*) label_
@@ -46,7 +46,7 @@
 -(void) setHighlighted: (BOOL) active;
 -(void) setValue: (BOOL) value atIndex: (int) index;
 -(void) switchValue;
--(int) width;
+-(int) height;
 -(int) endPosition;
 -(void) dealloc;
 @end

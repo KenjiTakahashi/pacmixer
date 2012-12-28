@@ -87,10 +87,10 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
                           forChannel: i];
         }
     }
-    NSArray *options = [info objectForKey: @"options"];
-    if(options != nil) {
-        [w addOptions: options];
-    }
+    //NSArray *options = [info objectForKey: @"options"];
+    //if(options != nil) {
+        //[w addOptions: options];
+    //}
     [tui refresh];
 }
 

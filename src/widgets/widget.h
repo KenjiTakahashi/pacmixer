@@ -46,7 +46,6 @@
 -(void) reprint: (int) height_;
 -(void) printName;
 -(Channels*) addChannels: (NSArray*) channels;
--(Options*) addOptions: (NSArray*) options;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(BOOL) canGoInside;
@@ -56,7 +55,6 @@
 -(void) next;
 -(void) up;
 -(void) down;
--(int) height;
 -(int) width;
 -(int) endPosition;
 -(View) type;
