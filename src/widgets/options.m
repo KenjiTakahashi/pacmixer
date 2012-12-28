@@ -19,15 +19,30 @@
 
 
 @implementation Options
--(Options*) initWithOptions: (NSArray*) options_
-                  andParent: (WINDOW*) parent {
+-(Options*) initWithLabel: (NSString*) label_
+                 andNames: (NSArray*) options_
+              andPosition: (int) ypos
+                andParent: (WINDOW*) parent {
     self = [super init];
-    options = options_;
+    label = [label_ copy];
+    options = [options_ retain];
+    highlighted = NO;
     highlight = 0;
-    int my = getmaxy(parent);
-    int dy = [options count];
-    win = derwin(parent, dy + 2, 8, my - dy - 3, 0);
-    box(win, 0, 0);
+    width = 0;
+    for(int i = 0; i < [options count]; ++i) {
+        int length = [[options objectAtIndex: i] length];
+        if(length > width) {
+            width = length;
+        }
+    }
+    int my;
+    int mx;
+    getmaxyx(parent, my, mx);
+    width += 2;
+    if(width >= mx) {
+        wresize(parent, my, mx + width);
+    }
+    win = derwin(parent, [options count] + 2, width, ypos, 0);
     [self print];
     return self;
 }
@@ -38,10 +53,11 @@
 }
 
 -(void) print {
-    int dy = [options count];
-    for(int i = 0; i < dy; ++i) {
+    box(win, 0, 0);
+    mvwprintw(win, 0, 1, "%@", label);
+    for(int i = 0; i < [options count]; ++i) {
         NSString *obj = [options objectAtIndex: i];
-        if(i == highlight) {
+        if(highlighted && i == highlight) {
             wattron(win, COLOR_PAIR(6));
         }
         mvwprintw(win, i + 1, 1, "      ");
@@ -69,5 +85,18 @@
     if(highlight < [options count] - 1) {
         [self setCurrent: highlight + 1];
     }
+}
+
+-(void) setHighlighted: (BOOL) active {
+    highlighted = active;
+    [self print];
+}
+
+-(int) width {
+    return width;
+}
+
+-(int) endPosition {
+    return [options count] + 2;
 }
 @end

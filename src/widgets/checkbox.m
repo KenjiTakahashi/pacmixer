@@ -21,8 +21,7 @@
 @implementation CheckBox
 -(CheckBox*) initWithLabel: (NSString*) label_
                   andNames: (NSArray*) names_
-              andYPosition: (int) ypos
-              andXPosition: (int) xpos
+               andPosition: (int) ypos
                  andParent: (WINDOW*) parent {
     self = [super init];
     label = [label_ copy];
@@ -41,10 +40,11 @@
     int my;
     int mx;
     getmaxyx(parent, my, mx);
-    if(xpos + width + 5 >= mx) {
-        wresize(parent, my, mx + width + 4);
+    width += 5;
+    if(width >= mx) {
+        wresize(parent, my, mx + width);
     }
-    win = derwin(parent, [values count] + 2, width + 5, ypos, xpos);
+    win = derwin(parent, [values count] + 2, width, ypos, 0);
     [self print];
     return self;
 }
@@ -111,8 +111,12 @@
     [self setValue: !currentValue atIndex: highlight];
 }
 
--(int) endPosition {
+-(int) width {
     return width;
+}
+
+-(int) endPosition {
+    return [names count] + 2;
 }
 
 -(void) dealloc {

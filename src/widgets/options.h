@@ -15,24 +15,31 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#import <Foundation/NSObject.h>
 #import <Foundation/NSArray.h>
+#import <Foundation/NSString.h>
 #import <curses.h>
 
 
 @interface Options: NSObject {
     @private
         WINDOW *win;
+        NSString *label;
         NSArray *options;
+        BOOL highlighted;
         int highlight;
+        int width;
 }
 
--(Options*) initWithOptions: (NSArray*) options_
-                   andParent: (WINDOW*) parent;
+-(Options*) initWithLabel: (NSString*) label_
+                 andNames: (NSArray*) options_
+              andPosition: (int) ypos
+                andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
--(void) show;
 -(void) setCurrent: (int) i;
 -(void) up;
 -(void) down;
+-(void) setHighlighted: (BOOL) active;
+-(int) width;
+-(int) endPosition;
 @end

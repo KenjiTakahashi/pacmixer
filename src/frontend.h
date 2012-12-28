@@ -26,6 +26,7 @@
 #import "widgets/widget.h"
 #import "widgets/misc.h"
 #import "widgets/notice.h"
+#import "widgets/options.h"
 #import "settings.h"
 #ifdef DEBUG
 #import "debug.h"

@@ -36,8 +36,7 @@
 
 -(CheckBox*) initWithLabel: (NSString*) label_
                   andNames: (NSArray*) names_
-              andYPosition: (int) ypos
-              andXPosition: (int) xpos
+               andPosition: (int) ypos
                  andParent: (WINDOW*) parent;
 -(void) print;
 -(void) printCheck: (int) i;
@@ -47,6 +46,7 @@
 -(void) setHighlighted: (BOOL) active;
 -(void) setValue: (BOOL) value atIndex: (int) index;
 -(void) switchValue;
+-(int) width;
 -(int) endPosition;
 -(void) dealloc;
 @end

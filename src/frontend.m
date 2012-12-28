@@ -238,14 +238,12 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     }
     NSArray *keys = [settings allKeys];
     int ypos = 0;
-    int xpos = 0;
     for(int i = 0; i < [keys count]; ++i) {
         NSString *key = [keys objectAtIndex: i];
         Values *value = [settings objectForKey: key];
         id widget = [[[value type] alloc] initWithLabel: key
                                                andNames: [value values]
-                                           andYPosition: ypos
-                                           andXPosition: xpos
+                                            andPosition: ypos
                                               andParent: win];
         for(int i = 0; i < [value count]; ++i) {
             NSString *fullkey = [NSString stringWithFormat:
@@ -254,7 +252,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                      atIndex: i];
         }
         [widgets addObject: widget];
-        xpos += [widget endPosition];
+        ypos += [widget endPosition];
         [widget release];
     }
     [self setFirst];
@@ -276,9 +274,11 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         Widget *w = [widgets objectAtIndex: highlight];
         if([w endPosition] - [w width] <= padding) {
             int count = [paddingStates count] - 1;
-            int delta = [[paddingStates objectAtIndex: count] intValue];
-            [paddingStates removeObjectAtIndex: count];
-            padding -= delta;
+            if(count >= 0) {
+                int delta = [[paddingStates objectAtIndex: count] intValue];
+                [paddingStates removeObjectAtIndex: count];
+                padding -= delta;
+            }
         }
     }
     [self refresh];
