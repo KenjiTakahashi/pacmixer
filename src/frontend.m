@@ -328,18 +328,24 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 }
 
 -(void) up {
-    [[widgets objectAtIndex: highlight] up];
-    [self refresh];
+    if([widgets count]) {
+        [[widgets objectAtIndex: highlight] up];
+        [self refresh];
+    }
 }
 
 -(void) down {
-    [[widgets objectAtIndex: highlight] down];
-    [self refresh];
+    if([widgets count]) {
+        [[widgets objectAtIndex: highlight] down];
+        [self refresh];
+    }
 }
 
 -(void) mute {
-    [(id<Controlling>)[widgets objectAtIndex: highlight] mute];
-    [self refresh];
+    if([widgets count]) {
+        [(id<Controlling>)[widgets objectAtIndex: highlight] mute];
+        [self refresh];
+    }
 }
 
 -(void) inside {

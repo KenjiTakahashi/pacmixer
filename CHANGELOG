@@ -21,3 +21,4 @@
 == 0.2:
 - Ability to filter out PA internals/Monitors.
 - Properly dealing with non-existing/lost connections.
+- Fixed m/j/k crash when used on empty page.
