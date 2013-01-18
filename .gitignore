@@ -1,6 +1,6 @@
 *~
 *swp
 *.o
-.todo
+.td
 pacmixer
 dist/

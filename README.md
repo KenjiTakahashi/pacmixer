@@ -34,7 +34,7 @@ k (or up arrow): increase the volume
 m: mute the volume
 i: go into the inside mode
 q (or Esc): go outside the inside mode or exit the application
-F1-F5 (or 1-5): change to all/playback/recording/outputs/inputs view, respectively
+F1-F5 (or 1-5): switch to all/playback/recording/outputs/inputs view, respectively
 F12 (or 0): switch to settings view
 ```
 
@@ -54,7 +54,7 @@ q (or Esc): exit the application
 #### inside mode
 Inside mode is used to adjust specific channel's volume.
 
-All shortcuts (besides ```q```) work the same, except that they affect single channels instead of the whole sink/source.
+All shortcuts (besides ```q```) work the same, except that they affect single channel instead of the whole sink/source.
 
 ## something's broken?
 

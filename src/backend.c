@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2012
+ Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -250,6 +250,14 @@ void _cb_s_source_output(pa_context *c, const pa_source_output_info *info, int e
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
     int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
+    if(t__ == PA_SUBSCRIPTION_EVENT_CARD) {
+        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
+        }
+        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
+        }
+        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
+        }
+    }
     if(t__ == PA_SUBSCRIPTION_EVENT_SINK_INPUT) {
         if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
             pa_context_get_sink_input_info(c, idx, _cb_u_sink_input, userdata);
@@ -271,7 +279,7 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
             ((tcallback_remove_func)(callback->remove))(callback->self, idx);
         }
         if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
-            pa_context_get_sink_input_info(c, idx, _cb_sink_input, userdata);
+            pa_context_get_sink_info_by_index(c, idx, _cb_sink, userdata);
         }
     }
     if(t__ == PA_SUBSCRIPTION_EVENT_SOURCE) {
