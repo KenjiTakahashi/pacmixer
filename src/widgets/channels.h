@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -78,6 +78,7 @@
         BOOL inside;
         BOOL hasPeak;
         BOOL hasMute;
+        BOOL hidden;
         int position;
         int y;
         int my;

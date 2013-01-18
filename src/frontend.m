@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -141,15 +141,15 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
                                               andType: type
                                                 andId: id_
                                             andParent: win];
-    if(x == 1) {
-        [widget setHighlighted: YES];
-    }
     [allWidgets addObject: widget];
     if(
         ([top view] == ALL || type == [top view])
         && [self applySettings: [widget name]]
     ) {
         [widgets addObject: widget];
+        if(x == 1) {
+            [widget setHighlighted: YES];
+        }
         [widget show];
     }
     [widget release];

@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@
     internalId = [id_ copy];
     parent = parent_;
     width = 8;
+    hidden = YES;
     [self print];
 #ifdef DEBUG
 debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8String]);
@@ -97,6 +98,9 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
                                                andPosition: position_
                                                      andId: internalId
                                                  andParent: win];
+    if(!hidden) {
+        [control show];
+    }
     [controls addObject: control];
     [control release];
     return control;
@@ -223,6 +227,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) show {
+    hidden = NO;
     [self printName];
     for(int i = 0; i < [controls count]; ++i) {
         [[controls objectAtIndex: i] show];
@@ -230,6 +235,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) hide {
+    hidden = YES;
     for(int i = 0; i < [controls count]; ++i) {
         [[controls objectAtIndex: i] hide];
     }

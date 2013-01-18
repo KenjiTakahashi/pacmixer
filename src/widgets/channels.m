@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
     self = [super init];
     signal = [signal_ copy];
     propagate = YES;
-    hidden = NO;
+    hidden = YES;
     my = getmaxy(parent) - 1;
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
@@ -52,34 +52,36 @@
 }
 
 -(void) print {
-    if(mute) {
-        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
-    } else {
-        mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
-    }
-    int currentPos = my - 1;
-    if(mutable) {
-        currentPos -= 2;
-    }
-    float dy = (float)currentPos / (float)maxLevel;
-    int limit = dy * currentLevel;
-    int high = dy * normLevel;
-    int medium = high * (4. / 5.);
-    int low = high * (2. / 5.);
-    for(int i = 0; i < my - 3; ++i) {
-        int color = COLOR_PAIR(2);
-        if(i < limit) {
-            if(i >= high) {
-                color = COLOR_PAIR(5);
-            } else if(i >= medium) {
-                color = COLOR_PAIR(4);
-            } else if(i >= low) {
-                color = COLOR_PAIR(3);
-            }
+    if(!hidden) {
+        if(mute) {
+            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
         } else {
-            color = COLOR_PAIR(1);
+            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
         }
-        mvwaddch(win, currentPos - i, 0, ' ' | color);
+        int currentPos = my - 1;
+        if(mutable) {
+            currentPos -= 2;
+        }
+        float dy = (float)currentPos / (float)maxLevel;
+        int limit = dy * currentLevel;
+        int high = dy * normLevel;
+        int medium = high * (4. / 5.);
+        int low = high * (2. / 5.);
+        for(int i = 0; i < my - 3; ++i) {
+            int color = COLOR_PAIR(2);
+            if(i < limit) {
+                if(i >= high) {
+                    color = COLOR_PAIR(5);
+                } else if(i >= medium) {
+                    color = COLOR_PAIR(4);
+                } else if(i >= low) {
+                    color = COLOR_PAIR(3);
+                }
+            } else {
+                color = COLOR_PAIR(1);
+            }
+            mvwaddch(win, currentPos - i, 0, ' ' | color);
+        }
     }
 }
 
@@ -126,9 +128,7 @@
          andMute: (BOOL) mute_ {
     currentLevel = level_;
     mute = mute_;
-    if(!hidden) {
-        [self print];
-    }
+    [self print];
 }
 
 -(void) setPropagation: (BOOL) p {
@@ -177,6 +177,7 @@
 
 -(void) show {
     hidden = NO;
+    [self print];
 }
 
 -(void) hide {
@@ -198,6 +199,7 @@
     mx = [channels_ count] + 2;
     hasPeak = NO;
     hasMute = NO;
+    hidden = YES;
     for(int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
         if([obj maxLevel] != nil) {
@@ -267,11 +269,13 @@ debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
 }
 
 -(void) print {
-    box(win, 0, 0);
-    if(hasPeak && hasMute) {
-        mvwaddch(win, my - 3, 0, ACS_LTEE);
-        mvwhline(win, my - 3, 1, 0, mx - 2);
-        mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
+    if(!hidden) {
+        box(win, 0, 0);
+        if(hasPeak && hasMute) {
+            mvwaddch(win, my - 3, 0, ACS_LTEE);
+            mvwhline(win, my - 3, 1, 0, mx - 2);
+            mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
+        }
     }
 }
 
@@ -395,6 +399,7 @@ debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
 }
 
 -(void) show {
+    hidden = NO;
     [self print];
     for(int i = 0; i < [channels count]; ++i) {
         Channel *channel = [channels objectAtIndex: i];
@@ -404,6 +409,7 @@ debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
 }
 
 -(void) hide {
+    hidden = YES;
     for(int i = 0; i < [channels count]; ++i) {
         [(Channel*)[channels objectAtIndex: i] hide];
     }
