@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #endif
 
 
-void callback_add_func(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);
+void callback_add_func(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, const backend_card_t*, uint8_t);
 void callback_update_func(void*, uint32_t, backend_entry_type, const backend_volume_t*, uint8_t);
 void callback_remove_func(void*, uint32_t);
 void callback_state_func(void*);

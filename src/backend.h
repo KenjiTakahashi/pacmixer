@@ -20,6 +20,7 @@
 #include <pulse/pulseaudio.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <time.h>
 #ifdef DEBUG
 #include "debug.h"
@@ -31,7 +32,7 @@
  * Returned from backend_init() and passed to all other manipulation
  * functions.
  *
- * @see backend_init()
+ * @see backend_new()
  */
 typedef struct CONTEXT {
     pa_threaded_mainloop *loop; /**< Ref to PA event loop. */
@@ -68,12 +69,21 @@ typedef struct BACKEND_CHANNEL {
 } backend_channel_t;
 
 /**
- * Holds information abous channel's current setting.
+ * Holds information about channel's current setting.
  */
 typedef struct BACKEND_VOLUME {
     int level;
     int mute;
 } backend_volume_t;
+
+/**
+ * Holds card-wise informations.
+ * Number of profiles should be passed along with this structure.
+ */
+typedef struct BACKEND_CARD {
+    char **profiles;
+    char *active_profile;
+} backend_card_t;
 
 /**
  * Controls types.
@@ -82,7 +92,8 @@ typedef enum {
     SINK,
     SINK_INPUT,
     SOURCE,
-    SOURCE_OUTPUT
+    SOURCE_OUTPUT,
+    CARD
 } backend_entry_type;
 
 /**
@@ -151,7 +162,7 @@ void backend_volume_setall(context_t*, backend_entry_type, uint32_t, int*, int);
  */
 void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 
-typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, uint8_t);
+typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, const backend_card_t*, uint8_t);
 typedef void (*tcallback_update_func)(void*, uint32_t, backend_entry_type, const backend_volume_t*, uint8_t);
 typedef void (*tcallback_remove_func)(void*, uint32_t);
 typedef void (*tstate_callback_func)(void*);
@@ -367,6 +378,9 @@ void _cb_u_source_output(pa_context*, const pa_source_output_info*, int, void*);
  */
 void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
 
+void _cb_card(pa_context*, const pa_card_info*, int, void*);
+
+
 /**
  * Internal function.
  * Callback. Fired when PA server emits an event.
@@ -380,6 +394,7 @@ void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
  * @param userdata Additional data of type CALLBACK.
  */
 void _cb_event(pa_context*, pa_subscription_event_type_t, uint32_t, void*);
+
 
 /**
  * Helper function.

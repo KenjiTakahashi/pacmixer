@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,15 @@
 #import "middleware.h"
 
 
-void callback_add_func(void *self_, const char *name, backend_entry_type type, uint32_t idx, const backend_channel_t *channels, const backend_volume_t *volumes, uint8_t chnum) {
+void callback_add_func(
+    void *self_, const char *name, backend_entry_type type, uint32_t idx,
+    const backend_channel_t *channels, const backend_volume_t *volumes,
+    const backend_card_t *card,
+    uint8_t chnum
+) {
+    if(type == CARD) {
+        return;
+    }
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     [self retain];
@@ -26,16 +34,12 @@ void callback_add_func(void *self_, const char *name, backend_entry_type type, u
     NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     for(int i = 0; i < chnum; ++i) {
-        NSNumber *lvl = [NSNumber numberWithInt: channels[i].maxLevel];
-        NSNumber *nlvl = [NSNumber numberWithInt: channels[i].normLevel];
-        BOOL mut = channels[i].mutable == 1 ? YES : NO;
-        [ch addObject: [[channel_t alloc] initWithMaxLevel: lvl
-                                              andNormLevel: nlvl
-                                                andMutable: mut]];
-        NSNumber *vlvl = [NSNumber numberWithInt: volumes[i].level];
-        BOOL vmut = volumes[i].mute == 1 ? YES : NO;
-        [chv addObject: [[volume_t alloc] initWithLevel: vlvl
-                                                andMute: vmut]];
+        const backend_channel_t chn = channels[i];
+        [ch addObject: [[channel_t alloc] initWithMaxLevel: chn.maxLevel
+                                              andNormLevel: chn.normLevel
+                                                andMutable: chn.mutable]];
+        [chv addObject: [[volume_t alloc] initWithLevel: volumes[i].level
+                                                andMute: volumes[i].mute]];
         Block *block = [self addBlockWithId: idx
                                    andIndex: i
                                     andType: type];
@@ -88,10 +92,8 @@ void callback_update_func(void *self_, uint32_t idx, backend_entry_type type, co
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     for(int i = 0; i < chnum; ++i) {
-        NSNumber *lvl = [NSNumber numberWithInt: volumes[i].level];
-        BOOL mut = volumes[i].mute == 1 ? YES : NO;
-        volume_t *v = [[volume_t alloc] initWithLevel: lvl
-                                              andMute: mut];
+        volume_t *v = [[volume_t alloc] initWithLevel: volumes[i].level
+                                              andMute: volumes[i].mute];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             v, @"volumes", nil];
         NSString *nname = [NSString stringWithFormat:

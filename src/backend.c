@@ -59,6 +59,7 @@ void backend_init(context_t *context, callback_t *callback) {
     pa_context_get_sink_info_list(context->context, _cb_sink, callback);
     pa_context_get_source_info_list(context->context, _cb_source, callback);
     pa_context_get_source_output_info_list(context->context, _cb_source_output, callback);
+    pa_context_get_card_info_list(context->context, _cb_card, callback);
 }
 
 void backend_destroy(context_t *context) {
@@ -144,7 +145,7 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
 #endif
-        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, client_callback->channels, client_callback->volumes, client_callback->chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, client_callback->channels, client_callback->volumes, NULL, client_callback->chnum);
         free(client_callback->channels);
         free(client_callback->volumes);
         free(client_callback);
@@ -247,6 +248,30 @@ void _cb_s_source_output(pa_context *c, const pa_source_output_info *info, int e
     }
 }
 
+void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
+    if(!eol) {
+        callback_t *callback = userdata;
+        int n = info->n_profiles;
+        backend_card_t card;
+        pa_card_profile_info *profiles = info->profiles;
+        card.profiles = malloc(n * sizeof(char*));
+        for(int i = 0; i < n; ++i) {
+            const char *desc = profiles[i].description;
+            card.profiles[i] = malloc((strlen(desc) + 1) * sizeof(char));
+            strcpy(card.profiles[i], desc);
+        }
+        const char *active = info->active_profile[0].description;
+        card.active_profile = malloc((strlen(active) + 1) * sizeof(char));
+        strcpy(card.active_profile, active);
+        ((tcallback_add_func)(callback->add))(callback->self, info->name, CARD, info->index, NULL, NULL, &card, n);
+        free(card.active_profile);
+        for(int i = 0; i < n; ++i) {
+            free(card.profiles[i]);
+        }
+        free(card.profiles);
+    }
+}
+
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
     int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
@@ -346,7 +371,7 @@ void _cb1(uint32_t index, pa_cvolume volume, int mute, const char *description, 
 debug_fprintf(__func__, "%d:%s appeared", index, description);
 #endif
         backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, channels, volumes, chnum);
+        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, channels, volumes, NULL, chnum);
         free(channels);
         free(volumes);
     }
