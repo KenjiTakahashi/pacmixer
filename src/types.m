@@ -62,10 +62,10 @@
 @end
 
 
-@implementation card_t
--(card_t*) initWithProfiles: (const char**) profiles_
-               andNProfiles: (int) n_profiles
-           andActiveProfile: (const char*) active {
+@implementation card_profile_t
+-(card_profile_t*) initWithProfiles: (const char**) profiles_
+                       andNProfiles: (int) n_profiles
+                   andActiveProfile: (const char*) active {
     self = [super init];
     profiles = [[NSMutableArray alloc] init];
     for(int i = 0; i < n_profiles; ++i) {

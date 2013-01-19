@@ -49,15 +49,15 @@
 @end
 
 
-@interface card_t: NSObject {
+@interface card_profile_t: NSObject {
     @private
         NSMutableArray *profiles;
         NSString *activeProfile;
 }
 
--(card_t*) initWithProfiles: (const char **) profiles_
-               andNProfiles: (int) n_profiles
-           andActiveProfile: (const char*) active;
+-(card_profile_t*) initWithProfiles: (const char **) profiles_
+                       andNProfiles: (int) n_profiles
+                   andActiveProfile: (const char*) active;
 -(NSString*) activeProfile;
 -(void) dealloc;
 @end
