@@ -142,10 +142,9 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
                                                 andId: id_
                                             andParent: win];
     [allWidgets addObject: widget];
-    if(
-        ([top view] == ALL || type == [top view])
-        && [self applySettings: [widget name]]
-    ) {
+    BOOL cond = [top view] == ALL || type == [top view];
+    cond = cond && [self applySettings: [widget name]];
+    if(cond) {
         [widgets addObject: widget];
         if(x == 1) {
             [widget setHighlighted: YES];
@@ -188,6 +187,26 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
     [self refresh];
+}
+
+-(void) addProfiles: (NSArray*) profiles
+         withActive: (NSString*) active
+            andName: (NSString*) name
+              andId: (NSString*) id_ {
+    int ypos = 0;
+    if([top view] == SETTINGS) {
+        ypos = [[widgets lastObject] endPosition];
+    }
+    Options *widget = [[Options alloc] initWithPosition: ypos
+                                                andName: name
+                                              andValues: profiles
+                                                  andId: id_
+                                              andParent: win];
+    [allWidgets addObject: widget];
+    if([top view] == SETTINGS) {
+        [widgets addObject: widget];
+    }
+    [widget release];
 }
 
 -(void) setCurrent: (int) i {
@@ -244,10 +263,11 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     for(int i = 0; i < [keys count]; ++i) {
         NSString *key = [keys objectAtIndex: i];
         Values *value = [settings objectForKey: key];
-        id widget = [[[value type] alloc] initWithLabel: key
-                                               andNames: [value values]
-                                            andPosition: ypos
-                                              andParent: win];
+        id widget = [[[value type] alloc] initWithPosition: ypos
+                                                   andName: key
+                                                 andValues: [value values]
+                                                     andId: nil
+                                                 andParent: win];
         for(int i = 0; i < [value count]; ++i) {
             NSString *fullkey = [NSString stringWithFormat:
                 @"%@/%@", key, [value objectAtIndex: i]];

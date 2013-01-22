@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,16 +28,19 @@
         WINDOW *win;
         NSString *label;
         NSArray *names;
+        NSString *internalId;
         NSMutableArray *values;
         BOOL highlighted;
         int highlight;
         int position;
 }
 
--(CheckBox*) initWithLabel: (NSString*) label_
-                  andNames: (NSArray*) names_
-               andPosition: (int) ypos
-                 andParent: (WINDOW*) parent;
+-(CheckBox*) initWithPosition: (int) ypos
+                      andName: (NSString*) label_
+                    andValues: (NSArray*) names_
+                        andId: (NSString*) id_
+                    andParent: (WINDOW*) parent;
+-(void) dealloc;
 -(void) print;
 -(void) printCheck: (int) i;
 -(void) setCurrent: (int) i;
@@ -48,5 +51,5 @@
 -(void) switchValue;
 -(int) height;
 -(int) endPosition;
--(void) dealloc;
+-(NSNumber*) internalId;
 @end

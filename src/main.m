@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,14 +22,19 @@
 -(Dispatcher*) init {
     self = [super init];
     pool = [[NSAutoreleasePool alloc] init];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(addWidget:)
-                                                 name: @"controlAppeared"
-                                               object: nil];
-    [[NSNotificationCenter defaultCenter] addObserver: self
-                                             selector: @selector(removeWidget:)
-                                                 name: @"controlDisappeared"
-                                               object: nil];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center addObserver: self
+               selector: @selector(addWidget:)
+                   name: @"controlAppeared"
+                 object: nil];
+    [center addObserver: self
+               selector: @selector(removeWidget:)
+                   name: @"controlDisappeared"
+                 object: nil];
+    [center addObserver: self
+               selector: @selector(addWidget:)
+                   name: @"cardAppeared"
+                 object: nil];
     tui = [[TUI alloc] init];
     middleware = [[Middleware alloc] init];
     return self;
@@ -46,8 +51,7 @@
 -(void) addWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
     NSNumber *id_ = [info objectForKey: @"id"];
-    NSNumber *typen = [info objectForKey: @"type"];
-    backend_entry_type typeb = [typen intValue];
+    backend_entry_type typeb = [[info objectForKey: @"type"] intValue];
     View type;
     switch(typeb) {
         case SINK:
@@ -61,6 +65,9 @@
             break;
         case SOURCE_OUTPUT:
             type = RECORDING;
+            break;
+        case CARD:
+            type = SETTINGS;
             break;
         default:
             type = ALL;
@@ -77,7 +84,7 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
 #endif
     NSArray *channels = [info objectForKey: @"channels"];
     NSArray *volumes = [info objectForKey: @"volumes"];
-    if(channels != nil) {
+    if(channels != nil && volumes != nil) {
         Channels *channelsWidgets = [w addChannels: channels];
         for(int i = 0; i < [channels count]; ++i) {
             volume_t *volume = [volumes objectAtIndex: i];
@@ -85,6 +92,14 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
                            forChannel: i];
             [channelsWidgets setMute: [volume mute]
                           forChannel: i];
+        }
+    } else {
+        card_profile_t *profile = [info objectForKey: @"profile"];
+        if(profile != nil) {
+            [tui addProfiles: [profile profiles]
+                  withActive: [profile activeProfile]
+                     andName: [info objectForKey: @"name"]
+                       andId: internalId];
         }
     }
     //NSArray *options = [info objectForKey: @"options"];

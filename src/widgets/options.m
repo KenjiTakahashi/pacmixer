@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,13 +19,15 @@
 
 
 @implementation Options
--(Options*) initWithLabel: (NSString*) label_
-                 andNames: (NSArray*) options_
-              andPosition: (int) ypos
-                andParent: (WINDOW*) parent {
+-(Options*) initWithPosition: (int) ypos
+                     andName: (NSString*) label_
+                   andValues: (NSArray*) options_
+                       andId: (NSString*) id_
+                   andParent: (WINDOW*) parent {
     self = [super init];
     label = [label_ copy];
     options = [options_ retain];
+    internalId = [id_ copy];
     highlighted = NO;
     highlight = 0;
     int width = 0;
@@ -60,6 +62,7 @@
 
 -(void) dealloc {
     delwin(win);
+    [internalId release];
     [options release];
     [label release];
     [super dealloc];
@@ -111,5 +114,11 @@
 
 -(int) endPosition {
     return position + [self height];
+}
+
+-(NSNumber*) internalId {
+    NSArray *components = [internalId componentsSeparatedByString: @"_"];
+    int i = [[components objectAtIndex: 0] integerValue];
+    return [NSNumber numberWithInt: i];
 }
 @end

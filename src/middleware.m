@@ -24,67 +24,77 @@ void callback_add_func(
     const backend_card_t *card,
     uint8_t chnum
 ) {
-    if(type == CARD) {
-        return;
-    }
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     [self retain];
-    NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
-    NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    for(int i = 0; i < chnum; ++i) {
-        const backend_channel_t chn = channels[i];
-        [ch addObject: [[channel_t alloc] initWithMaxLevel: chn.maxLevel
-                                              andNormLevel: chn.normLevel
-                                                andMutable: chn.mutable]];
-        [chv addObject: [[volume_t alloc] initWithLevel: volumes[i].level
-                                                andMute: volumes[i].mute]];
+    if(type == CARD) {
+        char ** const profiles = card->profiles;
+        const char *active = card->active_profile;
+        card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
+                                                        andNProfiles: chnum
+                                                    andActiveProfile: active];
+        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSString stringWithUTF8String: name], @"name",
+            [NSNumber numberWithInt: idx], @"id",
+            p, @"profile", nil];
+        [center postNotificationName: @"cardAppeared"
+                              object: self
+                            userInfo: s];
+    } else {
+        NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
+        NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
+        for(int i = 0; i < chnum; ++i) {
+            const backend_channel_t chn = channels[i];
+            [ch addObject: [[channel_t alloc] initWithMaxLevel: chn.maxLevel
+                                                  andNormLevel: chn.normLevel
+                                                    andMutable: chn.mutable]];
+            [chv addObject: [[volume_t alloc] initWithLevel: volumes[i].level
+                                                    andMute: volumes[i].mute]];
+            Block *block = [self addBlockWithId: idx
+                                       andIndex: i
+                                        andType: type];
+            NSString *sname = [NSString stringWithFormat:
+                @"%@%d_%d_%d", @"volumeChanged", idx, type, i];
+            [center addObserver: block
+                       selector: @selector(setVolume:)
+                           name: sname
+                         object: nil];
+#ifdef DEBUG
+debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
+#endif
+        }
         Block *block = [self addBlockWithId: idx
-                                   andIndex: i
+                                   andIndex: -1
                                     andType: type];
         NSString *sname = [NSString stringWithFormat:
-            @"%@%d_%d_%d", @"volumeChanged", idx, type, i];
+            @"%@%d_%d", @"volumeChanged", idx, type];
         [center addObserver: block
-                   selector: @selector(setVolume:)
+                   selector: @selector(setVolumes:)
                        name: sname
                      object: nil];
 #ifdef DEBUG
 debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
 #endif
-    }
-    Block *block = [self addBlockWithId: idx
-                               andIndex: -1
-                                andType: type];
-    NSString *sname = [NSString stringWithFormat:
-        @"%@%d_%d", @"volumeChanged", idx, type];
-    [center addObserver: block
-               selector: @selector(setVolumes:)
-                   name: sname
-                 object: nil];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
-#endif
-    NSString *mname = [NSString stringWithFormat:
-        @"%@%d_%d", @"muteChanged", idx, type];
-    [center addObserver: block
-               selector: @selector(setMute:)
-                   name: mname
-                 object: nil];
+        NSString *mname = [NSString stringWithFormat:
+            @"%@%d_%d", @"muteChanged", idx, type];
+        [center addObserver: block
+                   selector: @selector(setMute:)
+                       name: mname
+                     object: nil];
 #ifdef DEBUG
 debug_fprintf(__func__, "m:%s observer added", [mname UTF8String]);
-debug_fprintf(__func__, ":m:%d:%s received", idx, name);
+debug_fprintf(__func__, "m:%d:%s received", idx, name);
 #endif
-    NSString *volumesS = [NSString stringWithString: @"volumes"];
-    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSString stringWithUTF8String: name], @"name",
-        [NSNumber numberWithInt: idx], @"id",
-        ch, @"channels", chv, volumesS,
-        [NSNumber numberWithInt: type], @"type", nil];
-    NSString *nname = [NSString stringWithString: @"controlAppeared"];
-    [center postNotificationName: nname
-                          object: self
-                        userInfo: s];
+        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+            [NSString stringWithUTF8String: name], @"name",
+            [NSNumber numberWithInt: idx], @"id",
+            ch, @"channels", chv, @"volumes",
+            [NSNumber numberWithInt: type], @"type", nil];
+        [center postNotificationName: @"controlAppeared"
+                              object: self
+                            userInfo: s];
+    }
     [pool release];
 }
 

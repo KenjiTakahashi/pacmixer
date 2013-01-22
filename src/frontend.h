@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -62,6 +62,10 @@
                      andType: (View) type
                        andId: (NSString*) id_;
 -(void) removeWidget: (NSNumber*) id_;
+-(void) addProfiles: (NSArray*) profiles
+         withActive: (NSString*) active
+            andName: (NSString*) name
+              andId: (NSString*) id_;
 -(void) setCurrent: (int) i;
 -(void) setFirst;
 -(void) setFilter: (View) type;

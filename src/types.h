@@ -55,9 +55,10 @@
         NSString *activeProfile;
 }
 
--(card_profile_t*) initWithProfiles: (const char **) profiles_
+-(card_profile_t*) initWithProfiles: (char**const) profiles_
                        andNProfiles: (int) n_profiles
                    andActiveProfile: (const char*) active;
--(NSString*) activeProfile;
 -(void) dealloc;
+-(NSArray*) profiles;
+-(NSString*) activeProfile;
 @end

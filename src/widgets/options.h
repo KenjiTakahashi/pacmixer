@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 
 #import <Foundation/NSArray.h>
 #import <Foundation/NSString.h>
+#import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
 
 
@@ -24,16 +25,18 @@
     @private
         WINDOW *win;
         NSString *label;
+        NSString *internalId;
         NSArray *options;
         BOOL highlighted;
         int highlight;
         int position;
 }
 
--(Options*) initWithLabel: (NSString*) label_
-                 andNames: (NSArray*) options_
-              andPosition: (int) ypos
-                andParent: (WINDOW*) parent;
+-(Options*) initWithPosition: (int) ypos
+                     andName: (NSString*) label_
+                   andValues: (NSArray*) options_
+                       andId: (NSString*) id_
+                   andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
 -(void) setCurrent: (int) i;
@@ -42,4 +45,5 @@
 -(void) setHighlighted: (BOOL) active;
 -(int) height;
 -(int) endPosition;
+-(NSNumber*) internalId;
 @end

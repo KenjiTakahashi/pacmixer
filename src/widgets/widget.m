@@ -223,7 +223,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(NSNumber*) internalId {
     NSArray *components = [internalId componentsSeparatedByString: @"_"];
     int i = [[components objectAtIndex: 0] integerValue];
-    return [NSNumber numberWithInteger: i];
+    return [NSNumber numberWithInt: i];
 }
 
 -(void) show {

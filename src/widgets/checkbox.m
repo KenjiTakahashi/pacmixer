@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,13 +19,15 @@
 
 
 @implementation CheckBox
--(CheckBox*) initWithLabel: (NSString*) label_
-                  andNames: (NSArray*) names_
-               andPosition: (int) ypos
-                 andParent: (WINDOW*) parent {
+-(CheckBox*) initWithPosition: (int) ypos
+                      andName: (NSString*) label_
+                    andValues: (NSArray*) names_
+                        andId: (NSString*) id_
+                    andParent: (WINDOW*) parent {
     self = [super init];
     label = [label_ copy];
     names = [names_ retain];
+    internalId = [id_ copy];
     values = [[NSMutableArray alloc] init];
     highlighted = NO;
     highlight = 0;
@@ -58,6 +60,15 @@
     win = derwin(parent, [values count] + 2, width, position, 0);
     [self print];
     return self;
+}
+
+-(void) dealloc {
+    delwin(win);
+    [values release];
+    [internalId release];
+    [names release];
+    [label release];
+    [super dealloc];
 }
 
 -(void) print {
@@ -130,11 +141,9 @@
     return position + [names count] + 2;
 }
 
--(void) dealloc {
-    delwin(win);
-    [values release];
-    [names release];
-    [label release];
-    [super dealloc];
+-(NSNumber*) internalId {
+    NSArray *components = [internalId componentsSeparatedByString: @"_"];
+    int i = [[components objectAtIndex: 0] integerValue];
+    return [NSNumber numberWithInt: i];
 }
 @end

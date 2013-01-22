@@ -63,7 +63,7 @@
 
 
 @implementation card_profile_t
--(card_profile_t*) initWithProfiles: (const char**) profiles_
+-(card_profile_t*) initWithProfiles: (char**const) profiles_
                        andNProfiles: (int) n_profiles
                    andActiveProfile: (const char*) active {
     self = [super init];
@@ -75,12 +75,16 @@
     return self;
 }
 
--(NSString*) activeProfile {
-    return activeProfile;
-}
-
 -(void) dealloc {
     [profiles release];
     [super dealloc];
+}
+
+-(NSArray*) profiles {
+    return profiles;
+}
+
+-(NSString*) activeProfile {
+    return activeProfile;
 }
 @end
