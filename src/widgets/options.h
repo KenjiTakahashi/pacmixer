@@ -42,6 +42,7 @@
 -(void) dealloc;
 -(void) print;
 -(void) setCurrent: (int) i;
+-(void) setCurrentByName: (NSString*) name;
 -(void) up;
 -(void) down;
 -(void) setHighlighted: (BOOL) active;

@@ -57,6 +57,7 @@
     position = ypos;
     win = derwin(parent, height, width, position, 0);
     hidden = YES;
+    [self print];
     return self;
 }
 
@@ -69,21 +70,28 @@
 }
 
 -(void) print {
-    box(win, 0, 0);
-    mvwprintw(win, 0, 1, "%@", label);
-    for(int i = 0; i < [options count]; ++i) {
-        NSString *obj = [options objectAtIndex: i];
-        if(highlighted && i == highlight) {
-            wattron(win, COLOR_PAIR(6));
+    if(!hidden) {
+        box(win, 0, 0);
+        mvwprintw(win, 0, 1, "%@", label);
+        for(int i = 0; i < [options count]; ++i) {
+            NSString *obj = [options objectAtIndex: i];
+            if(highlighted && i == highlight) {
+                wattron(win, COLOR_PAIR(6));
+            }
+            mvwprintw(win, i + 1, 1, "      ");
+            mvwprintw(win, i + 1, 1, "%@", obj);
+            wattroff(win, COLOR_PAIR(6));
         }
-        mvwprintw(win, i + 1, 1, "      ");
-        mvwprintw(win, i + 1, 1, "%@", obj);
-        wattroff(win, COLOR_PAIR(6));
     }
 }
 
 -(void) setCurrent: (int) i {
     highlight = i;
+    [self print];
+}
+
+-(void) setCurrentByName: (NSString*) name {
+    highlight = [options indexOfObject: name];
     [self print];
 }
 

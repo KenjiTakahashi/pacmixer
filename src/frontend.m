@@ -202,6 +202,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                                               andValues: profiles
                                                   andId: id_
                                               andParent: win];
+    [widget setCurrentByName: active];
     [allWidgets addObject: widget];
     if([top view] == SETTINGS) {
         [widgets addObject: widget];
