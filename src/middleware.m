@@ -98,7 +98,11 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
     [pool release];
 }
 
-void callback_update_func(void *self_, uint32_t idx, backend_entry_type type, const backend_volume_t *volumes, uint8_t chnum) {
+void callback_update_func(
+    void *self_, backend_entry_type type, uint32_t idx,
+    const backend_volume_t *volumes, const backend_card_t *card,
+    uint8_t chnum
+) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     for(int i = 0; i < chnum; ++i) {

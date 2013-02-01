@@ -358,7 +358,7 @@ void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute,
         callback_t *callback = userdata;
         uint8_t chnum = volume.channels;
         backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-        ((tcallback_update_func)(callback->update))(callback->self, index, type, volumes, chnum);
+        ((tcallback_update_func)(callback->update))(callback->self, type, index, volumes, NULL, chnum);
         free(volumes);
     }
 }
