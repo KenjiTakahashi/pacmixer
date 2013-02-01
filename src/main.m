@@ -76,15 +76,15 @@
     NSString *name = [info objectForKey: @"name"];
     NSString *internalId = [NSString stringWithFormat:
         @"%@_%d", id_, typeb];
-    Widget *w = [tui addWidgetWithName: name
-                               andType: type
-                                 andId: internalId];
 #ifdef DEBUG
 debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
 #endif
     NSArray *channels = [info objectForKey: @"channels"];
     NSArray *volumes = [info objectForKey: @"volumes"];
     if(channels != nil && volumes != nil) {
+        Widget *w = [tui addWidgetWithName: name
+                                   andType: type
+                                     andId: internalId];
         Channels *channelsWidgets = [w addChannels: channels];
         for(int i = 0; i < [channels count]; ++i) {
             volume_t *volume = [volumes objectAtIndex: i];
@@ -98,7 +98,7 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
         if(profile != nil) {
             [tui addProfiles: [profile profiles]
                   withActive: [profile activeProfile]
-                     andName: [info objectForKey: @"name"]
+                     andName: name
                        andId: internalId];
         }
     }

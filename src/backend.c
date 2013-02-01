@@ -263,7 +263,8 @@ void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) 
         const char *active = info->active_profile[0].description;
         card.active_profile = malloc((strlen(active) + 1) * sizeof(char));
         strcpy(card.active_profile, active);
-        ((tcallback_add_func)(callback->add))(callback->self, info->name, CARD, info->index, NULL, NULL, &card, n);
+        const char *desc = pa_proplist_gets(info->proplist, PA_PROP_DEVICE_DESCRIPTION);
+        ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, NULL, NULL, &card, n);
         free(card.active_profile);
         for(int i = 0; i < n; ++i) {
             free(card.profiles[i]);

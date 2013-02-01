@@ -56,7 +56,7 @@
     }
     position = ypos;
     win = derwin(parent, height, width, position, 0);
-    [self print];
+    hidden = YES;
     return self;
 }
 
@@ -82,10 +82,6 @@
     }
 }
 
--(void) show {
-    [self print];
-}
-
 -(void) setCurrent: (int) i {
     highlight = i;
     [self print];
@@ -108,6 +104,11 @@
     [self print];
 }
 
+-(void) setPosition: (int) position_ {
+    position = position_;
+    mvderwin(win, position, 0);
+}
+
 -(int) height {
     return [options count] + 2;
 }
@@ -116,9 +117,26 @@
     return position + [self height];
 }
 
+-(View) type {
+    return SETTINGS;
+}
+
+-(NSString*) name {
+    return label;
+}
+
 -(NSNumber*) internalId {
     NSArray *components = [internalId componentsSeparatedByString: @"_"];
     int i = [[components objectAtIndex: 0] integerValue];
     return [NSNumber numberWithInt: i];
+}
+
+-(void) show {
+    hidden = NO;
+    [self print];
+}
+
+-(void) hide {
+    hidden = YES;
 }
 @end

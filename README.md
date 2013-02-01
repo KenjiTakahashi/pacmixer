@@ -39,6 +39,7 @@ F12 (or 0): switch to settings view
 ```
 
 #### settings view
+Used to change card wise settings (e.g. profiles) and control views filters.
 
 ```
 h (or left arrow): move to the previous group of settings

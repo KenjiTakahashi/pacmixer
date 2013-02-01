@@ -234,13 +234,13 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     } else {
         for(int i = 0; i < [allWidgets count]; ++i) {
             Widget *w = [allWidgets objectAtIndex: i];
-            if(
-                ([top view] == ALL || [w type] == [top view])
-                && [self applySettings: [w name]]
-            ) {
-                [widgets addObject: w];
+            BOOL cond = [top view] == ALL && [w type] != SETTINGS;
+            cond = cond || [w type] == [top view];
+            cond = cond && [self applySettings: [w name]];
+            if(cond) {
                 [w setPosition: x];
                 [w show];
+                [widgets addObject: w];
                 x = [w endPosition] + 1;
             } else {
                 [w hide];
@@ -254,12 +254,19 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [top setView: SETTINGS];
     [bottom setView: SETTINGS];
     [self clear];
+    int ypos = 0;
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
-        [w hide];
+        if([w type] == SETTINGS) {
+            [w setPosition: ypos];
+            [w show];
+            [widgets addObject: w];
+            ypos = [w endPosition];
+        } else {
+            [w hide];
+        }
     }
     NSArray *keys = [settings allKeys];
-    int ypos = 0;
     for(int i = 0; i < [keys count]; ++i) {
         NSString *key = [keys objectAtIndex: i];
         Values *value = [settings objectForKey: key];

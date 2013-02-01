@@ -19,9 +19,10 @@
 #import <Foundation/NSString.h>
 #import <Foundation/NSDecimalNumber.h>
 #import <curses.h>
+#import "misc.h"
 
 
-@interface Options: NSObject {
+@interface Options: NSObject <Hiding> {
     @private
         WINDOW *win;
         NSString *label;
@@ -30,6 +31,7 @@
         BOOL highlighted;
         int highlight;
         int position;
+        BOOL hidden;
 }
 
 -(Options*) initWithPosition: (int) ypos
@@ -43,7 +45,12 @@
 -(void) up;
 -(void) down;
 -(void) setHighlighted: (BOOL) active;
+-(void) setPosition: (int) position_;
 -(int) height;
 -(int) endPosition;
+-(View) type;
+-(NSString*) name;
 -(NSNumber*) internalId;
+-(void) show;
+-(void) hide;
 @end
