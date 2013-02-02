@@ -95,6 +95,11 @@
     [self print];
 }
 
+-(void) setCurrentByNotification: (NSNotification*) notification {
+    card_profile_t *info = [[notification userInfo] objectForKey: @"profile"];
+    [self setCurrentByName: [info activeProfile]];
+}
+
 -(void) up {
     if(highlight > 0) {
         [self setCurrent: highlight - 1];

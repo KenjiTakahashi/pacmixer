@@ -23,3 +23,4 @@
 - Properly dealing with non-existing/lost connections.
 - Fixed m/j/k crash when used on empty page.
 - Fixed possible mix-up of SINK and SINK_INPUT controls.
+- Fixed hidden controls sometimes not properly removed when gone.

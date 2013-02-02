@@ -21,9 +21,10 @@
 #import <Foundation/NSDecimalNumber.h>
 #import <Foundation/NSNotification.h>
 #import <curses.h>
+#import "misc.h"
 
 
-@interface CheckBox: NSObject {
+@interface CheckBox: NSObject <Hiding> {
     @private
         WINDOW *win;
         NSString *label;
@@ -31,6 +32,7 @@
         NSString *internalId;
         NSMutableArray *values;
         BOOL highlighted;
+        BOOL hidden;
         int highlight;
         int position;
 }
@@ -47,9 +49,12 @@
 -(void) up;
 -(void) down;
 -(void) setHighlighted: (BOOL) active;
+-(void) setPosition: (int) position_;
 -(void) setValue: (BOOL) value atIndex: (int) index;
 -(void) switchValue;
 -(int) height;
 -(int) endPosition;
 -(NSNumber*) internalId;
+-(void) show;
+-(void) hide;
 @end

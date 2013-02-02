@@ -249,27 +249,23 @@ void _cb_s_source_output(pa_context *c, const pa_source_output_info *info, int e
 }
 
 void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
-    if(!eol) {
+    if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         int n = info->n_profiles;
-        backend_card_t card;
-        pa_card_profile_info *profiles = info->profiles;
-        card.profiles = malloc(n * sizeof(char*));
-        for(int i = 0; i < n; ++i) {
-            const char *desc = profiles[i].description;
-            card.profiles[i] = malloc((strlen(desc) + 1) * sizeof(char));
-            strcpy(card.profiles[i], desc);
-        }
-        const char *active = info->active_profile[0].description;
-        card.active_profile = malloc((strlen(active) + 1) * sizeof(char));
-        strcpy(card.active_profile, active);
+        backend_card_t *card = _do_card(info, n);
         const char *desc = pa_proplist_gets(info->proplist, PA_PROP_DEVICE_DESCRIPTION);
-        ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, NULL, NULL, &card, n);
-        free(card.active_profile);
-        for(int i = 0; i < n; ++i) {
-            free(card.profiles[i]);
-        }
-        free(card.profiles);
+        ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, NULL, NULL, card, n);
+        _do_card_free(card, n);
+    }
+}
+
+void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
+    if(!eol && info->index != PA_INVALID_INDEX) {
+        callback_t *callback = userdata;
+        int n = info->n_profiles;
+        backend_card_t *card = _do_card(info, n);
+        ((tcallback_update_func)(callback->update))(callback->self, CARD, info->index, NULL, card, n);
+         _do_card_free(card, n);
     }
 }
 
@@ -278,10 +274,12 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
     if(t__ == PA_SUBSCRIPTION_EVENT_CARD) {
         if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
+            pa_context_get_card_info_by_index(c, idx, _cb_u_card, userdata);
         }
         if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
         }
         if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
+            pa_context_get_card_info_by_index(c, idx, _cb_card, userdata);
         }
     }
     if(t__ == PA_SUBSCRIPTION_EVENT_SINK_INPUT) {
@@ -351,6 +349,30 @@ backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
         volumes[i].mute = mute;
     }
     return volumes;
+}
+
+backend_card_t *_do_card(const pa_card_info* info, int n) {
+    backend_card_t *card = malloc(sizeof(backend_card_t));
+    pa_card_profile_info *profiles = info->profiles;
+    card->profiles = malloc(n * sizeof(char*));
+    for(int i = 0; i < n; ++i) {
+        const char *desc = profiles[i].description;
+        card->profiles[i] = malloc((strlen(desc) + 1) * sizeof(char));
+        strcpy(card->profiles[i], desc);
+    }
+    const char *active = info->active_profile[0].description;
+    card->active_profile = malloc((strlen(active) + 1) * sizeof(char));
+    strcpy(card->active_profile, active);
+    return card;
+}
+
+void _do_card_free(backend_card_t *card, int n) {
+    free(card->active_profile);
+    for(int i = 0; i < n; ++i) {
+        free(card->profiles[i]);
+    }
+    free(card->profiles);
+    free(card);
 }
 
 void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, void *userdata) {

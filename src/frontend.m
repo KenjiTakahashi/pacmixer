@@ -162,10 +162,6 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
         Widget *widget = [widgets objectAtIndex: i];
         if([[widget internalId] isEqualToNumber: id_]) {
             [indexes addIndex: i];
-            [allWidgets removeObject: widget];
-#ifdef DEBUG
-debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
-#endif
             if(highlight >= i) {
                 if(highlight > 0) {
                     highlight -= 1;
@@ -176,6 +172,17 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         }
     }
     [widgets removeObjectsAtIndexes: indexes];
+    [indexes removeAllIndexes];
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *widget = [allWidgets objectAtIndex: i];
+        if([[widget internalId] isEqualToNumber: id_]) {
+            [indexes addIndex: i];
+#ifdef DEBUG
+debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
+#endif
+        }
+    }
+    [allWidgets removeObjectsAtIndexes: indexes];
     int x = 1;
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
@@ -203,6 +210,16 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                                                   andId: id_
                                               andParent: win];
     [widget setCurrentByName: active];
+    SEL sel = @selector(setCurrentByNotification:);
+    NSString *nname = [NSString stringWithFormat:
+        @"%@_%@", @"cardProfileChanged", id_];
+#ifdef DEBUG
+debug_fprintf(__func__, "%s", [nname UTF8String]);
+#endif
+    [[NSNotificationCenter defaultCenter] addObserver: widget
+                                             selector: sel
+                                                 name: nname
+                                               object: nil];
     [allWidgets addObject: widget];
     if([top view] == SETTINGS) {
         [widgets addObject: widget];
@@ -255,14 +272,14 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [top setView: SETTINGS];
     [bottom setView: SETTINGS];
     [self clear];
-    int ypos = 0;
+    int y = 0;
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
         if([w type] == SETTINGS) {
-            [w setPosition: ypos];
+            [w setPosition: y];
             [w show];
             [widgets addObject: w];
-            ypos = [w endPosition];
+            y = [w endPosition];
         } else {
             [w hide];
         }
@@ -271,11 +288,12 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     for(int i = 0; i < [keys count]; ++i) {
         NSString *key = [keys objectAtIndex: i];
         Values *value = [settings objectForKey: key];
-        id widget = [[[value type] alloc] initWithPosition: ypos
+        id widget = [[[value type] alloc] initWithPosition: y
                                                    andName: key
                                                  andValues: [value values]
                                                      andId: nil
                                                  andParent: win];
+        [widget show];
         for(int i = 0; i < [value count]; ++i) {
             NSString *fullkey = [NSString stringWithFormat:
                 @"%@/%@", key, [value objectAtIndex: i]];
@@ -283,7 +301,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                      atIndex: i];
         }
         [widgets addObject: widget];
-        ypos = [widget endPosition];
+        y = [widget endPosition];
         [widget release];
     }
     [self setFirst];

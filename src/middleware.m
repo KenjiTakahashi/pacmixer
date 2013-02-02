@@ -37,7 +37,7 @@ void callback_add_func(
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: name], @"name",
             [NSNumber numberWithInt: idx], @"id",
-            p, @"profile", nil];
+            p, @"profile", [NSNumber numberWithInt: type], @"type", nil];
         [center postNotificationName: @"cardAppeared"
                               object: self
                             userInfo: s];
@@ -105,20 +105,39 @@ void callback_update_func(
 ) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
-    for(int i = 0; i < chnum; ++i) {
-        volume_t *v = [[volume_t alloc] initWithLevel: volumes[i].level
-                                              andMute: volumes[i].mute];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    if(type == CARD) {
+        char ** const profiles = card->profiles;
+        const char *active = card->active_profile;
+        card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
+                                                        andNProfiles: chnum
+                                                    andActiveProfile: active];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-            v, @"volumes", nil];
+            p, @"profile", nil];
         NSString *nname = [NSString stringWithFormat:
-        @"%@%d_%d_%d", @"controlChanged", idx, type, i];
-        [[NSNotificationCenter defaultCenter] postNotificationName: nname
-                                                            object: self
-                                                          userInfo: s];
+            @"%@_%d_%d", @"cardProfileChanged", idx, type];
+        [center postNotificationName: nname
+                              object: self
+                            userInfo: s];
 #ifdef DEBUG
 debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
 #endif
-        [v release];
+    } else {
+        for(int i = 0; i < chnum; ++i) {
+            volume_t *v = [[volume_t alloc] initWithLevel: volumes[i].level
+                                                  andMute: volumes[i].mute];
+            NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+                v, @"volumes", nil];
+            NSString *nname = [NSString stringWithFormat:
+            @"%@%d_%d_%d", @"controlChanged", idx, type, i];
+            [center postNotificationName: nname
+                                  object: self
+                                userInfo: s];
+#ifdef DEBUG
+debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
+#endif
+            [v release];
+        }
     }
     [pool release];
 }

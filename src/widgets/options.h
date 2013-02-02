@@ -18,8 +18,11 @@
 #import <Foundation/NSArray.h>
 #import <Foundation/NSString.h>
 #import <Foundation/NSDecimalNumber.h>
+#import <Foundation/NSNotification.h>
+#import <Foundation/NSDictionary.h>
 #import <curses.h>
 #import "misc.h"
+#import "../types.h"
 
 
 @interface Options: NSObject <Hiding> {
@@ -43,6 +46,7 @@
 -(void) print;
 -(void) setCurrent: (int) i;
 -(void) setCurrentByName: (NSString*) name;
+-(void) setCurrentByNotification: (NSNotification*) notification;
 -(void) up;
 -(void) down;
 -(void) setHighlighted: (BOOL) active;

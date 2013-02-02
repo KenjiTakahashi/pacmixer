@@ -380,6 +380,8 @@ void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
 
 void _cb_card(pa_context*, const pa_card_info*, int, void*);
 
+void _cb_u_card(pa_context*, const pa_card_info*, int, void*);
+
 
 /**
  * Internal function.
@@ -419,6 +421,11 @@ backend_channel_t *_do_channels(pa_cvolume, uint8_t);
  * @return Array of BACKEND_VOLUME.
  */
 backend_volume_t *_do_volumes(pa_cvolume, uint8_t, int);
+
+backend_card_t *_do_card(const pa_card_info*, int);
+
+void _do_card_free(backend_card_t*, int n);
+
 
 /**
  * Internal helper function.

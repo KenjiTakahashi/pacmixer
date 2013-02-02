@@ -58,6 +58,7 @@
     }
     position = ypos;
     win = derwin(parent, [values count] + 2, width, position, 0);
+    hidden = YES;
     [self print];
     return self;
 }
@@ -72,10 +73,12 @@
 }
 
 -(void) print {
-    box(win, 0, 0);
-    mvwprintw(win, 0, 1, "%@", label);
-    for(int i = 0; i < [values count]; ++i) {
-        mvwprintw(win, i + 1, 1, "[ ]%@", [names objectAtIndex: i]);
+    if(!hidden) {
+        box(win, 0, 0);
+        mvwprintw(win, 0, 1, "%@", label);
+        for(int i = 0; i < [values count]; ++i) {
+            mvwprintw(win, i + 1, 1, "[ ]%@", [names objectAtIndex: i]);
+        }
     }
 }
 
@@ -114,6 +117,9 @@
     [self setCurrent: highlight];
 }
 
+-(void) setPosition: (int) position_ {
+}
+
 -(void) setValue: (BOOL) value atIndex: (int) index {
     NSNumber *newValue = [NSNumber numberWithBool: value];
     [values replaceObjectAtIndex: index withObject: newValue];
@@ -145,5 +151,14 @@
     NSArray *components = [internalId componentsSeparatedByString: @"_"];
     int i = [[components objectAtIndex: 0] integerValue];
     return [NSNumber numberWithInt: i];
+}
+
+-(void) show {
+    hidden = NO;
+    [self print];
+}
+
+-(void) hide {
+    hidden = YES;
 }
 @end
