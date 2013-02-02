@@ -44,7 +44,7 @@ Used to change card wise settings (e.g. profiles) and control views filters.
 ```
 h (or left arrow): move to the previous group of settings
 l (or right arrow): move to the next group of settings
-l (or up arrow): move to the previous setting within group
+k (or up arrow): move to the previous setting within group
 j (or down arrow): move to the next setting within group
 space: (un)check highlighted setting
 q (or Esc): exit the application
@@ -53,7 +53,7 @@ q (or Esc): exit the application
 **Note:** All settings are applied and saved automatically.
 
 #### inside mode
-Inside mode is used to adjust specific channel's volume.
+Used to adjust specific channel's volume.
 
 All shortcuts (besides ```q```) work the same, except that they affect single channel instead of the whole sink/source.
 
