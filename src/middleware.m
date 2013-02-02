@@ -28,7 +28,15 @@ void callback_add_func(
     Middleware *self = self_;
     [self retain];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSString *sname;
+    SEL ssel;
+    Block *block = [self addBlockWithId: idx
+                               andIndex: -1
+                                andType: type];
     if(type == CARD) {
+        sname = [NSString stringWithFormat:
+            @"%@%d_%d", @"cardActiveProfileChanged", idx, type];
+        ssel = @selector(setCardActiveProfile:);
         char ** const profiles = card->profiles;
         const char *active = card->active_profile;
         card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
@@ -54,28 +62,19 @@ void callback_add_func(
             Block *block = [self addBlockWithId: idx
                                        andIndex: i
                                         andType: type];
-            NSString *sname = [NSString stringWithFormat:
+            NSString *siname = [NSString stringWithFormat:
                 @"%@%d_%d_%d", @"volumeChanged", idx, type, i];
             [center addObserver: block
                        selector: @selector(setVolume:)
-                           name: sname
+                           name: siname
                          object: nil];
 #ifdef DEBUG
-debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
+debug_fprintf(__func__, "m:%s observer added", [siname UTF8String]);
 #endif
         }
-        Block *block = [self addBlockWithId: idx
-                                   andIndex: -1
-                                    andType: type];
-        NSString *sname = [NSString stringWithFormat:
+        sname = [NSString stringWithFormat:
             @"%@%d_%d", @"volumeChanged", idx, type];
-        [center addObserver: block
-                   selector: @selector(setVolumes:)
-                       name: sname
-                     object: nil];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
-#endif
+        ssel = @selector(setVolumes:);
         NSString *mname = [NSString stringWithFormat:
             @"%@%d_%d", @"muteChanged", idx, type];
         [center addObserver: block
@@ -95,6 +94,13 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
                               object: self
                             userInfo: s];
     }
+    [center addObserver: block
+               selector: ssel
+                   name: sname
+                 object: nil];
+#ifdef DEBUG
+debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
+#endif
     [pool release];
 }
 
@@ -115,7 +121,7 @@ void callback_update_func(
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             p, @"profile", nil];
         NSString *nname = [NSString stringWithFormat:
-            @"%@_%d_%d", @"cardProfileChanged", idx, type];
+            @"%@%d_%d", @"cardProfileChanged", idx, type];
         [center postNotificationName: nname
                               object: self
                             userInfo: s];
@@ -197,6 +203,11 @@ void callback_state_func(void *self_) {
 -(void) setMute: (NSNotification*) notification {
     BOOL v = [[[notification userInfo] objectForKey: @"mute"] boolValue];
     backend_mute_set(context, type, idx, v ? 1 : 0);
+}
+
+-(void) setCardActiveProfile: (NSNotification*) notification {
+    NSString *name = [[notification userInfo] objectForKey: @"profile"];
+    backend_card_profile_set(context, type, idx, [name UTF8String]);
 }
 @end
 

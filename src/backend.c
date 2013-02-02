@@ -87,6 +87,8 @@ void backend_volume_set(context_t *c, backend_entry_type type, uint32_t idx, int
         case SOURCE_OUTPUT:
             pa_context_get_source_output_info(c->context, idx, _cb_s_source_output, volume);
             break;
+        default:
+            break;
     }
 }
 
@@ -109,10 +111,12 @@ void backend_volume_setall(context_t *c, backend_entry_type type, uint32_t idx, 
         case SOURCE_OUTPUT:
             pa_context_set_source_output_volume(c->context, idx, &volume, NULL, NULL);
             break;
+        default:
+            break;
     }
 }
 
-void backend_mute_set(context_t* c, backend_entry_type type, uint32_t idx, int v) {
+void backend_mute_set(context_t *c, backend_entry_type type, uint32_t idx, int v) {
     switch(type) {
         case SINK:
             pa_context_set_sink_mute_by_index(c->context, idx, v, NULL, NULL);
@@ -126,7 +130,13 @@ void backend_mute_set(context_t* c, backend_entry_type type, uint32_t idx, int v
         case SOURCE_OUTPUT:
             pa_context_set_source_output_mute(c->context, idx, v, NULL, NULL);
             break;
+        default:
+            break;
     }
+}
+
+void backend_card_profile_set(context_t *c, backend_entry_type type, uint32_t idx, const char *active) {
+    pa_context_set_card_profile_by_index(c->context, idx, active, NULL, NULL);
 }
 
 void _cb_state_changed(pa_context *c, void *userdata) {
@@ -277,6 +287,8 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
             pa_context_get_card_info_by_index(c, idx, _cb_u_card, userdata);
         }
         if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
+            callback_t *callback = userdata;
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
         }
         if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
             pa_context_get_card_info_by_index(c, idx, _cb_card, userdata);

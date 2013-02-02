@@ -183,7 +183,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         }
     }
     [allWidgets removeObjectsAtIndexes: indexes];
-    int x = 1;
+    int x = 0;
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
         [w setPosition: x];
@@ -212,7 +212,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [widget setCurrentByName: active];
     SEL sel = @selector(setCurrentByNotification:);
     NSString *nname = [NSString stringWithFormat:
-        @"%@_%@", @"cardProfileChanged", id_];
+        @"%@%@", @"cardProfileChanged", id_];
 #ifdef DEBUG
 debug_fprintf(__func__, "%s", [nname UTF8String]);
 #endif

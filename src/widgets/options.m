@@ -87,6 +87,13 @@
 
 -(void) setCurrent: (int) i {
     highlight = i;
+    NSString *sname = [NSString stringWithFormat:
+        @"%@%@", @"cardActiveProfileChanged", internalId];
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        [options objectAtIndex: highlight], @"profile", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: sname
+                                                        object: self
+                                                      userInfo: s];
     [self print];
 }
 

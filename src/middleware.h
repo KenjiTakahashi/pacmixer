@@ -51,6 +51,7 @@ void callback_state_func(void*);
 -(void) setVolume: (NSNotification*) notification;
 -(void) setVolumes: (NSNotification*) notification;
 -(void) setMute: (NSNotification*) notification;
+-(void) setCardActiveProfile: (NSNotification*) notification;
 @end
 
 @interface Middleware: NSObject {
