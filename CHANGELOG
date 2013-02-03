@@ -19,8 +19,9 @@
 - Fixed hidden widgets getting reprinted when changed outside the app.
 
 == 0.2:
-- Ability to filter out PA internals/Monitors.
+- Added ability to filter out PA internals/Monitors.
 - Properly dealing with non-existing/lost connections.
 - Fixed m/j/k crash when used on empty page.
 - Fixed possible mix-up of SINK and SINK_INPUT controls.
 - Fixed hidden controls sometimes not properly removed when gone.
+- Added ability to get/set card-wise options (e.g. profiles).

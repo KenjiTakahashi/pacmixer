@@ -82,6 +82,7 @@ typedef struct BACKEND_VOLUME {
  */
 typedef struct BACKEND_CARD {
     char **profiles;
+    char **names;
     char *active_profile;
 } backend_card_t;
 

@@ -41,6 +41,7 @@ void callback_state_func(void*);
         uint32_t idx;
         int i;
         backend_entry_type type;
+        NSMutableDictionary *data;
 }
 
 -(Block*) initWithContext: (context_t*) context_
@@ -48,6 +49,9 @@ void callback_state_func(void*);
                  andIndex: (int) i_
                   andType: (backend_entry_type) type_;
 -(void) dealloc;
+-(void) addDataByCArray: (int) n
+             withValues: (char**const) values
+                andKeys: (char**const) keys;
 -(void) setVolume: (NSNotification*) notification;
 -(void) setVolumes: (NSNotification*) notification;
 -(void) setMute: (NSNotification*) notification;

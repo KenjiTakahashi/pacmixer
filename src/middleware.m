@@ -39,6 +39,9 @@ void callback_add_func(
         ssel = @selector(setCardActiveProfile:);
         char ** const profiles = card->profiles;
         const char *active = card->active_profile;
+        [block addDataByCArray: chnum
+                    withValues: card->names
+                       andKeys: profiles];
         card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
                                                         andNProfiles: chnum
                                                     andActiveProfile: active];
@@ -177,12 +180,24 @@ void callback_state_func(void *self_) {
     idx = idx_;
     i = i_;
     type = type_;
+    data = [[NSMutableDictionary alloc] init];
     return self;
 }
 
 -(void) dealloc {
+    [data release];
     [[NSNotificationCenter defaultCenter] removeObserver: self];
     [super dealloc];
+}
+
+-(void) addDataByCArray: (int) n
+             withValues: (char**const) values
+                andKeys: (char**const) keys {
+    for(int j = 0; j < n; ++j) {
+        NSString *val = [NSString stringWithUTF8String: values[j]];
+        NSString *key = [NSString stringWithUTF8String: keys[j]];
+        [data setObject: val forKey: key];
+    }
 }
 
 -(void) setVolume: (NSNotification*) notification {
@@ -206,8 +221,9 @@ void callback_state_func(void *self_) {
 }
 
 -(void) setCardActiveProfile: (NSNotification*) notification {
-    NSString *name = [[notification userInfo] objectForKey: @"profile"];
-    backend_card_profile_set(context, type, idx, [name UTF8String]);
+    NSString *key = [[notification userInfo] objectForKey: @"profile"];
+    const char *name = [[data objectForKey: key] UTF8String];
+    backend_card_profile_set(context, type, idx, name);
 }
 @end
 

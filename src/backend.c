@@ -367,10 +367,14 @@ backend_card_t *_do_card(const pa_card_info* info, int n) {
     backend_card_t *card = malloc(sizeof(backend_card_t));
     pa_card_profile_info *profiles = info->profiles;
     card->profiles = malloc(n * sizeof(char*));
+    card->names = malloc(n * sizeof(char*));
     for(int i = 0; i < n; ++i) {
         const char *desc = profiles[i].description;
         card->profiles[i] = malloc((strlen(desc) + 1) * sizeof(char));
         strcpy(card->profiles[i], desc);
+        const char *name = profiles[i].name;
+        card->names[i] = malloc((strlen(name) + 1) * sizeof(char));
+        strcpy(card->names[i], name);
     }
     const char *active = info->active_profile[0].description;
     card->active_profile = malloc((strlen(active) + 1) * sizeof(char));
@@ -382,8 +386,10 @@ void _do_card_free(backend_card_t *card, int n) {
     free(card->active_profile);
     for(int i = 0; i < n; ++i) {
         free(card->profiles[i]);
+        free(card->names[i]);
     }
     free(card->profiles);
+    free(card->names);
     free(card);
 }
 
