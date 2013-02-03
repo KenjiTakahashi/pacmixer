@@ -273,17 +273,6 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
     [bottom setView: SETTINGS];
     [self clear];
     int y = 0;
-    for(int i = 0; i < [allWidgets count]; ++i) {
-        Widget *w = [allWidgets objectAtIndex: i];
-        if([w type] == SETTINGS) {
-            [w setPosition: y];
-            [w show];
-            [widgets addObject: w];
-            y = [w endPosition];
-        } else {
-            [w hide];
-        }
-    }
     NSArray *keys = [settings allKeys];
     for(int i = 0; i < [keys count]; ++i) {
         NSString *key = [keys objectAtIndex: i];
@@ -303,6 +292,17 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
         [widgets addObject: widget];
         y = [widget endPosition];
         [widget release];
+    }
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *w = [allWidgets objectAtIndex: i];
+        if([w type] == SETTINGS) {
+            [w setPosition: y];
+            [w show];
+            [widgets addObject: w];
+            y = [w endPosition];
+        } else {
+            [w hide];
+        }
     }
     [self setFirst];
 }
