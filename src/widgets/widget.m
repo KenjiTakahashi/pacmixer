@@ -16,6 +16,7 @@
 
 
 #import "widget.h"
+#import "../frontend.h"
 
 
 @implementation Widget
@@ -58,6 +59,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     } else {
         wresize(win, height, width);
     }
+    [TUI refresh];
 }
 
 -(void) reprint: (int) height_ {

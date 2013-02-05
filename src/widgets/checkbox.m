@@ -16,6 +16,7 @@
 
 
 #import "checkbox.h"
+#import "../frontend.h"
 
 
 @implementation CheckBox
@@ -83,6 +84,7 @@
                 [names objectAtIndex: i]
             );
         }
+        [TUI refresh];
     }
 }
 

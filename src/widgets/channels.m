@@ -16,6 +16,7 @@
 
 
 #import "channels.h"
+#import "../frontend.h"
 
 
 @implementation Channel
@@ -82,6 +83,7 @@
             }
             mvwaddch(win, currentPos - i, 0, ' ' | color);
         }
+        [TUI refresh];
     }
 }
 
@@ -276,6 +278,7 @@ debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
             mvwhline(win, my - 3, 1, 0, mx - 2);
             mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
         }
+        [TUI refresh];
     }
 }
 

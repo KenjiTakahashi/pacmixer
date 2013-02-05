@@ -20,6 +20,9 @@
 #import "options.h"
 
 
+@class TUI;
+
+
 @interface Widget: NSObject <Controlling, Hiding> {
     @private
         WINDOW *win;

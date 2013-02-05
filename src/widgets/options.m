@@ -16,6 +16,7 @@
 
 
 #import "options.h"
+#import "../frontend.h"
 
 
 @implementation Options
@@ -76,17 +77,18 @@
         for(int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
             if(i == current) {
-                wattron(win, A_REVERSE);
+                wattron(win, COLOR_PAIR(6));
             }
             if(highlighted && i == highlight) {
-                wattroff(win, A_REVERSE);
-                wattron(win, COLOR_PAIR(6));
+                wattroff(win, COLOR_PAIR(6));
+                wattron(win, A_REVERSE);
             }
             mvwprintw(win, i + 1, 1, "      ");
             mvwprintw(win, i + 1, 1, "%@", obj);
-            wattroff(win, COLOR_PAIR(6));
             wattroff(win, A_REVERSE);
+            wattroff(win, COLOR_PAIR(6));
         }
+        [TUI refresh];
     }
 }
 

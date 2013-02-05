@@ -28,6 +28,10 @@
 #import "../debug.h"
 #endif
 
+
+@class TUI;
+
+
 @interface Channel: NSObject <Hiding> {
     @private
         int my;

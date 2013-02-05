@@ -24,6 +24,9 @@
 #import "misc.h"
 
 
+@class TUI;
+
+
 @interface CheckBox: NSObject <Hiding> {
     @private
         WINDOW *win;

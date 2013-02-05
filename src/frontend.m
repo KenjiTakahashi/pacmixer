@@ -18,6 +18,11 @@
 #import "frontend.h"
 
 
+static WINDOW *win;
+static int xpadding;
+static int ypadding;
+
+
 @implementation TUI
 -(TUI*) init {
     self = [super init];
@@ -79,14 +84,14 @@
     NSString *message = @"Waiting for connection...";
     notice = [[Notice alloc] initWithMessage: message
                                    andParent: win];
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) removeWaiter: (NSNotification*) _ {
     [notice release];
     notice = nil;
     wclear(win);
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) reprint {
@@ -103,10 +108,10 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     }
     wresize(win, my - 4, mx);
     [bottom reprint];
-    [self refresh];
+    [[self class] refresh];
 }
 
--(void) refresh {
++(void) refresh {
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
@@ -193,7 +198,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) addProfiles: (NSArray*) profiles
@@ -238,7 +243,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) setFilter: (View) type {
@@ -248,7 +253,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
     int x = 1;
     if(notice != nil) {
         [notice print];
-        [self refresh];
+        [[self class] refresh];
     } else {
         for(int i = 0; i < [allWidgets count]; ++i) {
             Widget *w = [allWidgets objectAtIndex: i];
@@ -312,7 +317,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
     if([widget respondsToSelector: @selector(switchValue)]) {
         [widget switchValue];
     }
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) previous {
@@ -340,7 +345,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
             ypadding -= delta;
         }
     }
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) next {
@@ -370,27 +375,27 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
             [ypaddingStates addObject: [NSNumber numberWithInt: delta]];
         }
     }
-    [self refresh];
+    [[self class] refresh];
 }
 
 -(void) up {
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] up];
-        [self refresh];
+        [[self class] refresh];
     }
 }
 
 -(void) down {
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] down];
-        [self refresh];
+        [[self class] refresh];
     }
 }
 
 -(void) mute {
     if([widgets count]) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] mute];
-        [self refresh];
+        [[self class] refresh];
     }
 }
 
@@ -402,7 +407,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
             [bottom inside];
             [[widgets objectAtIndex: highlight] inside];
         }
-        [self refresh];
+        [[self class] refresh];
     }
 }
 
@@ -412,7 +417,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
         inside = NO;
         Widget *widget = [widgets objectAtIndex: highlight];
         [widget outside];
-        [self refresh];
+        [[self class] refresh];
     }
     return outside;
 }

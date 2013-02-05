@@ -25,6 +25,9 @@
 #import "../types.h"
 
 
+@class TUI;
+
+
 @interface Options: NSObject <Hiding> {
     @private
         WINDOW *win;

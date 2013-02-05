@@ -40,9 +40,6 @@
         Settings *settings;
         Top *top;
         Bottom *bottom;
-        WINDOW *win;
-        int xpadding;
-        int ypadding;
         NSMutableArray *xpaddingStates;
         NSMutableArray *ypaddingStates;
         int highlight;
@@ -55,7 +52,7 @@
 -(void) addWaiter: (NSNotification*) _;
 -(void) removeWaiter: (NSNotification*) _;
 -(void) reprint;
--(void) refresh;
++(void) refresh;
 -(void) clear;
 -(BOOL) applySettings: (NSString*) name;
 -(Widget*) addWidgetWithName: (NSString*) name
