@@ -188,7 +188,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         Widget *w = [widgets objectAtIndex: i];
         [w setPosition: x];
         [w show];
-        x = [w endPosition] + 1;
+        x = [w endPosition];
     }
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];

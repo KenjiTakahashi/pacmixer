@@ -29,8 +29,8 @@ and you're done.
 ```
 h (or left arrow): move to the previous control
 l (or right arrow): move to the next control
-j (or down arrow): lower the volume
 k (or up arrow): increase the volume
+j (or down arrow): lower the volume
 m: mute the volume
 i: go into the inside mode
 q (or Esc): go outside the inside mode or exit the application

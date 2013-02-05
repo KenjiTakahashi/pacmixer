@@ -75,30 +75,29 @@
         mvwprintw(win, 0, 1, "%@", label);
         for(int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
+            if(i == current) {
+                wattron(win, A_REVERSE);
+            }
             if(highlighted && i == highlight) {
+                wattroff(win, A_REVERSE);
                 wattron(win, COLOR_PAIR(6));
             }
             mvwprintw(win, i + 1, 1, "      ");
             mvwprintw(win, i + 1, 1, "%@", obj);
             wattroff(win, COLOR_PAIR(6));
+            wattroff(win, A_REVERSE);
         }
     }
 }
 
 -(void) setCurrent: (int) i {
     highlight = i;
-    NSString *sname = [NSString stringWithFormat:
-        @"%@%@", @"cardActiveProfileChanged", internalId];
-    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [options objectAtIndex: highlight], @"profile", nil];
-    [[NSNotificationCenter defaultCenter] postNotificationName: sname
-                                                        object: self
-                                                      userInfo: s];
     [self print];
 }
 
 -(void) setCurrentByName: (NSString*) name {
     highlight = [options indexOfObject: name];
+    current = highlight;
     [self print];
 }
 
@@ -127,6 +126,18 @@
 -(void) setPosition: (int) position_ {
     position = position_;
     mvderwin(win, position, 0);
+}
+
+-(void) switchValue {
+    current = highlight;
+    NSString *sname = [NSString stringWithFormat:
+        @"%@%@", @"cardActiveProfileChanged", internalId];
+    NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        [options objectAtIndex: highlight], @"profile", nil];
+    [[NSNotificationCenter defaultCenter] postNotificationName: sname
+                                                        object: self
+                                                      userInfo: s];
+    [self print];
 }
 
 -(int) height {

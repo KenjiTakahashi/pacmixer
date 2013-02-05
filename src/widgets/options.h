@@ -32,6 +32,7 @@
         NSString *internalId;
         NSArray *options;
         BOOL highlighted;
+        int current;
         int highlight;
         int position;
         BOOL hidden;
@@ -51,6 +52,7 @@
 -(void) down;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
+-(void) switchValue;
 -(int) height;
 -(int) endPosition;
 -(View) type;

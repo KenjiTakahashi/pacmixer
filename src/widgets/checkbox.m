@@ -77,7 +77,11 @@
         box(win, 0, 0);
         mvwprintw(win, 0, 1, "%@", label);
         for(int i = 0; i < [values count]; ++i) {
-            mvwprintw(win, i + 1, 1, "[ ]%@", [names objectAtIndex: i]);
+            mvwprintw(
+                win, i + 1, 1, "[%c]%@",
+                [[values objectAtIndex: i] boolValue] ? 'X' : ' ',
+                [names objectAtIndex: i]
+            );
         }
     }
 }
