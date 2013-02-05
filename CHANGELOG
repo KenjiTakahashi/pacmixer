@@ -18,7 +18,7 @@
 - Fixed some setFilter corner cases causing screen corruptions.
 - Fixed hidden widgets getting reprinted when changed outside the app.
 
-== 0.2:
+== 0.2 (05.02.2013):
 - Added ability to filter out PA internals/Monitors.
 - Properly dealing with non-existing/lost connections.
 - Fixed m/j/k crash when used on empty page.
