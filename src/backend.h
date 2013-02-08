@@ -77,14 +77,15 @@ typedef struct BACKEND_VOLUME {
 } backend_volume_t;
 
 /**
- * Holds card-wise informations.
- * Number of profiles should be passed along with this structure.
+ * Holds a list of options with their names and descriptions.
+ * Used to store cards profiles and controls ports.
  */
-typedef struct BACKEND_CARD {
-    char **profiles;
+typedef struct BACKEND_OPTION {
+    char **descriptions;
     char **names;
-    char *active_profile;
-} backend_card_t;
+    char *active;
+    uint8_t size;
+} backend_option_t;
 
 /**
  * Structure used to leverage data to higher level.
@@ -95,8 +96,7 @@ typedef struct BACKEND_DATA {
     backend_channel_t *channels;
     backend_volume_t *volumes;
     uint8_t channels_num;
-    backend_card_t *card;
-    uint8_t profiles_num;
+    backend_option_t *option;
 } backend_data_t;
 
 /**
@@ -107,7 +107,7 @@ typedef enum {
     SINK_INPUT,
     SOURCE,
     SOURCE_OUTPUT,
-    CARD
+    CARD /**< Virtual type representing whole sound card. */
 } backend_entry_type;
 
 /**
@@ -176,6 +176,14 @@ void backend_volume_setall(context_t*, backend_entry_type, uint32_t, int*, int);
  */
 void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 
+/**
+ * Sets active profile for a card.
+ *
+ * @param c CONTEXT as returned by backend_init().
+ * @param type Type of the control. It is always CARD here.
+ * @param id xPA internal control index.
+ * @param active Active profile's name.
+ */
 void backend_card_profile_set(context_t*, backend_entry_type, uint32_t, const char*);
 
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_data_t*);
@@ -458,23 +466,23 @@ backend_volume_t *_do_volumes(pa_cvolume, uint8_t, int);
 
 /**
  * Helper function.
- * Creates BACKEND_CARD used by higher level callbacks
+ * Creates BACKEND_OPTION used by higher level callbacks
  * for low level PA representation.
  *
  * @param info Card info structure received from PA.
  * @param n Number of profiles.
  *
- * @return Array of BACKEND_CARD.
+ * @return Array of BACKEND_OPTION.
  */
-backend_card_t *_do_card(const pa_card_info*, int);
+backend_option_t *_do_card(const pa_card_info*, int);
 
 /**
- * Frees array created by _do_card.
+ * Frees an array of BACKEND_OPTION.
  *
- * @param card Array of BACKEND_CARD.
+ * @param card Array of BACKEND_OPTION.
  * @param n Number of profiles.
  */
-void _do_card_free(backend_card_t*, int n);
+void _do_option_free(backend_option_t*, int n);
 
 
 /**

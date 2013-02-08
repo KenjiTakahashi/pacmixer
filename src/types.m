@@ -62,29 +62,29 @@
 @end
 
 
-@implementation card_profile_t
--(card_profile_t*) initWithProfiles: (char**const) profiles_
-                       andNProfiles: (int) n_profiles
-                   andActiveProfile: (const char*) active {
+@implementation option_t
+-(option_t*) initWithOptions: (char**const) options_
+                 andNOptions: (int) n_options
+                   andActive: (const char*) active_ {
     self = [super init];
-    profiles = [[NSMutableArray alloc] init];
-    for(int i = 0; i < n_profiles; ++i) {
-        [profiles addObject: [NSString stringWithUTF8String: profiles_[i]]];
+    options = [[NSMutableArray alloc] init];
+    for(int i = 0; i < n_options; ++i) {
+        [options addObject: [NSString stringWithUTF8String: options_[i]]];
     }
-    activeProfile = [NSString stringWithUTF8String: active];
+    active = [NSString stringWithUTF8String: active_];
     return self;
 }
 
 -(void) dealloc {
-    [profiles release];
+    [options release];
     [super dealloc];
 }
 
--(NSArray*) profiles {
-    return profiles;
+-(NSArray*) options {
+    return options;
 }
 
--(NSString*) activeProfile {
-    return activeProfile;
+-(NSString*) active {
+    return active;
 }
 @end

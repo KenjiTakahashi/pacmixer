@@ -93,19 +93,19 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             [channelsWidgets setMute: [volume mute]
                           forChannel: i];
         }
+        option_t *options = [info objectForKey: @"options"];
+        if(options != nil) {
+            [w addOptions: options];
+        }
     } else {
-        card_profile_t *profile = [info objectForKey: @"profile"];
+        option_t *profile = [info objectForKey: @"profile"];
         if(profile != nil) {
-            [tui addProfiles: [profile profiles]
-                  withActive: [profile activeProfile]
+            [tui addProfiles: [profile options]
+                  withActive: [profile active]
                      andName: name
                        andId: internalId];
         }
     }
-    //NSArray *options = [info objectForKey: @"options"];
-    //if(options != nil) {
-        //[w addOptions: options];
-    //}
     [TUI refresh];
 }
 

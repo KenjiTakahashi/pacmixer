@@ -31,23 +31,19 @@ void callback_add_func(
     Block *block = [self addBlockWithId: idx
                                andIndex: -1
                                 andType: type];
-#ifdef DEBUG
-if(type == CARD)
-    debug_fprintf(__func__, "%d", data->card != NULL);
-#endif
-    if(type == CARD && data->card != NULL) {
+    if(type == CARD && data->option != NULL) {
         sname = [NSString stringWithFormat:
             @"%@%d_%d", @"cardActiveProfileChanged", idx, type];
         ssel = @selector(setCardActiveProfile:);
-        char ** const profiles = data->card->profiles;
-        const char *active = data->card->active_profile;
-        uint8_t chnum = data->profiles_num;
+        char ** const profiles = data->option->descriptions;
+        const char *active = data->option->active;
+        uint8_t chnum = data->option->size;
         [block addDataByCArray: chnum
-                    withValues: data->card->names
+                    withValues: data->option->names
                        andKeys: profiles];
-        card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
-                                                        andNProfiles: chnum
-                                                    andActiveProfile: active];
+        option_t *p = [[option_t alloc] initWithOptions: profiles
+                                            andNOptions: chnum
+                                              andActive: active];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: name], @"name",
             [NSNumber numberWithInt: idx], @"id",
@@ -57,6 +53,9 @@ if(type == CARD)
                             userInfo: s];
     } else if(data->channels != NULL && data->volumes != NULL) {
         uint8_t chnum = data->channels_num;
+#ifdef DEBUG
+debug_fprintf(__func__, "channelsnum:%d", data->channels_num);
+#endif
         NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
         NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
         for(uint8_t i = 0; i < chnum; ++i) {
@@ -119,13 +118,13 @@ void callback_update_func(
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    if(type == CARD && data->card != NULL) {
-        char ** const profiles = data->card->profiles;
-        const char *active = data->card->active_profile;
-        uint8_t chnum = data->profiles_num;
-        card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
-                                                        andNProfiles: chnum
-                                                    andActiveProfile: active];
+    if(type == CARD && data->option != NULL) {
+        char ** const profiles = data->option->descriptions;
+        const char *active = data->option->active;
+        uint8_t chnum = data->option->size;
+        option_t *p = [[option_t alloc] initWithOptions: profiles
+                                            andNOptions: chnum
+                                              andActive: active];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             p, @"profile", nil];
         NSString *nname = [NSString stringWithFormat:

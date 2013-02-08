@@ -267,11 +267,11 @@ void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) 
         callback_t *callback = userdata;
         int n = info->n_profiles;
         backend_data_t data;
-        data.card = _do_card(info, n);
-        data.profiles_num = n;
+        data.option = _do_card(info, n);
+        data.option->size = n;
         const char *desc = pa_proplist_gets(info->proplist, PA_PROP_DEVICE_DESCRIPTION);
         ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, &data);
-        _do_card_free(data.card, n);
+        _do_option_free(data.option, n);
     }
 }
 
@@ -280,9 +280,10 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
         callback_t *callback = userdata;
         int n = info->n_profiles;
         backend_data_t data;
-        data.card = _do_card(info, n);
+        data.option = _do_card(info, n);
+        data.option->size = n;
         ((tcallback_update_func)(callback->update))(callback->self, CARD, info->index, &data);
-         _do_card_free(data.card, n);
+         _do_option_free(data.option, n);
     }
 }
 
@@ -370,34 +371,34 @@ backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
     return volumes;
 }
 
-backend_card_t *_do_card(const pa_card_info* info, int n) {
-    backend_card_t *card = malloc(sizeof(backend_card_t));
+backend_option_t *_do_card(const pa_card_info* info, int n) {
+    backend_option_t *card = malloc(sizeof(backend_option_t));
     pa_card_profile_info *profiles = info->profiles;
-    card->profiles = malloc(n * sizeof(char*));
+    card->descriptions = malloc(n * sizeof(char*));
     card->names = malloc(n * sizeof(char*));
     for(int i = 0; i < n; ++i) {
         const char *desc = profiles[i].description;
-        card->profiles[i] = malloc((strlen(desc) + 1) * sizeof(char));
-        strcpy(card->profiles[i], desc);
+        card->descriptions[i] = malloc((strlen(desc) + 1) * sizeof(char));
+        strcpy(card->descriptions[i], desc);
         const char *name = profiles[i].name;
         card->names[i] = malloc((strlen(name) + 1) * sizeof(char));
         strcpy(card->names[i], name);
     }
     const char *active = info->active_profile[0].description;
-    card->active_profile = malloc((strlen(active) + 1) * sizeof(char));
-    strcpy(card->active_profile, active);
+    card->active = malloc((strlen(active) + 1) * sizeof(char));
+    strcpy(card->active, active);
     return card;
 }
 
-void _do_card_free(backend_card_t *card, int n) {
-    free(card->active_profile);
+void _do_option_free(backend_option_t *option, int n) {
+    free(option->active);
     for(int i = 0; i < n; ++i) {
-        free(card->profiles[i]);
-        free(card->names[i]);
+        free(option->descriptions[i]);
+        free(option->names[i]);
     }
-    free(card->profiles);
-    free(card->names);
-    free(card);
+    free(option->descriptions);
+    free(option->names);
+    free(option);
 }
 
 void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, void *userdata) {
@@ -422,6 +423,7 @@ debug_fprintf(__func__, "%d:%s appeared", index, description);
         backend_data_t data;
         data.channels = _do_channels(volume, chnum);
         data.volumes = _do_volumes(volume, chnum, mute);
+        data.channels_num = chnum;
         ((tcallback_add_func)(callback->add))(callback->self, description, type, index, &data);
         free(data.channels);
         free(data.volumes);

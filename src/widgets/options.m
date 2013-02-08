@@ -104,8 +104,8 @@
 }
 
 -(void) setCurrentByNotification: (NSNotification*) notification {
-    card_profile_t *info = [[notification userInfo] objectForKey: @"profile"];
-    [self setCurrentByName: [info activeProfile]];
+    option_t *info = [[notification userInfo] objectForKey: @"profile"];
+    [self setCurrentByName: [info active]];
 }
 
 -(void) up {
