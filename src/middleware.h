@@ -30,8 +30,8 @@
 #endif
 
 
-void callback_add_func(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, const backend_card_t*, uint8_t);
-void callback_update_func(void*, backend_entry_type, uint32_t, const backend_volume_t*, const backend_card_t*, uint8_t);
+void callback_add_func(void*, const char*, backend_entry_type, uint32_t, backend_data_t*);
+void callback_update_func(void*, backend_entry_type, uint32_t, const backend_data_t*);
 void callback_remove_func(void*, uint32_t);
 void callback_state_func(void*);
 

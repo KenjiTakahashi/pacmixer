@@ -155,7 +155,11 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
 #endif
-        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, client_callback->channels, client_callback->volumes, NULL, client_callback->chnum);
+        backend_data_t data;
+        data.channels = client_callback->channels;
+        data.volumes = client_callback->volumes;
+        data.channels_num = client_callback->chnum;
+        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, &data);
         free(client_callback->channels);
         free(client_callback->volumes);
         free(client_callback);
@@ -262,10 +266,12 @@ void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) 
     if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         int n = info->n_profiles;
-        backend_card_t *card = _do_card(info, n);
+        backend_data_t data;
+        data.card = _do_card(info, n);
+        data.profiles_num = n;
         const char *desc = pa_proplist_gets(info->proplist, PA_PROP_DEVICE_DESCRIPTION);
-        ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, NULL, NULL, card, n);
-        _do_card_free(card, n);
+        ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, &data);
+        _do_card_free(data.card, n);
     }
 }
 
@@ -273,9 +279,10 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
     if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         int n = info->n_profiles;
-        backend_card_t *card = _do_card(info, n);
-        ((tcallback_update_func)(callback->update))(callback->self, CARD, info->index, NULL, card, n);
-         _do_card_free(card, n);
+        backend_data_t data;
+        data.card = _do_card(info, n);
+        ((tcallback_update_func)(callback->update))(callback->self, CARD, info->index, &data);
+         _do_card_free(data.card, n);
     }
 }
 
@@ -397,24 +404,27 @@ void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute,
     if(index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         uint8_t chnum = volume.channels;
-        backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-        ((tcallback_update_func)(callback->update))(callback->self, type, index, volumes, NULL, chnum);
-        free(volumes);
+        backend_data_t data;
+        data.volumes = _do_volumes(volume, chnum, mute);
+        data.channels_num = chnum;
+        ((tcallback_update_func)(callback->update))(callback->self, type, index, &data);
+        free(data.volumes);
     }
 }
 
 void _cb1(uint32_t index, pa_cvolume volume, int mute, const char *description, backend_entry_type type, void *userdata) {
     if(index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
-        uint8_t chnum = volume.channels;
-        backend_channel_t *channels = _do_channels(volume, chnum);
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", index, description);
 #endif
-        backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, channels, volumes, NULL, chnum);
-        free(channels);
-        free(volumes);
+        callback_t *callback = userdata;
+        uint8_t chnum = volume.channels;
+        backend_data_t data;
+        data.channels = _do_channels(volume, chnum);
+        data.volumes = _do_volumes(volume, chnum, mute);
+        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, &data);
+        free(data.channels);
+        free(data.volumes);
     }
 }
 

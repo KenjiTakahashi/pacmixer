@@ -87,6 +87,19 @@ typedef struct BACKEND_CARD {
 } backend_card_t;
 
 /**
+ * Structure used to leverage data to higher level.
+ * Middleware should check if all the structures inside are initialized,
+ * because it is not guaranted in any way and it is OK if some are not.
+ */
+typedef struct BACKEND_DATA {
+    backend_channel_t *channels;
+    backend_volume_t *volumes;
+    uint8_t channels_num;
+    backend_card_t *card;
+    uint8_t profiles_num;
+} backend_data_t;
+
+/**
  * Controls types.
  */
 typedef enum {
@@ -165,8 +178,8 @@ void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 
 void backend_card_profile_set(context_t*, backend_entry_type, uint32_t, const char*);
 
-typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_channel_t*, const backend_volume_t*, const backend_card_t*, uint8_t);
-typedef void (*tcallback_update_func)(void*, backend_entry_type, uint32_t, const backend_volume_t*, const backend_card_t*, uint8_t);
+typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_data_t*);
+typedef void (*tcallback_update_func)(void*, backend_entry_type, uint32_t, backend_data_t*);
 typedef void (*tcallback_remove_func)(void*, uint32_t);
 typedef void (*tstate_callback_func)(void*);
 
@@ -381,8 +394,26 @@ void _cb_u_source_output(pa_context*, const pa_source_output_info*, int, void*);
  */
 void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
 
+/**
+ * Internal function.
+ * Callback. Fired after getting info about new CARD.
+ *
+ * @param c PA context. It is NOT our backend CONTEXT.
+ * @param info CARD info.
+ * @param eol Stop indicator.
+ * @param userdata Additional data of type CALLBACK.
+ */
 void _cb_card(pa_context*, const pa_card_info*, int, void*);
 
+/**
+ * Internal function.
+ * Callback. Fired after getting update info about existing CARD.
+ *
+ * @param c PA context. It is not our backend CONTEXT.
+ * @param info CARD info.
+ * @param eol Stop indicator.
+ * @param userdata Additional data of type CALLBACK.
+ */
 void _cb_u_card(pa_context*, const pa_card_info*, int, void*);
 
 
@@ -425,8 +456,24 @@ backend_channel_t *_do_channels(pa_cvolume, uint8_t);
  */
 backend_volume_t *_do_volumes(pa_cvolume, uint8_t, int);
 
+/**
+ * Helper function.
+ * Creates BACKEND_CARD used by higher level callbacks
+ * for low level PA representation.
+ *
+ * @param info Card info structure received from PA.
+ * @param n Number of profiles.
+ *
+ * @return Array of BACKEND_CARD.
+ */
 backend_card_t *_do_card(const pa_card_info*, int);
 
+/**
+ * Frees array created by _do_card.
+ *
+ * @param card Array of BACKEND_CARD.
+ * @param n Number of profiles.
+ */
 void _do_card_free(backend_card_t*, int n);
 
 

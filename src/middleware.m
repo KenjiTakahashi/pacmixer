@@ -19,10 +19,8 @@
 
 
 void callback_add_func(
-    void *self_, const char *name, backend_entry_type type, uint32_t idx,
-    const backend_channel_t *channels, const backend_volume_t *volumes,
-    const backend_card_t *card,
-    uint8_t chnum
+    void *self_, const char *name, backend_entry_type type,
+    uint32_t idx, backend_data_t *data
 ) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
@@ -33,14 +31,19 @@ void callback_add_func(
     Block *block = [self addBlockWithId: idx
                                andIndex: -1
                                 andType: type];
-    if(type == CARD) {
+#ifdef DEBUG
+if(type == CARD)
+    debug_fprintf(__func__, "%d", data->card != NULL);
+#endif
+    if(type == CARD && data->card != NULL) {
         sname = [NSString stringWithFormat:
             @"%@%d_%d", @"cardActiveProfileChanged", idx, type];
         ssel = @selector(setCardActiveProfile:);
-        char ** const profiles = card->profiles;
-        const char *active = card->active_profile;
+        char ** const profiles = data->card->profiles;
+        const char *active = data->card->active_profile;
+        uint8_t chnum = data->profiles_num;
         [block addDataByCArray: chnum
-                    withValues: card->names
+                    withValues: data->card->names
                        andKeys: profiles];
         card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
                                                         andNProfiles: chnum
@@ -52,16 +55,18 @@ void callback_add_func(
         [center postNotificationName: @"cardAppeared"
                               object: self
                             userInfo: s];
-    } else {
+    } else if(data->channels != NULL && data->volumes != NULL) {
+        uint8_t chnum = data->channels_num;
         NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
         NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
-        for(int i = 0; i < chnum; ++i) {
-            const backend_channel_t chn = channels[i];
+        for(uint8_t i = 0; i < chnum; ++i) {
+            const backend_channel_t chn = data->channels[i];
+            const backend_volume_t vol = data->volumes[i];
             [ch addObject: [[channel_t alloc] initWithMaxLevel: chn.maxLevel
                                                   andNormLevel: chn.normLevel
                                                     andMutable: chn.mutable]];
-            [chv addObject: [[volume_t alloc] initWithLevel: volumes[i].level
-                                                    andMute: volumes[i].mute]];
+            [chv addObject: [[volume_t alloc] initWithLevel: vol.level
+                                                    andMute: vol.mute]];
             Block *block = [self addBlockWithId: idx
                                        andIndex: i
                                         andType: type];
@@ -108,16 +113,16 @@ debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
 }
 
 void callback_update_func(
-    void *self_, backend_entry_type type, uint32_t idx,
-    const backend_volume_t *volumes, const backend_card_t *card,
-    uint8_t chnum
+    void *self_, backend_entry_type type,
+    uint32_t idx, const backend_data_t *data
 ) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    if(type == CARD) {
-        char ** const profiles = card->profiles;
-        const char *active = card->active_profile;
+    if(type == CARD && data->card != NULL) {
+        char ** const profiles = data->card->profiles;
+        const char *active = data->card->active_profile;
+        uint8_t chnum = data->profiles_num;
         card_profile_t *p = [[card_profile_t alloc] initWithProfiles: profiles
                                                         andNProfiles: chnum
                                                     andActiveProfile: active];
@@ -131,10 +136,12 @@ void callback_update_func(
 #ifdef DEBUG
 debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
 #endif
-    } else {
+    } else if(data->volumes != NULL) {
+        uint8_t chnum = data->channels_num;
         for(int i = 0; i < chnum; ++i) {
-            volume_t *v = [[volume_t alloc] initWithLevel: volumes[i].level
-                                                  andMute: volumes[i].mute];
+            const backend_volume_t vol = data->volumes[i];
+            volume_t *v = [[volume_t alloc] initWithLevel: vol.level
+                                                  andMute: vol.mute];
             NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
                 v, @"volumes", nil];
             NSString *nname = [NSString stringWithFormat:
