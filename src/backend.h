@@ -276,7 +276,7 @@ void _cb_s_sink(pa_context*, const pa_sink_info*, int, void*);
 /**
  * Internal function.
  * Callback. Fired after getting info about new SINK_INPUT.
- * Merely checks if we are done with iteration and calls _cb2().
+ * Checks if we are done, makes up BACKEND_OPTION structure and calls _cb2().
  *
  * @param c PA context. It is NOT our backend CONTEXT.
  * @param info SINK_INPUT info.
@@ -508,16 +508,17 @@ void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, void*);
  * and calls higher level add callback.
  *
  * @param index PA internal control index.
+ * @param type Type of the control.
  * @param volume Volume values.
  * @param mute Mute value.
+ * @param options Options data (BACKEND_OPTION).
  * @param description Human readable name of the control.
- * @param type Type of the control.
  * @param userdata Additional data of type CALLBACK.
  *
  * @see _do_channels()
  * @see _do_volumes()
  */
-void _cb1(uint32_t, pa_cvolume, int, const char*, backend_entry_type, void*);
+void _cb1(uint32_t, backend_entry_type, pa_cvolume, int, const char*, backend_option_t*, void*);
 
 /**
  * Internal helper function.

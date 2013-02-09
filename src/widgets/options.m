@@ -20,25 +20,50 @@
 
 
 @implementation Options
--(Options*) initWithPosition: (int) ypos
-                     andName: (NSString*) label_
-                   andValues: (NSArray*) options_
-                       andId: (NSString*) id_
-                   andParent: (WINDOW*) parent {
+-(id) initWithPosition: (int) ypos
+               andName: (NSString*) label_
+             andValues: (NSArray*) options_
+                 andId: (NSString*) id_
+             andParent: (WINDOW*) parent {
+    width = 0;
+    for(int i = 0; i < [options_ count]; ++i) {
+        int length = [[options_ objectAtIndex: i] length];
+        if(length > width) {
+            width = length;
+        }
+    }
+    position = ypos;
+    return [self initWithName: label_
+                    andValues: options_
+                        andId: id_
+                    andParent: parent];
+}
+
+-(id) initWithWidth: (int) width_
+            andName: (NSString*) label_
+          andValues: (NSArray*) options_
+              andId: (NSString*) id_
+          andParent: (WINDOW*) parent {
+    width = width_;
+    int my = getmaxy(parent);
+    position = my - [options_ count] - 3;
+    return [self initWithName: label_
+                    andValues: options_
+                        andId: id_
+                    andParent: parent];
+}
+
+-(id) initWithName: (NSString*) label_
+         andValues: (NSArray*) options_
+             andId: (NSString*) id_
+         andParent: (WINDOW*) parent {
     self = [super init];
     label = [label_ copy];
     options = [options_ retain];
     internalId = [id_ copy];
     highlighted = NO;
     highlight = 0;
-    int width = 0;
     int height = [options count] + 2;
-    for(int i = 0; i < [options count]; ++i) {
-        int length = [[options objectAtIndex: i] length];
-        if(length > width) {
-            width = length;
-        }
-    }
     int my;
     int mx;
     getmaxyx(parent, my, mx);
@@ -48,14 +73,13 @@
         mx = width;
         resizeParent = YES;
     }
-    if(ypos + height > my) {
-        my = ypos + height;
+    if(position + height > my) {
+        my = position + height;
         resizeParent = YES;
     }
     if(resizeParent) {
         wresize(parent, my, mx);
     }
-    position = ypos;
     win = derwin(parent, height, width, position, 0);
     hidden = YES;
     [self print];
@@ -73,7 +97,11 @@
 -(void) print {
     if(!hidden) {
         box(win, 0, 0);
-        mvwprintw(win, 0, 1, "%@", label);
+        if([label length] > width - 2) {
+            mvwprintw(win, 0, 1, "%@", [label substringToIndex: width - 2]);
+        } else {
+            mvwprintw(win, 0, 1, "%@", label);
+        }
         for(int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
             if(i == current) {
@@ -84,7 +112,13 @@
                 wattron(win, A_REVERSE);
             }
             mvwprintw(win, i + 1, 1, "      ");
-            mvwprintw(win, i + 1, 1, "%@", obj);
+            if([obj length] > width - 2) {
+                mvwprintw(win, i + 1, 1, "%@",
+                    [obj substringToIndex: width - 2]
+                );
+            } else {
+                mvwprintw(win, i + 1, 1, "%@", obj);
+            }
             wattroff(win, A_REVERSE);
             wattroff(win, COLOR_PAIR(6));
         }
@@ -171,5 +205,25 @@
 
 -(void) hide {
     hidden = YES;
+}
+@end
+
+
+@implementation ROptions
+-(ROptions*) initWithWidth: (int) width_
+                   andName: (NSString*) label_
+                 andValues: (NSArray*) options_
+                     andId: (NSString*) id_
+                 andParent: (WINDOW*) parent {
+    self = [super initWithWidth: width_
+                        andName: label_
+                      andValues: options_
+                          andId: id_
+                      andParent: parent];
+    return self;
+}
+
+-(void) adjust {
+    mvderwin(win, position, 0);
 }
 @end

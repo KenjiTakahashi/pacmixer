@@ -29,7 +29,7 @@
 
 
 @interface Options: NSObject <Hiding> {
-    @private
+    @protected
         WINDOW *win;
         NSString *label;
         NSString *internalId;
@@ -38,14 +38,24 @@
         int current;
         int highlight;
         int position;
+        int width;
         BOOL hidden;
 }
 
--(Options*) initWithPosition: (int) ypos
-                     andName: (NSString*) label_
-                   andValues: (NSArray*) options_
-                       andId: (NSString*) id_
-                   andParent: (WINDOW*) parent;
+-(id) initWithPosition: (int) ypos
+               andName: (NSString*) label_
+             andValues: (NSArray*) options_
+                 andId: (NSString*) id_
+             andParent: (WINDOW*) parent;
+-(id) initWithWidth: (int) width_
+            andName: (NSString*) label_
+          andValues: (NSArray*) options_
+              andId: (NSString*) id_
+          andParent: (WINDOW*) parent;
+-(id) initWithName: (NSString*) label_
+         andValues: (NSArray*) options_
+             andId: (NSString*) id_
+         andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;
 -(void) setCurrent: (int) i;
@@ -63,4 +73,16 @@
 -(NSNumber*) internalId;
 -(void) show;
 -(void) hide;
+@end
+
+
+@interface ROptions: Options {
+}
+
+-(ROptions*) initWithWidth: (int) width_
+                   andName: (NSString*) label_
+                 andValues: (NSArray*) options_
+                     andId: (NSString*) id_
+                 andParent: (WINDOW*) parent;
+-(void) adjust;
 @end

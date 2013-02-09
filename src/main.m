@@ -93,9 +93,11 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             [channelsWidgets setMute: [volume mute]
                           forChannel: i];
         }
-        option_t *options = [info objectForKey: @"options"];
-        if(options != nil) {
-            [w addOptions: options];
+        option_t *ports = [info objectForKey: @"ports"];
+        if(ports != nil) {
+            Options *opt = [w addOptions: [ports options]
+                                withName: @"Ports"];
+            [opt setCurrentByName: [ports active]];
         }
     } else {
         option_t *profile = [info objectForKey: @"profile"];

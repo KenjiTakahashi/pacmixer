@@ -108,6 +108,24 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     return control;
 }
 
+-(ROptions*) addOptions: (NSArray*) options
+               withName: (NSString*) optname {
+    for(int i = 0; i < [controls count]; ++i) {
+        [[controls objectAtIndex: i] reprint: height - [options count] - 2];
+    }
+    ROptions *control = [[ROptions alloc] initWithWidth: width - 2
+                                                andName: optname
+                                              andValues: options
+                                                  andId: internalId
+                                              andParent: win];
+    if(!hidden) {
+        [control show];
+    }
+    [controls addObject: control];
+    [control release];
+    return control;
+}
+
 -(void) setHighlighted: (BOOL) active {
     highlighted = active;
     [self printName];
@@ -122,16 +140,14 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(BOOL) canGoInside {
-    BOOL can = NO;
     for(int i = 0; i < [controls count]; ++i) {
         id control = [controls objectAtIndex: i];
         if([control respondsToSelector:@selector(previous)] ||
            [control respondsToSelector:@selector(next)]) {
-            can = YES;
-            break;
+            return YES;
         }
     }
-    return can;
+    return NO;
 }
 
 -(void) inside {

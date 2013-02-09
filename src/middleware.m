@@ -92,11 +92,20 @@ debug_fprintf(__func__, "m:%s observer added", [siname UTF8String]);
 debug_fprintf(__func__, "m:%s observer added", [mname UTF8String]);
 debug_fprintf(__func__, "m:%d:%s received", idx, name);
 #endif
-        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+        NSMutableDictionary *s = [
+            NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: name], @"name",
             [NSNumber numberWithInt: idx], @"id",
             ch, @"channels", chv, @"volumes",
             [NSNumber numberWithInt: type], @"type", nil];
+        if(data->option != NULL) {
+            char ** const ports = data->option->descriptions;
+            const char *active = data->option->active;
+            option_t *p = [[option_t alloc] initWithOptions: ports
+                                                andNOptions: data->option->size
+                                                  andActive: active];
+            [s setObject: p forKey: @"ports"];
+        }
         [center postNotificationName: @"controlAppeared"
                               object: self
                             userInfo: s];

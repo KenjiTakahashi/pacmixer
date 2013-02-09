@@ -50,6 +50,8 @@
 -(void) reprint: (int) height_;
 -(void) printName;
 -(Channels*) addChannels: (NSArray*) channels;
+-(ROptions*) addOptions: (NSArray*) options
+               withName: (NSString*) optname;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(BOOL) canGoInside;

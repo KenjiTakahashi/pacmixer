@@ -139,6 +139,26 @@ void backend_card_profile_set(context_t *c, backend_entry_type type, uint32_t id
     pa_context_set_card_profile_by_index(c->context, idx, active, NULL, NULL);
 }
 
+#define DO_OPTION(n, options, active_option)\
+    backend_option_t *optdata = NULL;\
+    if(n > 0) {\
+        optdata = malloc(sizeof(backend_option_t));\
+        optdata->descriptions = malloc(n * sizeof(char*));\
+        optdata->names = malloc(n * sizeof(char*));\
+        for(uint32_t i = 0; i < n; ++i) {\
+            const char *desc = options[i]->description;\
+            optdata->descriptions[i] = malloc((strlen(desc) + 1) * sizeof(char));\
+            strcpy(optdata->descriptions[i], desc);\
+            const char *name = options[i]->name;\
+            optdata->names[i] = malloc((strlen(name) + 1) * sizeof(char));\
+            strcpy(optdata->names[i], name);\
+        }\
+        const char *active_opt = active_option->description;\
+        optdata->active = malloc((strlen(active_opt) + 1) * sizeof(char));\
+        strcpy(optdata->active, active_opt);\
+        optdata->size = n;\
+    }\
+
 void _cb_state_changed(pa_context *c, void *userdata) {
     state_callback_t *state_callback = userdata;
     pa_context_state_t nstate = pa_context_get_state(c);
@@ -159,6 +179,7 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
         data.channels = client_callback->channels;
         data.volumes = client_callback->volumes;
         data.channels_num = client_callback->chnum;
+        data.option = NULL;
         ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, &data);
         free(client_callback->channels);
         free(client_callback->volumes);
@@ -168,7 +189,10 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
 
 void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
     if(!eol) {
-        _cb1(info->index, info->volume, info->mute, info->description, SINK, userdata);
+        uint32_t n = info->n_ports;
+        DO_OPTION(n, info->ports, info->active_port);
+        _cb1(info->index, SINK, info->volume, info->mute, info->description, optdata, userdata);
+        _do_option_free(optdata, n);
     }
 }
 
@@ -216,7 +240,10 @@ void _cb_s_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, vo
 
 void _cb_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
     if(!eol) {
-        _cb1(info->index, info->volume, info->mute, info->description, SOURCE, userdata);
+        uint32_t n = info->n_ports;
+        DO_OPTION(n, info->ports, info->active_port);
+        _cb1(info->index, SOURCE, info->volume, info->mute, info->description, optdata, userdata);
+        _do_option_free(optdata, n);
     }
 }
 
@@ -384,13 +411,16 @@ backend_option_t *_do_card(const pa_card_info* info, int n) {
         card->names[i] = malloc((strlen(name) + 1) * sizeof(char));
         strcpy(card->names[i], name);
     }
-    const char *active = info->active_profile[0].description;
+    const char *active = info->active_profile->description;
     card->active = malloc((strlen(active) + 1) * sizeof(char));
     strcpy(card->active, active);
     return card;
 }
 
 void _do_option_free(backend_option_t *option, int n) {
+    if(option == NULL) {
+        return;
+    }
     free(option->active);
     for(int i = 0; i < n; ++i) {
         free(option->descriptions[i]);
@@ -413,7 +443,7 @@ void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute,
     }
 }
 
-void _cb1(uint32_t index, pa_cvolume volume, int mute, const char *description, backend_entry_type type, void *userdata) {
+void _cb1(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, backend_option_t *options, void *userdata) {
     if(index != PA_INVALID_INDEX) {
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", index, description);
@@ -424,6 +454,7 @@ debug_fprintf(__func__, "%d:%s appeared", index, description);
         data.channels = _do_channels(volume, chnum);
         data.volumes = _do_volumes(volume, chnum, mute);
         data.channels_num = chnum;
+        data.option = options;
         ((tcallback_add_func)(callback->add))(callback->self, description, type, index, &data);
         free(data.channels);
         free(data.volumes);
