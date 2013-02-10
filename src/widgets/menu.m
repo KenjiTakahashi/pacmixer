@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@
     int mx;
     getmaxyx(stdscr, my, mx);
     win = newwin(1, mx, my - 1, 0);
-    mode = OUTSIDE;
+    mode = MODE_OUTSIDE;
     [self print];
     return self;
 }
@@ -103,20 +103,30 @@
             @"j/k: previous/next setting, "
             @"space: (un)check setting, "
             @"q: Exit";
-    } else if(mode == OUTSIDE) {
+    } else if(mode == MODE_OUTSIDE) {
         line =
             @" i: inside mode, "
+            @"s: settings mode, "
             @"h/l: previous/next control, "
             @"j/k: volume down/up, "
             @"m: (un)mute, "
             @"q: Exit";
-    } else if(mode == INSIDE) {
+    } else if(mode == MODE_INSIDE) {
         line =
             @" q: outside mode, "
+            @"s: settings mode, "
             @"h/l: previous/next channel, "
             @"j/k: volume down/up, "
             @"m: (un)mute";
         mode_ = 'i';
+        color = COLOR_PAIR(7);
+    } else if(mode == MODE_SETTINGS) {
+        line =
+            @" q: outside mode, "
+            @"i: inside mode, "
+            @"h/l: previous/next control, "
+            @"j/k: previous/next setting";
+        mode_ = 's';
         color = COLOR_PAIR(7);
     } else {
         line = @"";
@@ -142,15 +152,22 @@
 }
 
 -(void) inside {
-    if(mode == OUTSIDE) {
-        mode = INSIDE;
+    if(mode == MODE_OUTSIDE || mode == MODE_SETTINGS) {
+        mode = MODE_INSIDE;
+        [self print];
+    }
+}
+
+-(void) settings {
+    if(mode == MODE_OUTSIDE || mode == MODE_INSIDE) {
+        mode = MODE_SETTINGS;
         [self print];
     }
 }
 
 -(BOOL) outside {
-    if(mode == INSIDE) {
-        mode = OUTSIDE;
+    if(mode == MODE_INSIDE || mode == MODE_SETTINGS) {
+        mode = MODE_OUTSIDE;
         [self print];
         return NO;
     }
@@ -160,5 +177,9 @@
 -(void) setView: (View) view_ {
     view = view_;
     [self print];
+}
+
+-(Mode) mode {
+    return mode;
 }
 @end

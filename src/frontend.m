@@ -321,7 +321,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
 }
 
 -(void) previous {
-    if(inside) {
+    if([bottom mode] == MODE_INSIDE) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] previous];
     } else if(highlight > 0) {
         [self setCurrent: highlight - 1];
@@ -349,7 +349,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
 }
 
 -(void) next {
-    if(inside) {
+    if([bottom mode] == MODE_INSIDE) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] next];
     } else if(highlight < (int)[widgets count] - 1) {
         int start = [[widgets objectAtIndex: highlight] endPosition];
@@ -400,10 +400,9 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
 }
 
 -(void) inside {
-    if([widgets count]) {
+    if([top view] != SETTINGS && [widgets count]) {
         Widget *widget = [widgets objectAtIndex: highlight];
         if([widget canGoInside]) {
-            inside = YES;
             [bottom inside];
             [[widgets objectAtIndex: highlight] inside];
         }
@@ -414,11 +413,16 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
 -(BOOL) outside {
     BOOL outside = [bottom outside];
     if(!outside) {
-        inside = NO;
         Widget *widget = [widgets objectAtIndex: highlight];
         [widget outside];
         [[self class] refresh];
     }
     return outside;
+}
+
+-(void) settings {
+    if([top view] != SETTINGS && [widgets count]) {
+        [bottom settings];
+    }
 }
 @end

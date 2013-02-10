@@ -25,3 +25,6 @@
 - Fixed possible mix-up of SINK and SINK_INPUT controls.
 - Fixed hidden controls sometimes not properly removed when gone.
 - Added ability to get/set card-wise options (e.g. profiles).
+
+== 0.3:
+- Fixed crash when trying to go inside on SETTINGS tab.

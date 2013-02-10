@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -39,8 +39,9 @@
 
 
 typedef enum {
-    INSIDE,
-    OUTSIDE
+    MODE_INSIDE,
+    MODE_OUTSIDE,
+    MODE_SETTINGS
 } Mode;
 
 
@@ -56,6 +57,8 @@ typedef enum {
 -(void) print;
 -(void) reprint;
 -(void) inside;
+-(void) settings;
 -(BOOL) outside;
 -(void) setView: (View) view_;
+-(Mode) mode;
 @end

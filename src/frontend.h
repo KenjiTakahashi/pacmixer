@@ -43,7 +43,6 @@
         NSMutableArray *xpaddingStates;
         NSMutableArray *ypaddingStates;
         int highlight;
-        BOOL inside;
         Notice *notice;
 }
 
@@ -75,4 +74,5 @@
 -(void) mute;
 -(void) inside;
 -(BOOL) outside;
+-(void) settings;
 @end

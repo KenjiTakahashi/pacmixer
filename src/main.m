@@ -95,8 +95,8 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
         }
         option_t *ports = [info objectForKey: @"ports"];
         if(ports != nil) {
-            Options *opt = [w addOptions: [ports options]
-                                withName: @"Ports"];
+            ROptions *opt = [w addOptions: [ports options]
+                                 withName: @"Ports"];
             [opt setCurrentByName: [ports active]];
         }
     } else {
@@ -147,6 +147,9 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
                 break;
             case 'i':
                 [tui inside];
+                break;
+            case 's':
+                [tui settings];
                 break;
             case KEY_F(1):
             case '1':
