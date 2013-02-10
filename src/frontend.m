@@ -404,7 +404,18 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
         Widget *widget = [widgets objectAtIndex: highlight];
         if([widget canGoInside]) {
             [bottom inside];
-            [[widgets objectAtIndex: highlight] inside];
+            [widget inside];
+        }
+        [[self class] refresh];
+    }
+}
+
+-(void) settings {
+    if([top view] != SETTINGS && [widgets count]) {
+        Widget *widget = [widgets objectAtIndex: highlight];
+        if([widget canGoSettings]) {
+            [bottom settings];
+            [widget settings];
         }
         [[self class] refresh];
     }
@@ -418,11 +429,5 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
         [[self class] refresh];
     }
     return outside;
-}
-
--(void) settings {
-    if([top view] != SETTINGS && [widgets count]) {
-        [bottom settings];
-    }
 }
 @end

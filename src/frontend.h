@@ -73,6 +73,6 @@
 -(void) down;
 -(void) mute;
 -(void) inside;
--(BOOL) outside;
 -(void) settings;
+-(BOOL) outside;
 @end

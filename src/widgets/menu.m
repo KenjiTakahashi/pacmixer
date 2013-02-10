@@ -152,21 +152,21 @@
 }
 
 -(void) inside {
-    if(mode == MODE_OUTSIDE || mode == MODE_SETTINGS) {
+    if(mode != MODE_INSIDE) {
         mode = MODE_INSIDE;
         [self print];
     }
 }
 
 -(void) settings {
-    if(mode == MODE_OUTSIDE || mode == MODE_INSIDE) {
+    if(mode != MODE_SETTINGS) {
         mode = MODE_SETTINGS;
         [self print];
     }
 }
 
 -(BOOL) outside {
-    if(mode == MODE_INSIDE || mode == MODE_SETTINGS) {
+    if(mode != MODE_OUTSIDE) {
         mode = MODE_OUTSIDE;
         [self print];
         return NO;

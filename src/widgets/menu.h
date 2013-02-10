@@ -38,13 +38,6 @@
 @end
 
 
-typedef enum {
-    MODE_INSIDE,
-    MODE_OUTSIDE,
-    MODE_SETTINGS
-} Mode;
-
-
 @interface Bottom: NSObject {
     @private
         WINDOW *win;

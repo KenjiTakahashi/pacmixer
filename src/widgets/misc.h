@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -26,6 +26,13 @@ typedef enum {
     INPUTS,
     SETTINGS
 } View;
+
+
+typedef enum {
+    MODE_INSIDE,
+    MODE_OUTSIDE,
+    MODE_SETTINGS
+} Mode;
 
 
 @protocol Controlling <NSObject>

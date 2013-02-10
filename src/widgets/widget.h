@@ -33,9 +33,11 @@
         View type;
         NSString *internalId;
         NSMutableArray *controls;
+        NSMutableArray *options;
         BOOL highlighted;
         int highlight;
-        BOOL inside;
+        int shighlight;
+        Mode mode;
         BOOL hidden;
         WINDOW *parent;
 }
@@ -50,12 +52,14 @@
 -(void) reprint: (int) height_;
 -(void) printName;
 -(Channels*) addChannels: (NSArray*) channels;
--(ROptions*) addOptions: (NSArray*) options
+-(ROptions*) addOptions: (NSArray*) options_
                withName: (NSString*) optname;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(BOOL) canGoInside;
+-(BOOL) canGoSettings;
 -(void) inside;
+-(void) settings;
 -(void) outside;
 -(void) previous;
 -(void) next;

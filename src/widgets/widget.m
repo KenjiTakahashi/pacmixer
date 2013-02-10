@@ -27,7 +27,9 @@
                   andParent: (WINDOW*) parent_ {
     self = [super init];
     highlight = 0;
+    shighlight = 0;
     controls = [[NSMutableArray alloc] init];
+    options = [[NSMutableArray alloc] init];
     position = p;
     name = [name_ copy];
     type = type_;
@@ -35,6 +37,7 @@
     parent = parent_;
     width = 8;
     hidden = YES;
+    mode = MODE_OUTSIDE;
     [self print];
 #ifdef DEBUG
 debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8String]);
@@ -43,6 +46,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) dealloc {
+    [options release];
     [controls release];
     [name release];
     [internalId release];
@@ -108,20 +112,20 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     return control;
 }
 
--(ROptions*) addOptions: (NSArray*) options
+-(ROptions*) addOptions: (NSArray*) options_
                withName: (NSString*) optname {
     for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] reprint: height - [options count] - 2];
+        [[controls objectAtIndex: i] reprint: height - [options_ count] - 2];
     }
     ROptions *control = [[ROptions alloc] initWithWidth: width - 2
                                                 andName: optname
-                                              andValues: options
+                                              andValues: options_
                                                   andId: internalId
                                               andParent: win];
     if(!hidden) {
         [control show];
     }
-    [controls addObject: control];
+    [options addObject: control];
     [control release];
     return control;
 }
@@ -150,22 +154,43 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     return NO;
 }
 
+-(BOOL) canGoSettings {
+    return (BOOL)[options count];
+}
+
 -(void) inside {
-    if(!inside) {
-        inside = YES;
+    if(mode == MODE_SETTINGS) {
+        [[options objectAtIndex: shighlight] setHighlighted: NO];
+    }
+    if(mode != MODE_INSIDE) {
+        mode = MODE_INSIDE;
         [[controls objectAtIndex: highlight] inside];
     }
 }
 
--(void) outside {
-    if(inside) {
-        inside = NO;
+-(void) settings {
+    if(mode == MODE_INSIDE) {
         [(id<Controlling>)[controls objectAtIndex: highlight] outside];
+    }
+    if(mode != MODE_SETTINGS) {
+        mode = MODE_SETTINGS;
+        [[options objectAtIndex: shighlight] setHighlighted: YES];
+    }
+}
+
+-(void) outside {
+    if(mode != MODE_OUTSIDE) {
+        if(mode == MODE_INSIDE) {
+            [(id<Controlling>)[controls objectAtIndex: highlight] outside];
+        } else if(mode == MODE_SETTINGS) {
+            [[options objectAtIndex: shighlight] setHighlighted: NO];
+        }
+        mode = MODE_OUTSIDE;
     }
 }
 
 -(void) previous {
-    if(inside) {
+    if(mode == MODE_INSIDE) {
         id<Controlling> control = [controls objectAtIndex: highlight];
         BOOL end = [control previous];
         while(end) {
@@ -180,7 +205,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) next {
-    if(inside) {
+    if(mode == MODE_INSIDE) {
         id<Controlling> control = [controls objectAtIndex: highlight];
         BOOL end = [control next];
         while(end) {
@@ -194,8 +219,10 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) up {
-    if(inside) {
+    if(mode == MODE_INSIDE) {
         [[controls objectAtIndex: highlight] up];
+    } else if(mode == MODE_SETTINGS) {
+        [[options objectAtIndex: shighlight] up];
     } else {
         for(int i = 0; i < [controls count]; ++i) {
             [[controls objectAtIndex: i] up];
@@ -204,8 +231,10 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) down {
-    if(inside) {
+    if(mode == MODE_INSIDE) {
         [[controls objectAtIndex: highlight] down];
+    } else if(mode == MODE_SETTINGS) {
+        [[options objectAtIndex: shighlight] down];
     } else {
         for(int i = 0; i < [controls count]; ++i) {
             [[controls objectAtIndex: i] down];
