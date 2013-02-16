@@ -65,6 +65,8 @@
 -(void) next;
 -(void) up;
 -(void) down;
+-(void) mute;
+-(void) switchValue;
 -(int) width;
 -(int) endPosition;
 -(View) type;

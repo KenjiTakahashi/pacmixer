@@ -340,7 +340,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
 
 -(void) switchSetting {
     id widget = [widgets objectAtIndex: highlight];
-    if([widget respondsToSelector: @selector(switchValue)]) {
+    if([top view] == SETTINGS || [bottom mode] == MODE_SETTINGS) {
         [widget switchValue];
     }
     [[self class] refresh];

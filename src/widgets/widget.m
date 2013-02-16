@@ -254,6 +254,12 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     }
 }
 
+-(void) switchValue {
+    if(mode == MODE_SETTINGS) {
+        [[options objectAtIndex: shighlight] switchValue];
+    }
+}
+
 -(int) width {
     return width;
 }
