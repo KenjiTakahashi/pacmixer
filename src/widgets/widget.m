@@ -141,6 +141,9 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     for(int i = 0; i < [controls count]; ++i) {
         [[controls objectAtIndex: i] adjust];
     }
+    for(int i = 0; i < [options count]; ++i) {
+        [[options objectAtIndex: i] adjust];
+    }
 }
 
 -(BOOL) canGoInside {
@@ -279,12 +282,18 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     for(int i = 0; i < [controls count]; ++i) {
         [[controls objectAtIndex: i] show];
     }
+    for(int i = 0; i < [options count]; ++i) {
+        [[options objectAtIndex: i] show];
+    }
 }
 
 -(void) hide {
     hidden = YES;
     for(int i = 0; i < [controls count]; ++i) {
         [[controls objectAtIndex: i] hide];
+    }
+    for(int i = 0; i < [options count]; ++i) {
+        [[options objectAtIndex: i] hide];
     }
 }
 @end
