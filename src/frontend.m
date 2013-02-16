@@ -18,7 +18,9 @@
 #import "frontend.h"
 
 
+static WINDOW *pad;
 static WINDOW *win;
+static PANEL *pan;
 static int xpadding;
 static int ypadding;
 
@@ -45,8 +47,12 @@ static int ypadding;
     init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     refresh();
-    int my = getmaxy(stdscr);
-    win = newpad(my - 4, 1);
+    int my;
+    int mx;
+    getmaxyx(stdscr, my, mx);
+    pad = newpad(my - 4, 1);
+    win = newwin(my - 4, mx - 2, 2, 1);
+    pan = new_panel(win);
     xpadding = 0;
     ypadding = 0;
     xpaddingStates = [[NSMutableArray alloc] init];
@@ -67,7 +73,9 @@ static int ypadding;
 
 -(void) dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
+    del_panel(pan);
     delwin(win);
+    delwin(pad);
     endwin();
     [bottom release];
     [top release];
@@ -80,17 +88,17 @@ static int ypadding;
 }
 
 -(void) addWaiter: (NSNotification*) _ {
-    wclear(win);
+    wclear(pad);
     NSString *message = @"Waiting for connection...";
     notice = [[Notice alloc] initWithMessage: message
-                                   andParent: win];
+                                   andParent: pad];
     [[self class] refresh];
 }
 
 -(void) removeWaiter: (NSNotification*) _ {
     [notice release];
     notice = nil;
-    wclear(win);
+    wclear(pad);
     [[self class] refresh];
 }
 
@@ -106,7 +114,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
         Widget *w = [widgets objectAtIndex: i];
         [w reprint: my - 4];
     }
-    wresize(win, my - 4, mx);
+    wresize(pad, my - 4, mx);
     [bottom reprint];
     [[self class] refresh];
 }
@@ -115,7 +123,25 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
-    prefresh(win, ypadding, xpadding, 2, 1, my - 2, mx - 1);
+    int py;
+    int px;
+    getmaxyx(pad, py, px);
+    if(py > my - 4) {
+        py = my - 4;
+    }
+    if(px > mx - 2) {
+        px = mx - 2;
+    }
+    int r = copywin(pad, win, ypadding, xpadding, 0, 0, py - 1, px - 1, 0);
+    if(r == ERR) {
+        int y;
+        int x;
+        getmaxyx(win, y, x);
+        printw("%d:%d:%d:%d\t", my - 5, mx - 3, y, x);
+    }
+    bottom_panel(pan);
+    update_panels();
+    doupdate();
 }
 
 -(void) clear {
@@ -123,7 +149,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
         id widget = [widgets objectAtIndex: highlight];
         [widget setHighlighted: NO];
     }
-    wclear(win);
+    wclear(pad);
     [widgets removeAllObjects];
 }
 
@@ -145,7 +171,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
                                               andName: name
                                               andType: type
                                                 andId: id_
-                                            andParent: win];
+                                            andParent: pad];
     [allWidgets addObject: widget];
     BOOL cond = [top view] == ALL || type == [top view];
     cond = cond && [self applySettings: [widget name]];
@@ -162,7 +188,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 
 -(void) removeWidget: (NSNumber*) id_ {
     NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
-    wclear(win);
+    wclear(pad);
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *widget = [widgets objectAtIndex: i];
         if([[widget internalId] isEqualToNumber: id_]) {
@@ -213,7 +239,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                                                 andName: name
                                               andValues: profiles
                                                   andId: id_
-                                              andParent: win];
+                                              andParent: pad];
     [widget setCurrentByName: active];
     SEL sel = @selector(setCurrentByNotification:);
     NSString *nname = [NSString stringWithFormat:
@@ -286,7 +312,7 @@ debug_fprintf(__func__, "%s", [nname UTF8String]);
                                                    andName: key
                                                  andValues: [value values]
                                                      andId: nil
-                                                 andParent: win];
+                                                 andParent: pad];
         [widget show];
         for(int i = 0; i < [value count]; ++i) {
             NSString *fullkey = [NSString stringWithFormat:

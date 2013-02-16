@@ -53,9 +53,6 @@ void callback_add_func(
                             userInfo: s];
     } else if(data->channels != NULL && data->volumes != NULL) {
         uint8_t chnum = data->channels_num;
-#ifdef DEBUG
-debug_fprintf(__func__, "channelsnum:%d", data->channels_num);
-#endif
         NSMutableArray *ch = [NSMutableArray arrayWithCapacity: chnum];
         NSMutableArray *chv = [NSMutableArray arrayWithCapacity: chnum];
         for(uint8_t i = 0; i < chnum; ++i) {

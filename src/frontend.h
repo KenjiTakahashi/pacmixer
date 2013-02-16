@@ -22,6 +22,7 @@
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSIndexSet.h>
 #import <curses.h>
+#import <panel.h>
 #import "widgets/menu.h"
 #import "widgets/widget.h"
 #import "widgets/misc.h"

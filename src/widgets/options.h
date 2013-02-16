@@ -21,6 +21,7 @@
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSDictionary.h>
 #import <curses.h>
+#import <panel.h>
 #import "misc.h"
 #import "../types.h"
 
@@ -39,6 +40,7 @@
         int highlight;
         int position;
         int width;
+        int height;
         BOOL hidden;
 }
 
@@ -77,12 +79,18 @@
 
 
 @interface ROptions: Options {
+    @private
+        int owidth;
+        PANEL *pan;
+        WINDOW *parent;
 }
 
 -(ROptions*) initWithWidth: (int) width_
                    andName: (NSString*) label_
                  andValues: (NSArray*) options_
                      andId: (NSString*) id_
-                 andParent: (WINDOW*) parent;
+                 andParent: (WINDOW*) parent_;
+-(void) dealloc;
+-(void) setHighlighted: (BOOL) active;
 -(void) adjust;
 @end

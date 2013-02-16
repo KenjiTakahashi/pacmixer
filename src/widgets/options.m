@@ -63,7 +63,7 @@
     internalId = [id_ copy];
     highlighted = NO;
     highlight = 0;
-    int height = [options count] + 2;
+    height = [options count] + 2;
     int my;
     int mx;
     getmaxyx(parent, my, mx);
@@ -214,7 +214,8 @@
                    andName: (NSString*) label_
                  andValues: (NSArray*) options_
                      andId: (NSString*) id_
-                 andParent: (WINDOW*) parent {
+                 andParent: (WINDOW*) parent_ {
+    parent = parent_;
     self = [super initWithWidth: width_
                         andName: label_
                       andValues: options_
@@ -223,7 +224,37 @@
     return self;
 }
 
+-(void) dealloc {
+    if(pan != NULL) {
+        del_panel(pan);
+    }
+    [super dealloc];
+}
+
+-(void) setHighlighted: (BOOL) active {
+    if(active) {
+        owidth = width;
+        int by = getbegy(win);
+        width = getmaxx(stdscr);
+        delwin(win);
+        win = newwin([options count] + 2, width, by + 2, 0);
+        pan = new_panel(win);
+        [super setHighlighted: active];
+    } else {
+        width = owidth;
+        if(pan != NULL) {
+            del_panel(pan);
+            pan = NULL;
+        }
+        delwin(win);
+        win = derwin(parent, height, width, position, 0);
+        [super setHighlighted: active];
+    }
+}
+
 -(void) adjust {
-    mvderwin(win, position, 0);
+    if(pan == NULL) {
+        mvderwin(win, position, 0);
+    }
 }
 @end
