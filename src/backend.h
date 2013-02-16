@@ -181,10 +181,20 @@ void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
  *
  * @param c CONTEXT as returned by backend_init().
  * @param type Type of the control. It is always CARD here.
- * @param id xPA internal control index.
+ * @param idx PA internal control index.
  * @param active Active profile's name.
  */
 void backend_card_profile_set(context_t*, backend_entry_type, uint32_t, const char*);
+
+/**
+ * Sets active port value for a control.
+ *
+ * @param c CONTEXT as returned by backend_init().
+ * @param type Type of the control. It should be SINK or SOURCE.
+ * @param idx PA internal control index.
+ * @param active Active port's name.
+ */
+void backend_port_set(context_t*, backend_entry_type, uint32_t, const char*);
 
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_data_t*);
 typedef void (*tcallback_update_func)(void*, backend_entry_type, uint32_t, backend_data_t*);

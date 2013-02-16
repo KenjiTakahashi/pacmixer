@@ -139,6 +139,19 @@ void backend_card_profile_set(context_t *c, backend_entry_type type, uint32_t id
     pa_context_set_card_profile_by_index(c->context, idx, active, NULL, NULL);
 }
 
+void backend_port_set(context_t *c, backend_entry_type type, uint32_t idx, const char *active) {
+    switch(type) {
+        case SINK:
+            pa_context_set_sink_port_by_index(c->context, idx, active, NULL, NULL);
+            break;
+        case SOURCE:
+            pa_context_set_source_port_by_index(c->context, idx, active, NULL, NULL);
+            break;
+        default:
+            break;
+    }
+}
+
 #define DO_OPTION(n, options, active_option)\
     backend_option_t *optdata = NULL;\
     if(n > 0) {\

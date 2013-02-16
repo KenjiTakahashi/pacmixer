@@ -98,10 +98,20 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
         if(data->option != NULL) {
             char ** const ports = data->option->descriptions;
             const char *active = data->option->active;
+            uint8_t pnum = data->option->size;
             option_t *p = [[option_t alloc] initWithOptions: ports
-                                                andNOptions: data->option->size
+                                                andNOptions: pnum
                                                   andActive: active];
             [s setObject: p forKey: @"ports"];
+            NSString *psname = [NSString stringWithFormat:
+                @"%@%d_%d", @"activeOptionChanged", idx, type];
+            [block addDataByCArray: pnum
+                        withValues: data->option->names
+                           andKeys: ports];
+            [center addObserver: block
+                       selector: @selector(setActivePort:)
+                           name: psname
+                         object: nil];
         }
         [center postNotificationName: @"controlAppeared"
                               object: self
@@ -236,6 +246,12 @@ void callback_state_func(void *self_) {
     NSString *key = [[notification userInfo] objectForKey: @"option"];
     const char *name = [[data objectForKey: key] UTF8String];
     backend_card_profile_set(context, type, idx, name);
+}
+
+-(void) setActivePort: (NSNotification*) notification {
+    NSString *key = [[notification userInfo] objectForKey: @"option"];
+    const char *name = [[data objectForKey: key] UTF8String];
+    backend_port_set(context, type, idx, name);
 }
 @end
 
