@@ -244,9 +244,6 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     SEL sel = @selector(setCurrentByNotification:);
     NSString *nname = [NSString stringWithFormat:
         @"%@%@", @"cardProfileChanged", id_];
-#ifdef DEBUG
-debug_fprintf(__func__, "%s", [nname UTF8String]);
-#endif
     [[NSNotificationCenter defaultCenter] addObserver: widget
                                              selector: sel
                                                  name: nname

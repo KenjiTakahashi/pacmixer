@@ -167,9 +167,9 @@
 -(void) switchValue {
     current = highlight;
     NSString *sname = [NSString stringWithFormat:
-        @"%@%@", @"cardActiveProfileChanged", internalId];
+        @"%@%@", @"activeOptionChanged", internalId];
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [options objectAtIndex: highlight], @"profile", nil];
+        [options objectAtIndex: highlight], @"option", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName: sname
                                                         object: self
                                                       userInfo: s];

@@ -33,7 +33,7 @@ void callback_add_func(
                                 andType: type];
     if(type == CARD && data->option != NULL) {
         sname = [NSString stringWithFormat:
-            @"%@%d_%d", @"cardActiveProfileChanged", idx, type];
+            @"%@%d_%d", @"activeOptionChanged", idx, type];
         ssel = @selector(setCardActiveProfile:);
         char ** const profiles = data->option->descriptions;
         const char *active = data->option->active;
@@ -233,7 +233,7 @@ void callback_state_func(void *self_) {
 }
 
 -(void) setCardActiveProfile: (NSNotification*) notification {
-    NSString *key = [[notification userInfo] objectForKey: @"profile"];
+    NSString *key = [[notification userInfo] objectForKey: @"option"];
     const char *name = [[data objectForKey: key] UTF8String];
     backend_card_profile_set(context, type, idx, name);
 }
