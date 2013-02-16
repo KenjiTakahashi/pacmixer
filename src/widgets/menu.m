@@ -125,9 +125,10 @@
             @" q: outside mode, "
             @"i: inside mode, "
             @"h/l: previous/next control, "
-            @"j/k: previous/next setting";
+            @"j/k: previous/next setting, "
+            @"space: (un)check setting";
         mode_ = 's';
-        color = COLOR_PAIR(7);
+        color = COLOR_PAIR(4);
     } else {
         line = @"";
         mode_ = '?';
