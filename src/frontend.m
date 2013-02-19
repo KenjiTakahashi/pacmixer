@@ -263,9 +263,15 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 }
 
 -(void) setCurrent: (int) i {
-    [[widgets objectAtIndex: highlight] setHighlighted: NO];
+    Widget *owidget = [widgets objectAtIndex: highlight];
     highlight = i;
-    [[widgets objectAtIndex: highlight] setHighlighted: YES];
+    Widget *nwidget = [widgets objectAtIndex: highlight];
+    [owidget setHighlighted: NO];
+    [nwidget setHighlighted: YES];
+    if([bottom mode] == MODE_SETTINGS) {
+        [owidget outside];
+        [nwidget settings];
+    }
 }
 
 -(void) setFirst {
@@ -354,21 +360,34 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     if([bottom mode] == MODE_INSIDE) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] previous];
     } else if(highlight > 0) {
-        [self setCurrent: highlight - 1];
+        if([bottom mode] == MODE_SETTINGS) {
+            BOOL flag = NO;
+            for(int i = highlight - 1; i >= 0; --i) {
+                Widget *widget = [widgets objectAtIndex: i];
+                if([widget canGoSettings]) {
+                    [self setCurrent: i];
+                    flag = YES;
+                    break;
+                }
+            }
+            if(!flag) {
+                return;
+            }
+        } else {
+            [self setCurrent: highlight - 1];
+        }
         id w = [widgets objectAtIndex: highlight];
-        if(
-            [w respondsToSelector: @selector(width)] &&
-            [w endPosition] - [w width] <= xpadding
-        ) {
+        BOOL cond = [w respondsToSelector: @selector(width)];
+        cond = cond && [w endPosition] - [w width] <= xpadding;
+        if(cond) {
             int count = [xpaddingStates count] - 1;
             int delta = [[xpaddingStates objectAtIndex: count] intValue];
             [xpaddingStates removeObjectAtIndex: count];
             xpadding -= delta;
         }
-        if(
-            [w respondsToSelector: @selector(height)] &&
-            [w endPosition] - [w height] < ypadding
-        ) {
+        cond = [w respondsToSelector: @selector(height)];
+        cond = cond && [w endPosition] - [w height] < ypadding;
+        if(cond) {
             int count = [ypaddingStates count] - 1;
             int delta = [[ypaddingStates objectAtIndex: count] intValue];
             [ypaddingStates removeObjectAtIndex: count];
@@ -383,23 +402,37 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         [(id<Controlling>)[widgets objectAtIndex: highlight] next];
     } else if(highlight < (int)[widgets count] - 1) {
         int start = [[widgets objectAtIndex: highlight] endPosition];
-        [self setCurrent: highlight + 1];
+        if([bottom mode] == MODE_SETTINGS) {
+            BOOL flag = NO;
+            for(int i = highlight + 1; i < (int)[widgets count] - 1; ++i) {
+                Widget *widget = [widgets objectAtIndex: i];
+                if([widget canGoSettings]) {
+                    [self setCurrent: i];
+                    flag = YES;
+                    break;
+                }
+            }
+            if(!flag) {
+                return;
+            }
+            start = [[widgets objectAtIndex: highlight - 1] endPosition];
+        } else {
+            [self setCurrent: highlight + 1];
+        }
         id w = [widgets objectAtIndex: highlight];
         int my;
         int mx;
         getmaxyx(stdscr, my, mx);
-        if(
-            [w respondsToSelector: @selector(width)] &&
-            [w endPosition] - xpadding >= mx
-        ) {
+        BOOL cond = [w respondsToSelector: @selector(width)];
+        cond = cond && [w endPosition] - xpadding >= mx;
+        if(cond) {
             int delta = [w width] - (mx - start - 3 + xpadding);
             xpadding += delta;
             [xpaddingStates addObject: [NSNumber numberWithInt: delta]];
         }
-        if(
-            [w respondsToSelector: @selector(height)] &&
-            [w endPosition] - ypadding >= my - 1
-        ) {
+        cond = [w respondsToSelector: @selector(height)];
+        cond = cond && [w endPosition] - ypadding >= my - 1;
+        if(cond) {
             int delta = [w height] - (my - start - 3 + ypadding);
             ypadding += delta;
             [ypaddingStates addObject: [NSNumber numberWithInt: delta]];
