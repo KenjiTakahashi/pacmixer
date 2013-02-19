@@ -231,6 +231,16 @@
     [super dealloc];
 }
 
+-(void) reprint: (int) height_ {
+    height = height - 1;
+    if(pan != NULL) {
+        int mx = getmaxx(stdscr);
+        wresize(win, [options count] + 2, mx);
+        replace_panel(pan, win);
+        move_panel(pan, height - [options count], 0);
+    }
+}
+
 -(void) setHighlighted: (BOOL) active {
     if(active) {
         owidth = width;

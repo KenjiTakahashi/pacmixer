@@ -26,10 +26,6 @@
                       andId: (NSString*) id_
                   andParent: (WINDOW*) parent_ {
     self = [super init];
-    highlight = 0;
-    shighlight = 0;
-    controls = [[NSMutableArray alloc] init];
-    options = [[NSMutableArray alloc] init];
     position = p;
     name = [name_ copy];
     type = type_;
@@ -46,8 +42,12 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) dealloc {
-    [options release];
-    [controls release];
+    if(ports != nil) {
+        [ports release];
+    }
+    if(channels != nil) {
+        [channels release];
+    }
     [name release];
     [internalId release];
     delwin(win);
@@ -69,9 +69,8 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(void) reprint: (int) height_ {
     werase(win);
     height = height_;
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] reprint: height];
-    }
+    [channels reprint: height];
+    [ports reprint: height];
     wresize(win, height, width);
     [self printName];
 }
@@ -92,42 +91,36 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     wattroff(win, color | A_BOLD);
 }
 
--(Channels*) addChannels: (NSArray*) channels {
-    int width_ = [channels count] + 2;
+-(Channels*) addChannels: (NSArray*) channels_ {
+    int width_ = [channels_ count] + 2;
     int position_ = (width - width_) / 2;
     if(width_ > 8) {
         width = width_;
         [self print];
         [self printName];
     }
-    Channels *control = [[Channels alloc] initWithChannels: channels
-                                               andPosition: position_
-                                                     andId: internalId
-                                                 andParent: win];
+    channels = [[Channels alloc] initWithChannels: channels_
+                                      andPosition: position_
+                                            andId: internalId
+                                        andParent: win];
     if(!hidden) {
-        [control show];
+        [channels show];
     }
-    [controls addObject: control];
-    [control release];
-    return control;
+    return channels;
 }
 
 -(ROptions*) addOptions: (NSArray*) options_
                withName: (NSString*) optname {
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] reprint: height - [options_ count] - 2];
-    }
-    ROptions *control = [[ROptions alloc] initWithWidth: width - 2
-                                                andName: optname
-                                              andValues: options_
-                                                  andId: internalId
-                                              andParent: win];
+    [channels reprint: height - [options_ count] - 2];
+    ports = [[ROptions alloc] initWithWidth: width - 2
+                                    andName: optname
+                                  andValues: options_
+                                      andId: internalId
+                                  andParent: win];
     if(!hidden) {
-        [control show];
+        [ports show];
     }
-    [options addObject: control];
-    [control release];
-    return control;
+    return ports;
 }
 
 -(void) setHighlighted: (BOOL) active {
@@ -138,125 +131,81 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(void) setPosition: (int) position_ {
     position = position_;
     mvderwin(win, 0, position);
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] adjust];
-    }
-    for(int i = 0; i < [options count]; ++i) {
-        [[options objectAtIndex: i] adjust];
-    }
+    [channels adjust];
+    [ports adjust];
 }
 
 -(BOOL) canGoInside {
-    for(int i = 0; i < [controls count]; ++i) {
-        id control = [controls objectAtIndex: i];
-        if([control respondsToSelector:@selector(previous)] ||
-           [control respondsToSelector:@selector(next)]) {
-            return YES;
-        }
-    }
-    return NO;
+    BOOL can = [channels respondsToSelector:@selector(previous)];
+    return can || [channels respondsToSelector:@selector(next)];
 }
 
 -(BOOL) canGoSettings {
-    return (BOOL)[options count];
+    return ports != nil;
 }
 
 -(void) inside {
     if(mode == MODE_SETTINGS) {
-        [[options objectAtIndex: shighlight] setHighlighted: NO];
+        [ports setHighlighted: NO];
     }
     if(mode != MODE_INSIDE) {
         mode = MODE_INSIDE;
-        [[controls objectAtIndex: highlight] inside];
+        [channels inside];
     }
 }
 
 -(void) settings {
     if(mode == MODE_INSIDE) {
-        [(id<Controlling>)[controls objectAtIndex: highlight] outside];
+        [channels outside];
     }
     if(mode != MODE_SETTINGS) {
         mode = MODE_SETTINGS;
-        [[options objectAtIndex: shighlight] setHighlighted: YES];
+        [ports setHighlighted: YES];
     }
 }
 
 -(void) outside {
     if(mode != MODE_OUTSIDE) {
         if(mode == MODE_INSIDE) {
-            [(id<Controlling>)[controls objectAtIndex: highlight] outside];
+            [channels outside];
         } else if(mode == MODE_SETTINGS) {
-            [[options objectAtIndex: shighlight] setHighlighted: NO];
+            [ports setHighlighted: NO];
         }
         mode = MODE_OUTSIDE;
     }
 }
 
 -(void) previous {
-    if(mode == MODE_INSIDE) {
-        id<Controlling> control = [controls objectAtIndex: highlight];
-        BOOL end = [control previous];
-        while(end) {
-            if(highlight == 0) {
-                break;
-            }
-            highlight -= 1;
-            control = [controls objectAtIndex: highlight];
-            end = [control previous];
-        }
-    }
+    [channels previous];
 }
 
 -(void) next {
-    if(mode == MODE_INSIDE) {
-        id<Controlling> control = [controls objectAtIndex: highlight];
-        BOOL end = [control next];
-        while(end) {
-            if(highlight == [controls count] - 1) {
-                break;
-            }
-            highlight += 1;
-            end = [(id<Controlling>)[controls objectAtIndex: highlight] next];
-        }
-    }
+    [channels next];
 }
 
 -(void) up {
-    if(mode == MODE_INSIDE) {
-        [[controls objectAtIndex: highlight] up];
-    } else if(mode == MODE_SETTINGS) {
-        [[options objectAtIndex: shighlight] up];
+    if(mode == MODE_SETTINGS) {
+        [ports up];
     } else {
-        for(int i = 0; i < [controls count]; ++i) {
-            [[controls objectAtIndex: i] up];
-        }
+        [channels up];
     }
 }
 
 -(void) down {
-    if(mode == MODE_INSIDE) {
-        [[controls objectAtIndex: highlight] down];
-    } else if(mode == MODE_SETTINGS) {
-        [[options objectAtIndex: shighlight] down];
+    if(mode == MODE_SETTINGS) {
+        [ports down];
     } else {
-        for(int i = 0; i < [controls count]; ++i) {
-            [[controls objectAtIndex: i] down];
-        }
+        [channels down];
     }
 }
 
 -(void) mute {
-    for(int i = 0; i < [controls count]; ++i) {
-        id<Controlling> obj = [controls objectAtIndex: i];
-        if([obj respondsToSelector: @selector(mute)]) {
-            [obj mute];
-        }
-    }
+    [channels mute];
 }
 
 -(void) switchValue {
     if(mode == MODE_SETTINGS) {
-        [[options objectAtIndex: shighlight] switchValue];
+        [ports switchValue];
     }
 }
 
@@ -285,21 +234,13 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(void) show {
     hidden = NO;
     [self printName];
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] show];
-    }
-    for(int i = 0; i < [options count]; ++i) {
-        [[options objectAtIndex: i] show];
-    }
+    [channels show];
+    [ports show];
 }
 
 -(void) hide {
     hidden = YES;
-    for(int i = 0; i < [controls count]; ++i) {
-        [[controls objectAtIndex: i] hide];
-    }
-    for(int i = 0; i < [options count]; ++i) {
-        [[options objectAtIndex: i] hide];
-    }
+    [channels hide];
+    [ports hide];
 }
 @end

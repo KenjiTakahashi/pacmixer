@@ -91,6 +91,7 @@
                      andId: (NSString*) id_
                  andParent: (WINDOW*) parent_;
 -(void) dealloc;
+-(void) reprint: (int) height_;
 -(void) setHighlighted: (BOOL) active;
 -(void) adjust;
 @end
