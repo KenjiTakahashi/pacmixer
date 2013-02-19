@@ -505,11 +505,12 @@ void _do_option_free(backend_option_t*, int n);
  * @param type Type of the control.
  * @param volume Volume values.
  * @param mute Mute value.
+ * @param optdata Options data. Can be NULL.
  * @param userdata Additional data of type CALLBACK.
  *
  * @see _do_volumes()
  */
-void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, void*);
+void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, backend_option_t*, void*);
 
 /**
  * Internal helper function.
