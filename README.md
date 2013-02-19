@@ -59,6 +59,12 @@ Used to adjust specific channel's volume.
 All shortcuts (besides ```q```) work the same, except that they affect single channel instead of the whole sink/source.
 
 #### settings mode
+Used to change controls settings (e.g. profiles).
+
+Keys work like in outside mode, except that:
+
+* `space` is used to check setting.
+* `h` and `l` iterate only over controls which actually have settings.
 
 ## something's broken?
 
