@@ -283,6 +283,10 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 }
 
 -(void) setFilter: (View) type {
+    if([bottom mode] == MODE_SETTINGS) {
+        [(Widget*)[widgets objectAtIndex: highlight] outside];
+        [bottom outside];
+    }
     [top setView: type];
     [bottom setView: ALL];
     [self clear];
@@ -310,6 +314,10 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
 }
 
 -(void) showSettings {
+    if([bottom mode] == MODE_SETTINGS) {
+        [(Widget*)[widgets objectAtIndex: highlight] outside];
+        [bottom outside];
+    }
     [top setView: SETTINGS];
     [bottom setView: SETTINGS];
     [self clear];
