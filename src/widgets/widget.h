@@ -54,6 +54,7 @@
                withName: (NSString*) optname;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
+-(void) setValuesByNotification: (NSNotification*) notification;
 -(BOOL) canGoInside;
 -(BOOL) canGoSettings;
 -(void) inside;

@@ -87,6 +87,7 @@
 }
 
 -(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     delwin(win);
     [internalId release];
     [options release];

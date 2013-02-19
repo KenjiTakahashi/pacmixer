@@ -42,6 +42,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
     if(ports != nil) {
         [ports release];
     }
@@ -135,9 +136,24 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     [ports adjust];
 }
 
+-(void) setValuesByNotification: (NSNotification*) notification {
+    NSDictionary* info = [notification userInfo];
+    NSArray *volumes = [info objectForKey: @"volumes"];
+    if(volumes != nil) {
+        for(int i = 0; i < [volumes count]; ++i) {
+            volume_t *vol = [volumes objectAtIndex: i];
+            [channels setLevel: [[vol level] intValue] forChannel: i];
+            [channels setMute: [vol mute] forChannel: i];
+        }
+    }
+    option_t *ports_ = [info objectForKey: @"ports"];
+    if(ports_ != nil) {
+        [ports setCurrentByName: [ports_ active]];
+    }
+}
+
 -(BOOL) canGoInside {
-    BOOL can = [channels respondsToSelector:@selector(previous)];
-    return can || [channels respondsToSelector:@selector(next)];
+    return channels != nil;
 }
 
 -(BOOL) canGoSettings {

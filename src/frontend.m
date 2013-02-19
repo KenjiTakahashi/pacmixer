@@ -172,6 +172,13 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
                                               andType: type
                                                 andId: id_
                                             andParent: pad];
+    SEL sel = @selector(setValuesByNotification:);
+    NSString *nname = [NSString stringWithFormat:
+        @"%@%@", @"controlChanged", id_];
+    [[NSNotificationCenter defaultCenter] addObserver: widget
+                                             selector: sel
+                                                 name: nname
+                                               object: nil];
     [allWidgets addObject: widget];
     BOOL cond = [top view] == ALL || type == [top view];
     cond = cond && [self applySettings: [widget name]];

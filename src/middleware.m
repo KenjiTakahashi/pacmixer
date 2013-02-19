@@ -153,22 +153,35 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
 #endif
     } else if(data->volumes != NULL) {
         uint8_t chnum = data->channels_num;
+        NSMutableArray *volumes = [[NSMutableArray alloc] init];
         for(int i = 0; i < chnum; ++i) {
             const backend_volume_t vol = data->volumes[i];
             volume_t *v = [[volume_t alloc] initWithLevel: vol.level
                                                   andMute: vol.mute];
-            NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-                v, @"volumes", nil];
-            NSString *nname = [NSString stringWithFormat:
-            @"%@%d_%d_%d", @"controlChanged", idx, type, i];
-            [center postNotificationName: nname
-                                  object: self
-                                userInfo: s];
+            [volumes addObject: v];
+            [v release];
+        }
+        NSMutableDictionary *s = [
+            NSMutableDictionary dictionaryWithObjectsAndKeys:
+            volumes, @"volumes", nil];
+        [volumes release];
+        if(data->option != NULL) {
+            char ** const ports = data->option->descriptions;
+            const char *active = data->option->active;
+            uint8_t pnum = data->option->size;
+            option_t *p = [[option_t alloc] initWithOptions: ports
+                                                andNOptions: pnum
+                                                  andActive: active];
+            [s setObject: p forKey: @"ports"];
+        }
+        NSString *nname = [NSString stringWithFormat:
+        @"%@%d_%d", @"controlChanged", idx, type];
+        [center postNotificationName: nname
+                              object: self
+                            userInfo: s];
 #ifdef DEBUG
 debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
 #endif
-            [v release];
-        }
     }
     [pool release];
 }

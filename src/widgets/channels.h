@@ -61,7 +61,6 @@
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
 -(int) level;
--(void) setLevelAndMuteN: (NSNotification*) notification;
 -(void) setLevel: (int) level_ andMute: (BOOL) mute_;
 -(void) setPropagation: (BOOL) p;
 -(void) inside;

@@ -120,12 +120,6 @@
     return currentLevel;
 }
 
--(void) setLevelAndMuteN: (NSNotification*) notification {
-    volume_t *info = [[notification userInfo] objectForKey: @"volumes"];
-    [self setLevel: [[info level] intValue]
-           andMute: [info mute]];
-}
-
 -(void) setLevel: (int) level_
          andMute: (BOOL) mute_ {
     currentLevel = level_;
@@ -244,16 +238,6 @@
                                                   andMute: mute
                                                 andSignal: csignal
                                                 andParent: win];
-        SEL selector = @selector(setLevelAndMuteN:);
-        NSString *nname = [NSString stringWithFormat:
-            @"%@%@", @"controlChanged", bname];
-        [[NSNotificationCenter defaultCenter] addObserver: channel
-                                                 selector: selector
-                                                     name: nname
-                                                   object: nil];
-#ifdef DEBUG
-debug_fprintf(__func__, "f:%s observer added", [nname UTF8String]);
-#endif
         [channels addObject: channel];
     }
     return self;
