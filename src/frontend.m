@@ -166,7 +166,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
                        andId: (NSString*) id_ {
-    int x = [[widgets lastObject] endPosition] + 1;
+    int x = [[widgets lastObject] endPosition];
     Widget *widget = [[Widget alloc] initWithPosition: x
                                               andName: name
                                               andType: type

@@ -150,7 +150,7 @@
 }
 
 -(int) endPosition {
-    return position + [names count] + 2;
+    return position + [self height];
 }
 
 -(NSNumber*) internalId {

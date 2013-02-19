@@ -26,7 +26,7 @@
                       andId: (NSString*) id_
                   andParent: (WINDOW*) parent_ {
     self = [super init];
-    position = p;
+    position = p + 1;
     name = [name_ copy];
     type = type_;
     internalId = [id_ copy];
@@ -130,7 +130,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 }
 
 -(void) setPosition: (int) position_ {
-    position = position_;
+    position = position_ + 1;
     mvderwin(win, 0, position);
     [channels adjust];
     [ports adjust];

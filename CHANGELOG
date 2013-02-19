@@ -28,3 +28,4 @@
 
 == 0.3:
 - Fixed crash when trying to go inside on SETTINGS tab.
+- Fixed a small screen corruption introduced in 0.2.
