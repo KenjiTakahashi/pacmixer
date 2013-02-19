@@ -184,7 +184,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     cond = cond && [self applySettings: [widget name]];
     if(cond) {
         [widgets addObject: widget];
-        if(x == 1) {
+        if(x == 0) {
             [widget setHighlighted: YES];
         }
         [widget show];

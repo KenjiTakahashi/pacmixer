@@ -195,6 +195,9 @@ void callback_remove_func(void *self_, uint32_t idx) {
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
+#ifdef DEBUG
+debug_fprintf(__func__, "m:%d %s notification posted", idx, [nname UTF8String]);
+#endif
     [pool release];
 }
 
