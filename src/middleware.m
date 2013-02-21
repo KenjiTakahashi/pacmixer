@@ -26,7 +26,7 @@ void callback_add_func(
     Middleware *self = self_;
     [self retain];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    NSString *sname;
+    NSString *sname = nil;
     SEL ssel;
     Block *block = [self addBlockWithId: idx
                                andIndex: -1
@@ -117,10 +117,12 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
                               object: self
                             userInfo: s];
     }
-    [center addObserver: block
-               selector: ssel
-                   name: sname
-                 object: nil];
+    if(sname != nil) {
+        [center addObserver: block
+                   selector: ssel
+                       name: sname
+                     object: nil];
+    }
 #ifdef DEBUG
 debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
 #endif

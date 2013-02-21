@@ -304,7 +304,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
                 [w setPosition: x];
                 [w show];
                 [widgets addObject: w];
-                x = [w endPosition] + 1;
+                x = [w endPosition];
             } else {
                 [w hide];
             }
@@ -412,7 +412,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
         int start = [[widgets objectAtIndex: highlight] endPosition];
         if([bottom mode] == MODE_SETTINGS) {
             BOOL flag = NO;
-            for(int i = highlight + 1; i < (int)[widgets count] - 1; ++i) {
+            for(int i = highlight + 1; i < (int)[widgets count]; ++i) {
                 Widget *widget = [widgets objectAtIndex: i];
                 if([widget canGoSettings]) {
                     [self setCurrent: i];

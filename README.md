@@ -61,7 +61,7 @@ All shortcuts (besides ```q```) work the same, except that they affect single ch
 #### settings mode
 Used to change controls settings (e.g. profiles).
 
-Keys work like in outside mode, except that:
+Shortcuts work like in outside mode, except that:
 
 * `space` is used to check setting.
 * `h` and `l` iterate only over controls which actually have settings.
