@@ -110,11 +110,11 @@ static int ypadding;
 debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 #endif
     [top reprint];
+    wresize(win, my - 4, mx - 2);
     for(int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
         [w reprint: my - 4];
     }
-    wresize(pad, my - 4, mx);
     [bottom reprint];
     [[self class] refresh];
 }
@@ -132,13 +132,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     if(px > mx - 2) {
         px = mx - 2;
     }
-    int r = copywin(pad, win, ypadding, xpadding, 0, 0, py - 1, px - 1, 0);
-    if(r == ERR) {
-        int y;
-        int x;
-        getmaxyx(win, y, x);
-        printw("%d:%d:%d:%d\t", my - 5, mx - 3, y, x);
-    }
+    copywin(pad, win, ypadding, xpadding, 0, 0, py - 1, px - 1, 0);
     bottom_panel(pan);
     update_panels();
     doupdate();
@@ -290,7 +284,7 @@ debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
     [top setView: type];
     [bottom setView: ALL];
     [self clear];
-    int x = 1;
+    int x = 0;
     if(notice != nil) {
         [notice print];
         [[self class] refresh];

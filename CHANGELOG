@@ -26,7 +26,7 @@
 - Fixed hidden controls sometimes not properly removed when gone.
 - Added ability to get/set card-wise options (e.g. profiles).
 
-== 0.3:
+== 0.3 (24.02.2013):
 - Fixed crash when trying to go inside on SETTINGS tab.
 - Fixed a small screen corruption introduced in 0.2.
 - Added ability to get/set control-wise options (e.g. ports).
