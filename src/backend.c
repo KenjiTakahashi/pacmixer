@@ -403,7 +403,7 @@ backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
     for(int i = 0; i < chnum; ++i) {
         channels[i].maxLevel = PA_VOLUME_UI_MAX;
         channels[i].normLevel = PA_VOLUME_NORM;
-        channels[i].mutable = 1;
+        channels[i].isMutable = 1;
     }
     return channels;
 }

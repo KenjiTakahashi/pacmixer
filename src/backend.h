@@ -65,7 +65,7 @@ typedef struct STATE_CALLBACK {
 typedef struct BACKEND_CHANNEL {
     int maxLevel;
     int normLevel;
-    int mutable;
+    int isMutable;
 } backend_channel_t;
 
 /**

@@ -60,7 +60,7 @@ void callback_add_func(
             const backend_volume_t vol = data->volumes[i];
             [ch addObject: [[channel_t alloc] initWithMaxLevel: chn.maxLevel
                                                   andNormLevel: chn.normLevel
-                                                    andMutable: chn.mutable]];
+                                                    andMutable: chn.isMutable]];
             [chv addObject: [[volume_t alloc] initWithLevel: vol.level
                                                     andMute: vol.mute]];
             Block *block = [self addBlockWithId: idx
