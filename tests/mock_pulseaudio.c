@@ -20,11 +20,6 @@
 #include "mock_pulseaudio.h"
 
 
-static pa_threaded_mainloop s_instance = -1;
-static pa_mainloop_api s_api = 1;
-static pa_context s_context = 1;
-
-
 pa_threaded_mainloop *pa_threaded_mainloop_new() {
     return &s_instance;
 }

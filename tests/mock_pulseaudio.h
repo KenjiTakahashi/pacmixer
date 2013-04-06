@@ -18,11 +18,9 @@
 
 
 #include <stdint.h>
+#include "mock_variables.h"
 
 
-typedef int pa_threaded_mainloop;
-typedef int pa_mainloop_api;
-typedef int pa_context;
 typedef int pa_context_state_t;
 typedef struct PA_CLIENT_INFO {
     uint32_t index;

@@ -3,4 +3,5 @@
 *.o
 .td
 pacmixer
+pacmixer_run_tests
 dist/

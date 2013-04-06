@@ -32,7 +32,7 @@ TOBJECTS=$(TSOURCES:.cpp=.o)
 MSOURCES=$(wildcard tests/mock_*.c)
 MOBJECTS=$(MSOURCES:.c=.o)
 EXEC=pacmixer
-TEXEC=test_pacmixer
+TEXEC=pacmixer_run_tests
 
 all: CFLAGS += -O2
 all: $(CSOURCES) $(SOURCES) $(EXEC)
