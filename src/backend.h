@@ -17,7 +17,11 @@
 */
 
 
+#ifdef TESTS
+#include "../tests/mock_pulseaudio.h"
+#else
 #include <pulse/pulseaudio.h>
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
