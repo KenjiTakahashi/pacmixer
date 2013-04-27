@@ -70,13 +70,25 @@ void pa_context_get_source_info_by_index(pa_context *context, uint32_t idx, void
 
 void pa_context_get_source_output_info(pa_context *context, uint32_t idx, void *s, void *m) {}
 
-void pa_context_set_sink_volume_by_index(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {}
+void pa_context_set_sink_volume_by_index(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {
+    output_sink_volume[0] = v->values[0];
+    output_sink_volume[1] = v->values[1];
+}
 
-void pa_context_set_sink_input_volume(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {}
+void pa_context_set_sink_input_volume(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {
+    output_sink_input_volume[0] = v->values[0];
+    output_sink_input_volume[1] = v->values[1];
+}
 
-void pa_context_set_source_volume_by_index(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {}
+void pa_context_set_source_volume_by_index(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {
+    output_source_volume[0] = v->values[0];
+    output_source_volume[1] = v->values[1];
+}
 
-void pa_context_set_source_output_volume(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {}
+void pa_context_set_source_output_volume(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {
+    output_source_output_volume[0] = v->values[0];
+    output_source_output_volume[1] = v->values[1];
+}
 
 void pa_context_set_sink_mute_by_index(pa_context* context, uint32_t idx, int v, void *s, void *m) {}
 

@@ -19,6 +19,10 @@
 
 #include <stdint.h>
 #include "mock_variables.h"
+#include <stdio.h>
+
+
+#define PA_CHANNELS_MAX 32U // Taken from PA sources.
 
 
 typedef int pa_context_state_t;
@@ -34,7 +38,7 @@ typedef struct PA_PORT_INFO pa_sink_port_info;
 typedef struct PA_PORT_INFO pa_source_port_info;
 typedef struct PA_CVOLUME {
     int channels;
-    int *values;
+    int values[PA_CHANNELS_MAX];
 } pa_cvolume;
 struct PA_INFO {
     uint32_t index;
