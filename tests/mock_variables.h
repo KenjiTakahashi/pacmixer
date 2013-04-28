@@ -10,4 +10,9 @@ extern int output_sink_input_volume[2];
 extern int output_source_volume[2];
 extern int output_source_output_volume[2];
 
+extern int output_sink_info[3];
+extern int output_sink_input_info[3];
+extern int output_source_info[3];
+extern int output_source_output_info[3];
+
 void reset_mock_variables();

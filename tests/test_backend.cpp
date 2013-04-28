@@ -41,6 +41,67 @@ TEST_CASE("backend_new/connect", "Should successfully return PA context") {
     free(sc);
 }
 
+TEST_CASE("backend_volume_set", "Should set volume for a single channel") {
+    // "Single" really means "not all".
+    // To do so, it needs to get current volumes
+    // and that is what we really test here.
+    // Callbacks are tested elsewhere.
+    context_t *c = (context_t*)malloc(sizeof(context_t));
+
+    SECTION("sink", "") {
+        backend_volume_set(c, SINK, 1, 2, 10);
+
+        REQUIRE(output_sink_info[0] == 1);
+        REQUIRE(output_sink_info[1] == 2);
+        REQUIRE(output_sink_info[2] == 10);
+    }
+
+    SECTION("sink input", "") {
+        backend_volume_set(c, SINK_INPUT, 1, 2, 10);
+
+        REQUIRE(output_sink_input_info[0] == 1);
+        REQUIRE(output_sink_input_info[1] == 2);
+        REQUIRE(output_sink_input_info[2] == 10);
+    }
+
+    SECTION("source", "") {
+        backend_volume_set(c, SOURCE, 1, 2, 10);
+
+        REQUIRE(output_source_info[0] == 1);
+        REQUIRE(output_source_info[1] == 2);
+        REQUIRE(output_source_info[2] == 10);
+    }
+
+    SECTION("source output", "") {
+        backend_volume_set(c, SOURCE_OUTPUT, 1, 2, 10);
+
+        REQUIRE(output_source_output_info[0] == 1);
+        REQUIRE(output_source_output_info[1] == 2);
+        REQUIRE(output_source_output_info[2] == 10);
+    }
+
+    reset_mock_variables();
+
+    SECTION("other", "") {
+        backend_volume_set(c, CARD, 1, 2, 10);
+
+        REQUIRE(output_sink_info[0] == 0);
+        REQUIRE(output_sink_info[1] == 0);
+        REQUIRE(output_sink_info[2] == 0);
+        REQUIRE(output_sink_input_info[0] == 0);
+        REQUIRE(output_sink_input_info[1] == 0);
+        REQUIRE(output_sink_input_info[2] == 0);
+        REQUIRE(output_source_info[0] == 0);
+        REQUIRE(output_source_info[1] == 0);
+        REQUIRE(output_source_info[2] == 0);
+        REQUIRE(output_source_output_info[0] == 0);
+        REQUIRE(output_source_output_info[1] == 0);
+        REQUIRE(output_source_output_info[2] == 0);
+    }
+
+    free(c);
+}
+
 TEST_CASE("backend_volume_setall", "Should set volume for all channels") {
     // We'll use two channels, but it scales by induction.
     context_t *c = (context_t*)malloc(sizeof(context_t));
