@@ -1,3 +1,8 @@
+#ifndef MOCK_VARIABLES_H
+#define MOCK_VARIABLES_H
+
+#include <string.h>
+
 typedef int pa_threaded_mainloop;
 typedef int pa_mainloop_api;
 typedef int pa_context;
@@ -20,4 +25,13 @@ extern int output_sink_input_mute[2];
 extern int output_source_mute[2];
 extern int output_source_output_mute[2];
 
+typedef struct OUTPUT_CARD_PROFILE {
+    int index;
+    char active[32];
+} output_card_profile_t;
+
+extern output_card_profile_t output_card_profile;
+
 void reset_mock_variables();
+
+#endif

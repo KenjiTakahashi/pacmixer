@@ -130,7 +130,10 @@ void pa_context_set_source_output_mute(pa_context *context, uint32_t idx, int v,
     PA_CONTEXT_SET_MUTE(output_source_output_mute);
 }
 
-void pa_context_set_card_profile_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {}
+void pa_context_set_card_profile_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {
+    output_card_profile.index = idx;
+    strcpy(output_card_profile.active, name);
+}
 
 void pa_context_set_sink_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {}
 

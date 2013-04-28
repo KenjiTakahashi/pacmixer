@@ -209,3 +209,15 @@ TEST_CASE("backend_mute_set", "Should set mute state for control") {
 
     free(c);
 }
+
+TEST_CASE("backend_card_profile_set", "Should set active card profile") {
+    // The value of backend_entry_type is ignored.
+    context_t *c = (context_t*)malloc(sizeof(context_t));
+
+    backend_card_profile_set(c, CARD, 1, "active_profile");
+
+    REQUIRE(output_card_profile.index == 1);
+    REQUIRE(strcmp(output_card_profile.active, "active_profile") == 0);
+
+    free(c);
+}

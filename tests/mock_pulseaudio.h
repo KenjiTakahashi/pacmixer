@@ -18,8 +18,8 @@
 
 
 #include <stdint.h>
+#include <string.h>
 #include "mock_variables.h"
-#include <stdio.h>
 
 
 #define PA_CHANNELS_MAX 32U // Taken from PA sources.
