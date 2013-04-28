@@ -20,7 +20,10 @@ int output_sink_input_mute[2] = {0, 0};
 int output_source_mute[2] = {0, 0};
 int output_source_output_mute[2] = {0, 0};
 
-output_card_profile_t output_card_profile = {.index = 0, .active = ""};
+output_index_active_t output_card_profile = {.index = 0, .active = ""};
+
+output_index_active_t output_sink_port = {.index = 0, .active = ""};
+output_index_active_t output_source_port = {.index = 0, .active = ""};
 
 void reset_mock_variables() {
     s_instance = -1;
@@ -60,4 +63,8 @@ void reset_mock_variables() {
     output_source_output_mute[1] = 0;
     output_card_profile.index = 0;
     strcpy(output_card_profile.active, "");
+    output_sink_port.index = 0;
+    strcpy(output_sink_port.active, "");
+    output_source_port.index = 0;
+    strcpy(output_source_port.active, "");
 }

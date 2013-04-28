@@ -221,3 +221,37 @@ TEST_CASE("backend_card_profile_set", "Should set active card profile") {
 
     free(c);
 }
+
+TEST_CASE("backend_port_set", "Should set active port") {
+    context_t *c = (context_t*)malloc(sizeof(context_t));
+
+    SECTION("sink", "") {
+        backend_port_set(c, SINK, 1, "active_port");
+
+        REQUIRE(output_sink_port.index == 1);
+        REQUIRE(strcmp(output_sink_port.active, "active_port") == 0);
+    }
+
+    SECTION("source", "") {
+        backend_port_set(c, SOURCE, 1, "active_port");
+
+        REQUIRE(output_source_port.index == 1);
+        REQUIRE(strcmp(output_source_port.active, "active_port") == 0);
+    }
+
+    reset_mock_variables();
+
+    SECTION("other", "Should not do anything") {
+        backend_entry_type types[3] = {SINK_INPUT, SOURCE_OUTPUT, CARD};
+        for(int i = 0; i < 3; ++i) {
+            backend_port_set(c, types[i], 1, "active_port");
+
+            REQUIRE(output_sink_port.index == 0);
+            REQUIRE(strcmp(output_sink_port.active, "") == 0);
+            REQUIRE(output_source_port.index == 0);
+            REQUIRE(strcmp(output_source_port.active, "") == 0);
+        }
+    }
+
+    free(c);
+}

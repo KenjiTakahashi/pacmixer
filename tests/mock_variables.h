@@ -25,12 +25,15 @@ extern int output_sink_input_mute[2];
 extern int output_source_mute[2];
 extern int output_source_output_mute[2];
 
-typedef struct OUTPUT_CARD_PROFILE {
+typedef struct OUTPUT_INDEX_ACTIVE {
     int index;
     char active[32];
-} output_card_profile_t;
+} output_index_active_t;
 
-extern output_card_profile_t output_card_profile;
+extern output_index_active_t output_card_profile;
+
+extern output_index_active_t output_sink_port;
+extern output_index_active_t output_source_port;
 
 void reset_mock_variables();
 

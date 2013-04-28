@@ -135,9 +135,17 @@ void pa_context_set_card_profile_by_index(pa_context *context, uint32_t idx, con
     strcpy(output_card_profile.active, name);
 }
 
-void pa_context_set_sink_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {}
+#define PA_CONTEXT_SET_PORT(output)\
+    output.index = idx;\
+    strcpy(output.active, name);\
 
-void pa_context_set_source_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {}
+void pa_context_set_sink_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {
+    PA_CONTEXT_SET_PORT(output_sink_port);
+}
+
+void pa_context_set_source_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {
+    PA_CONTEXT_SET_PORT(output_source_port);
+}
 
 pa_context_state_t pa_context_get_state(pa_context *context) {
     return s_instance;
