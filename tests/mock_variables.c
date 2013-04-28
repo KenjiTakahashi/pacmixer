@@ -4,6 +4,7 @@
 pa_threaded_mainloop s_instance = -1;
 pa_mainloop_api s_api = 1;
 pa_context s_context = 1;
+pa_context_state_t s_state = PA_CONTEXT_UNCONNECTED;
 
 int output_sink_volume[3] = {0, 0, 0};
 int output_sink_input_volume[3] = {0, 0, 0};

@@ -148,7 +148,7 @@ void pa_context_set_source_port_by_index(pa_context *context, uint32_t idx, cons
 }
 
 pa_context_state_t pa_context_get_state(pa_context *context) {
-    return s_instance;
+    return s_state;
 }
 
 const char *pa_proplist_gets(pa_proplist proplist, int mask) {

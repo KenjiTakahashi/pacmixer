@@ -255,3 +255,32 @@ TEST_CASE("backend_port_set", "Should set active port") {
 
     free(c);
 }
+
+int TEST_RETURN__cb_state_changed = 0;
+
+void TEST_CALLBACK__cb_state_changed(void *s) {
+    TEST_RETURN__cb_state_changed = 1;
+}
+
+TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
+    state_callback_t *sc = (state_callback_t*)malloc(sizeof(state_callback_t));
+    sc->func = (void*)TEST_CALLBACK__cb_state_changed;
+
+    SECTION("failed", "PA_CONTEXT_FAILED") {
+        s_state = PA_CONTEXT_FAILED;
+        _cb_state_changed(NULL, sc);
+
+        REQUIRE(TEST_RETURN__cb_state_changed == 1);
+    }
+
+    TEST_RETURN__cb_state_changed = 0;
+
+    SECTION("terminated", "PA_CONTEXT_TERMINATED") {
+        s_state = PA_CONTEXT_TERMINATED;
+        _cb_state_changed(NULL, sc);
+
+        REQUIRE(TEST_RETURN__cb_state_changed == 1);
+    }
+
+    free(sc);
+}

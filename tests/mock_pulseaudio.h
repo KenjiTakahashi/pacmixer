@@ -31,8 +31,8 @@ typedef struct PA_CLIENT_INFO {
     const char *name;
 } pa_client_info;
 struct PA_PORT_INFO {
-    const char *name;
-    const char *description;
+    char name[STRING_SIZE];
+    char description[STRING_SIZE];
 };
 typedef struct PA_PORT_INFO pa_sink_port_info;
 typedef struct PA_PORT_INFO pa_source_port_info;
@@ -74,14 +74,6 @@ typedef struct PA_CARD_INFO {
     pa_card_profile_info *active_profile;
 } pa_card_info;
 typedef int pa_subscription_event_type_t;
-
-
-enum {
-    PA_CONTEXT_UNCONNECTED,
-    PA_CONTEXT_READY,
-    PA_CONTEXT_FAILED,
-    PA_CONTEXT_TERMINATED
-};
 
 
 enum {
