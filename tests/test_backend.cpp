@@ -82,7 +82,7 @@ TEST_CASE("backend_volume_set", "Should set volume for a single channel") {
 
     reset_mock_variables();
 
-    SECTION("other", "") {
+    SECTION("other", "Should not do anything") {
         backend_volume_set(c, CARD, 1, 2, 10);
 
         REQUIRE(output_sink_info[0] == 0);
@@ -148,6 +148,55 @@ TEST_CASE("backend_volume_setall", "Should set volume for all channels") {
         REQUIRE(output_source_volume[1] == 0);
         REQUIRE(output_source_output_volume[0] == 0);
         REQUIRE(output_source_output_volume[1] == 0);
+    }
+
+    free(c);
+}
+
+TEST_CASE("backend_mute_set", "Should set mute state for control") {
+    context_t *c = (context_t*)malloc(sizeof(context_t));
+
+    SECTION("sink", "") {
+        backend_mute_set(c, SINK, 1, 1);
+
+        REQUIRE(output_sink_mute[0] == 1);
+        REQUIRE(output_sink_mute[1] == 1);
+    }
+
+    SECTION("sink input", "") {
+        backend_mute_set(c, SINK_INPUT, 1, 1);
+
+        REQUIRE(output_sink_input_mute[0] == 1);
+        REQUIRE(output_sink_input_mute[1] == 1);
+    }
+
+    SECTION("source", "") {
+        backend_mute_set(c, SOURCE, 1, 1);
+
+        REQUIRE(output_source_mute[0] == 1);
+        REQUIRE(output_source_mute[1] == 1);
+    }
+
+    SECTION("source output", "") {
+        backend_mute_set(c, SOURCE_OUTPUT, 1, 1);
+
+        REQUIRE(output_source_output_mute[0] == 1);
+        REQUIRE(output_source_output_mute[1] == 1);
+    }
+
+    reset_mock_variables();
+
+    SECTION("other", "Should not do anything") {
+        backend_mute_set(c, CARD, 1, 1);
+
+        REQUIRE(output_sink_mute[0] == 0);
+        REQUIRE(output_sink_mute[1] == 0);
+        REQUIRE(output_sink_input_mute[0] == 0);
+        REQUIRE(output_sink_input_mute[1] == 0);
+        REQUIRE(output_source_mute[0] == 0);
+        REQUIRE(output_source_mute[1] == 0);
+        REQUIRE(output_source_output_mute[0] == 0);
+        REQUIRE(output_source_output_mute[1] == 0);
     }
 
     free(c);

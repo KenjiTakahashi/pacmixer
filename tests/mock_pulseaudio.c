@@ -109,13 +109,25 @@ void pa_context_set_source_output_volume(pa_context *context, uint32_t idx, pa_c
     PA_CONTEXT_SET_VOLUME(output_source_output_volume);
 }
 
-void pa_context_set_sink_mute_by_index(pa_context* context, uint32_t idx, int v, void *s, void *m) {}
+#define PA_CONTEXT_SET_MUTE(output)\
+    output[0] = idx;\
+    output[1] = v;\
 
-void pa_context_set_sink_input_mute(pa_context *context, uint32_t idx, int v, void *s, void *m) {}
+void pa_context_set_sink_mute_by_index(pa_context* context, uint32_t idx, int v, void *s, void *m) {
+    PA_CONTEXT_SET_MUTE(output_sink_mute);
+}
 
-void pa_context_set_source_mute_by_index(pa_context *context, uint32_t idx, int v, void *s, void *m) {}
+void pa_context_set_sink_input_mute(pa_context *context, uint32_t idx, int v, void *s, void *m) {
+    PA_CONTEXT_SET_MUTE(output_sink_input_mute);
+}
 
-void pa_context_set_source_output_mute(pa_context *context, uint32_t idx, int v, void *s, void *m) {}
+void pa_context_set_source_mute_by_index(pa_context *context, uint32_t idx, int v, void *s, void *m) {
+    PA_CONTEXT_SET_MUTE(output_source_mute);
+}
+
+void pa_context_set_source_output_mute(pa_context *context, uint32_t idx, int v, void *s, void *m) {
+    PA_CONTEXT_SET_MUTE(output_source_output_mute);
+}
 
 void pa_context_set_card_profile_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {}
 
