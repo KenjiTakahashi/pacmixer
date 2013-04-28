@@ -5,10 +5,10 @@ pa_threaded_mainloop s_instance = -1;
 pa_mainloop_api s_api = 1;
 pa_context s_context = 1;
 
-int output_sink_volume[2] = {0, 0};
-int output_sink_input_volume[2] = {0, 0};
-int output_source_volume[2] = {0, 0};
-int output_source_output_volume[2] = {0, 0};
+int output_sink_volume[3] = {0, 0, 0};
+int output_sink_input_volume[3] = {0, 0, 0};
+int output_source_volume[3] = {0, 0, 0};
+int output_source_output_volume[3] = {0, 0, 0};
 
 int output_sink_info[3] = {0, 0, 0};
 int output_sink_input_info[3] = {0, 0, 0};
@@ -26,12 +26,16 @@ void reset_mock_variables() {
     s_context = 1;
     output_sink_volume[0] = 0;
     output_sink_volume[1] = 0;
+    output_sink_volume[2] = 0;
     output_sink_input_volume[0] = 0;
     output_sink_input_volume[1] = 0;
+    output_sink_input_volume[2] = 0;
     output_source_volume[0] = 0;
     output_source_volume[1] = 0;
+    output_source_volume[2] = 0;
     output_source_output_volume[0] = 0;
     output_source_output_volume[1] = 0;
+    output_source_output_volume[2] = 0;
     output_sink_info[0] = 0;
     output_sink_info[1] = 0;
     output_sink_info[2] = 0;

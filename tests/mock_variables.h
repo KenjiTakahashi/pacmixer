@@ -5,10 +5,10 @@ extern pa_threaded_mainloop s_instance;
 extern pa_mainloop_api s_api;
 extern pa_context s_context;
 
-extern int output_sink_volume[2];
-extern int output_sink_input_volume[2];
-extern int output_source_volume[2];
-extern int output_source_output_volume[2];
+extern int output_sink_volume[3];
+extern int output_sink_input_volume[3];
+extern int output_source_volume[3];
+extern int output_source_output_volume[3];
 
 extern int output_sink_info[3];
 extern int output_sink_input_info[3];

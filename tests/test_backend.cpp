@@ -108,46 +108,54 @@ TEST_CASE("backend_volume_setall", "Should set volume for all channels") {
     int e[2] = {10, 15};
 
     SECTION("sink", "") {
-        backend_volume_setall(c, SINK, 0, e, 2);
+        backend_volume_setall(c, SINK, 1, e, 2);
 
-        REQUIRE(output_sink_volume[0] == 10);
-        REQUIRE(output_sink_volume[1] == 15);
+        REQUIRE(output_sink_volume[0] == 1);
+        REQUIRE(output_sink_volume[1] == 10);
+        REQUIRE(output_sink_volume[2] == 15);
     }
 
     SECTION("sink input", "") {
-        backend_volume_setall(c, SINK_INPUT, 0, e, 2);
+        backend_volume_setall(c, SINK_INPUT, 1, e, 2);
 
-        REQUIRE(output_sink_input_volume[0] == 10);
-        REQUIRE(output_sink_input_volume[1] == 15);
+        REQUIRE(output_sink_input_volume[0] == 1);
+        REQUIRE(output_sink_input_volume[1] == 10);
+        REQUIRE(output_sink_input_volume[2] == 15);
     }
 
     SECTION("source", "") {
-        backend_volume_setall(c, SOURCE, 0, e, 2);
+        backend_volume_setall(c, SOURCE, 1, e, 2);
 
-        REQUIRE(output_source_volume[0] == 10);
-        REQUIRE(output_source_volume[1] == 15);
+        REQUIRE(output_source_volume[0] == 1);
+        REQUIRE(output_source_volume[1] == 10);
+        REQUIRE(output_source_volume[2] == 15);
     }
 
     SECTION("source output", "") {
-        backend_volume_setall(c, SOURCE_OUTPUT, 0, e, 2);
+        backend_volume_setall(c, SOURCE_OUTPUT, 1, e, 2);
 
-        REQUIRE(output_source_output_volume[0] == 10);
-        REQUIRE(output_source_output_volume[1] == 15);
+        REQUIRE(output_source_output_volume[0] == 1);
+        REQUIRE(output_source_output_volume[1] == 10);
+        REQUIRE(output_source_output_volume[2] == 15);
     }
 
     reset_mock_variables();
 
     SECTION("other", "Should not do anything") {
-        backend_volume_setall(c, CARD, 0, e, 2);
+        backend_volume_setall(c, CARD, 1, e, 2);
 
         REQUIRE(output_sink_volume[0] == 0);
         REQUIRE(output_sink_volume[1] == 0);
+        REQUIRE(output_sink_volume[2] == 0);
         REQUIRE(output_sink_input_volume[0] == 0);
         REQUIRE(output_sink_input_volume[1] == 0);
+        REQUIRE(output_sink_input_volume[2] == 0);
         REQUIRE(output_source_volume[0] == 0);
         REQUIRE(output_source_volume[1] == 0);
+        REQUIRE(output_source_volume[2] == 0);
         REQUIRE(output_source_output_volume[0] == 0);
         REQUIRE(output_source_output_volume[1] == 0);
+        REQUIRE(output_source_output_volume[2] == 0);
     }
 
     free(c);

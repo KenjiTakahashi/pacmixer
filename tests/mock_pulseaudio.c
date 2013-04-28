@@ -90,8 +90,9 @@ void pa_context_get_source_output_info(pa_context *context, uint32_t idx, void *
 }
 
 #define PA_CONTEXT_SET_VOLUME(output)\
-    output[0] = v->values[0];\
-    output[1] = v->values[1];\
+    output[0] = idx;\
+    output[1] = v->values[0];\
+    output[2] = v->values[1];\
 
 void pa_context_set_sink_volume_by_index(pa_context *context, uint32_t idx, pa_cvolume *v, void *s, void *m) {
     PA_CONTEXT_SET_VOLUME(output_sink_volume);
