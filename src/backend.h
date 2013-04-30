@@ -218,6 +218,42 @@ typedef struct VOLUME_CALLBACK {
     int value;
 } volume_callback_t;
 
+#define _CB_DO_OPTION(_cb_func, type)\
+    if(!eol) {\
+        uint32_t n = info->n_ports;\
+        backend_option_t *optdata = NULL;\
+        if(n > 0) {\
+            optdata = malloc(sizeof(backend_option_t));\
+            optdata->descriptions = malloc(n * sizeof(char*));\
+            optdata->names = malloc(n * sizeof(char*));\
+            for(uint32_t i = 0; i < n; ++i) {\
+                const char *desc = info->ports[i]->description;\
+                optdata->descriptions[i] = malloc((strlen(desc) + 1) * sizeof(char));\
+                strcpy(optdata->descriptions[i], desc);\
+                const char *name = info->ports[i]->name;\
+                optdata->names[i] = malloc((strlen(name) + 1) * sizeof(char));\
+                strcpy(optdata->names[i], name);\
+            }\
+            const char *active_opt = info->active_port->description;\
+            optdata->active = malloc((strlen(active_opt) + 1) * sizeof(char));\
+            strcpy(optdata->active, active_opt);\
+            optdata->size = n;\
+        }\
+        _cb_func(info->index, type, info->volume, info->mute, info->description, optdata, userdata);\
+        _do_option_free(optdata, n);\
+    }\
+
+#define _CB_SET_VOLUME(type, by_index)\
+    if(!eol) {\
+        volume_callback_t *volume = userdata;\
+        if(info->index != PA_INVALID_INDEX) {\
+            pa_cvolume cvolume = info->volume;\
+            cvolume.values[volume->index] = volume->value;\
+            pa_context_set_ ## type ## _volume ## by_index(c, info->index, &cvolume, NULL, NULL);\
+        }\
+        free(volume);\
+    }\
+
 /**
  * Internal function.
  * Callback. Fired when PA server changes state.
@@ -509,12 +545,13 @@ void _do_option_free(backend_option_t*, int n);
  * @param type Type of the control.
  * @param volume Volume values.
  * @param mute Mute value.
+ * @param description Human readable name of the control (IGNORED).
  * @param optdata Options data. Can be NULL.
  * @param userdata Additional data of type CALLBACK.
  *
  * @see _do_volumes()
  */
-void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, backend_option_t*, void*);
+void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, const char*, backend_option_t*, void*);
 
 /**
  * Internal helper function.
@@ -526,8 +563,8 @@ void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, backend_option_t*, voi
  * @param type Type of the control.
  * @param volume Volume values.
  * @param mute Mute value.
- * @param options Options data (BACKEND_OPTION).
  * @param description Human readable name of the control.
+ * @param options Options data (BACKEND_OPTION).
  * @param userdata Additional data of type CALLBACK.
  *
  * @see _do_channels()

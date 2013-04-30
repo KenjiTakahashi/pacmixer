@@ -152,26 +152,6 @@ void backend_port_set(context_t *c, backend_entry_type type, uint32_t idx, const
     }
 }
 
-#define DO_OPTION(n, options, active_option)\
-    backend_option_t *optdata = NULL;\
-    if(n > 0) {\
-        optdata = malloc(sizeof(backend_option_t));\
-        optdata->descriptions = malloc(n * sizeof(char*));\
-        optdata->names = malloc(n * sizeof(char*));\
-        for(uint32_t i = 0; i < n; ++i) {\
-            const char *desc = options[i]->description;\
-            optdata->descriptions[i] = malloc((strlen(desc) + 1) * sizeof(char));\
-            strcpy(optdata->descriptions[i], desc);\
-            const char *name = options[i]->name;\
-            optdata->names[i] = malloc((strlen(name) + 1) * sizeof(char));\
-            strcpy(optdata->names[i], name);\
-        }\
-        const char *active_opt = active_option->description;\
-        optdata->active = malloc((strlen(active_opt) + 1) * sizeof(char));\
-        strcpy(optdata->active, active_opt);\
-        optdata->size = n;\
-    }\
-
 void _cb_state_changed(pa_context *c, void *userdata) {
     state_callback_t *state_callback = userdata;
     pa_context_state_t nstate = pa_context_get_state(c);
@@ -201,33 +181,15 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
 }
 
 void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    if(!eol) {
-        uint32_t n = info->n_ports;
-        DO_OPTION(n, info->ports, info->active_port);
-        _cb1(info->index, SINK, info->volume, info->mute, info->description, optdata, userdata);
-        _do_option_free(optdata, n);
-    }
+    _CB_DO_OPTION(_cb1, SINK);
 }
 
 void _cb_u_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    if(!eol) {
-        uint32_t n = info->n_ports;
-        DO_OPTION(n, info->ports, info->active_port);
-        _cb_u(info->index, SINK, info->volume, info->mute, optdata, userdata);
-        _do_option_free(optdata, n);
-    }
+    _CB_DO_OPTION(_cb_u, SINK);
 }
 
 void _cb_s_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    if(!eol) {
-        volume_callback_t *volume = userdata;
-        if(info->index != PA_INVALID_INDEX) {
-            pa_cvolume cvolume = info->volume;
-            cvolume.values[volume->index] = volume->value;
-            pa_context_set_sink_volume_by_index(c, info->index, &cvolume, NULL, NULL);
-        }
-        free(volume);
-    }
+    _CB_SET_VOLUME(sink, _by_index);
 }
 
 void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
@@ -238,50 +200,24 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
 
 void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
     if(!eol) {
-        _cb_u(info->index, SINK_INPUT, info->volume, info->mute, NULL, userdata);
+        _cb_u(info->index, SINK_INPUT, info->volume, info->mute, NULL, NULL, userdata);
     }
 }
 
 void _cb_s_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
-    if(!eol) {
-        volume_callback_t *volume = userdata;
-        if(info->index != PA_INVALID_INDEX) {
-            pa_cvolume cvolume = info->volume;
-            cvolume.values[volume->index] = volume->value;
-            pa_context_set_sink_input_volume(c, info->index, &cvolume, NULL, NULL);
-        }
-        free(volume);
-    }
+    _CB_SET_VOLUME(sink_input, );
 }
 
 void _cb_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
-    if(!eol) {
-        uint32_t n = info->n_ports;
-        DO_OPTION(n, info->ports, info->active_port);
-        _cb1(info->index, SOURCE, info->volume, info->mute, info->description, optdata, userdata);
-        _do_option_free(optdata, n);
-    }
+    _CB_DO_OPTION(_cb1, SOURCE);
 }
 
 void _cb_u_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
-    if(!eol) {
-        uint32_t n = info->n_ports;
-        DO_OPTION(n, info->ports, info->active_port);
-        _cb_u(info->index, SOURCE, info->volume, info->mute, optdata, userdata);
-        _do_option_free(optdata, n);
-    }
+    _CB_DO_OPTION(_cb_u, SOURCE);
 }
 
 void _cb_s_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
-    if(!eol) {
-        volume_callback_t *volume = userdata;
-        if(info->index != PA_INVALID_INDEX) {
-            pa_cvolume cvolume = info->volume;
-            cvolume.values[volume->index] = volume->value;
-            pa_context_set_source_volume_by_index(c, info->index, &cvolume, NULL, NULL);
-        }
-        free(volume);
-    }
+    _CB_SET_VOLUME(source, _by_index);
 }
 
 void _cb_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
@@ -292,20 +228,12 @@ void _cb_source_output(pa_context *c, const pa_source_output_info *info, int eol
 
 void _cb_u_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
     if(!eol) {
-        _cb_u(info->index, SOURCE_OUTPUT, info->volume, info->mute, NULL, userdata);
+        _cb_u(info->index, SOURCE_OUTPUT, info->volume, info->mute, NULL, NULL, userdata);
     }
 }
 
 void _cb_s_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
-    if(!eol) {
-        volume_callback_t *volume = userdata;
-        if(info->index != PA_INVALID_INDEX) {
-            pa_cvolume cvolume = info->volume;
-            cvolume.values[volume->index] = volume->value;
-            pa_context_set_source_output_volume(c, info->index, &cvolume, NULL, NULL);
-        }
-        free(volume);
-    }
+    _CB_SET_VOLUME(source_output, );
 }
 
 void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
@@ -450,7 +378,7 @@ void _do_option_free(backend_option_t *option, int n) {
     free(option);
 }
 
-void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, backend_option_t *optdata, void *userdata) {
+void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, backend_option_t *optdata, void *userdata) {
     if(index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         uint8_t chnum = volume.channels;
