@@ -23,16 +23,6 @@
 
 
 typedef int pa_context_state_t;
-struct PA_INFO {
-    uint32_t index;
-    pa_cvolume volume;
-    int mute;
-    const char *name;
-    uint32_t client;
-    const char *description;
-};
-typedef struct PA_INFO pa_sink_input_info;
-typedef struct PA_INFO pa_source_output_info;
 typedef int pa_proplist;
 typedef struct PA_CARD_PROFILE_INFO {
     const char *name;

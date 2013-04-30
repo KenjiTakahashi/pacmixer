@@ -59,6 +59,20 @@ typedef struct PA_CLIENT_INFO {
     char name[STRING_SIZE];
 } pa_client_info;
 
+typedef struct PA_CVOLUME {
+    int channels;
+    int values[PA_CHANNELS_MAX];
+} pa_cvolume;
+struct PA_INFO {
+    uint32_t index;
+    pa_cvolume volume;
+    int mute;
+    const char *name;
+    uint32_t client;
+    const char *description;
+};
+typedef struct PA_INFO pa_sink_input_info;
+typedef struct PA_INFO pa_source_output_info;
 struct PA_PORT_INFO {
     char name[STRING_SIZE];
     char description[STRING_SIZE];
@@ -67,10 +81,6 @@ typedef struct PA_PORT_INFO pa_sink_port_info;
 typedef struct PA_PORT_INFO pa_source_port_info;
 typedef struct PA_PORT_INFO pa_sink_port_info;
 typedef struct PA_PORT_INFO pa_source_port_info;
-typedef struct PA_CVOLUME {
-    int channels;
-    int values[PA_CHANNELS_MAX];
-} pa_cvolume;
 struct PA_PORT_INFO_INFO {
     uint32_t index;
     pa_cvolume volume;

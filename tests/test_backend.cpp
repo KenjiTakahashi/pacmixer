@@ -390,3 +390,78 @@ TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
 }
 
 // For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
+
+TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
+    pa_context *c = NULL;
+    int eol = 0;
+    volume_callback_t *vc = (volume_callback_t*)malloc(sizeof(volume_callback_t));
+    vc->index = 1;
+    vc->value = 75;
+    void *userdata = (void*)vc;
+
+    SECTION("sink", "") {
+        pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
+        info->index = PA_VALID_INDEX;
+        info->volume.channels = 2;
+        info->volume.values[0] = 90;
+        info->volume.values[1] = 120;
+
+        _CB_SET_VOLUME(sink, _by_index);
+
+        REQUIRE(output_sink_volume[0] == PA_VALID_INDEX);
+        REQUIRE(output_sink_volume[1] == 90);
+        REQUIRE(output_sink_volume[2] == 75);
+
+        free(info);
+    }
+
+    SECTION("sink input", "") {
+        pa_sink_input_info *info = (pa_sink_input_info*)malloc(sizeof(pa_sink_input_info));
+        info->index = PA_VALID_INDEX;
+        info->volume.channels = 2;
+        info->volume.values[0] = 90;
+        info->volume.values[1] = 120;
+
+        _CB_SET_VOLUME(sink_input, );
+
+        REQUIRE(output_sink_input_volume[0] == PA_VALID_INDEX);
+        REQUIRE(output_sink_input_volume[1] == 90);
+        REQUIRE(output_sink_input_volume[2] == 75);
+
+        free(info);
+    }
+
+    SECTION("source", "") {
+        pa_source_info *info = (pa_source_info*)malloc(sizeof(pa_source_info));
+        info->index = PA_VALID_INDEX;
+        info->volume.channels = 2;
+        info->volume.values[0] = 90;
+        info->volume.values[1] = 120;
+
+        _CB_SET_VOLUME(source, _by_index);
+
+        REQUIRE(output_source_volume[0] == PA_VALID_INDEX);
+        REQUIRE(output_source_volume[1] == 90);
+        REQUIRE(output_source_volume[2] == 75);
+
+        free(info);
+    }
+
+    SECTION("source output", "") {
+        pa_source_output_info *info = (pa_source_output_info*)malloc(sizeof(pa_source_output_info));
+        info->index = PA_VALID_INDEX;
+        info->volume.channels = 2;
+        info->volume.values[0] = 90;
+        info->volume.values[1] = 120;
+
+        _CB_SET_VOLUME(source_output, );
+
+        REQUIRE(output_source_output_volume[0] == PA_VALID_INDEX);
+        REQUIRE(output_source_output_volume[1] == 90);
+        REQUIRE(output_source_output_volume[2] == 75);
+
+        free(info);
+    }
+}
+
+// For _cb_s_sink/_cb_s_sink_input/_cb_s_source/_cb_s_source_output, see _CB_SET_VOLUME.
