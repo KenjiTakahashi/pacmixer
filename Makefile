@@ -20,7 +20,7 @@ CCC=gcc
 CPP=g++
 CFLAGS=-std=gnu99 -Wall
 OFLAGS=-fconstant-string-class=NSConstantString
-CPPFLAGS=-Wall -g -O2 -D TESTS=1
+CPPFLAGS=-Wall -fpermissive -g -O2 -D TESTS=1
 LIBS=-lgnustep-base -lobjc -lpanel -lcurses
 PLIBS=-lpulse
 SOURCES=$(wildcard src/*.m) $(wildcard src/widgets/*.m)

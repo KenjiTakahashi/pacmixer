@@ -22,19 +22,7 @@
 #include "mock_variables.h"
 
 
-#define PA_CHANNELS_MAX 32U // Taken from PA sources.
-
 typedef int pa_context_state_t;
-struct PA_PORT_INFO {
-    char name[STRING_SIZE];
-    char description[STRING_SIZE];
-};
-typedef struct PA_PORT_INFO pa_sink_port_info;
-typedef struct PA_PORT_INFO pa_source_port_info;
-typedef struct PA_CVOLUME {
-    int channels;
-    int values[PA_CHANNELS_MAX];
-} pa_cvolume;
 struct PA_INFO {
     uint32_t index;
     pa_cvolume volume;
@@ -45,17 +33,6 @@ struct PA_INFO {
 };
 typedef struct PA_INFO pa_sink_input_info;
 typedef struct PA_INFO pa_source_output_info;
-struct PA_PORT_INFO_INFO {
-    uint32_t index;
-    pa_cvolume volume;
-    int mute;
-    const char *description;
-    int n_ports;
-    struct PA_PORT_INFO **ports;
-    struct PA_PORT_INFO *active_port;
-};
-typedef struct PA_PORT_INFO_INFO pa_sink_info;
-typedef struct PA_PORT_INFO_INFO pa_source_info;
 typedef int pa_proplist;
 typedef struct PA_CARD_PROFILE_INFO {
     const char *name;

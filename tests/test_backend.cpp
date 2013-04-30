@@ -336,3 +336,57 @@ TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
     free(TEST_RETURN__cb_client_data.volumes);
     free(TEST_RETURN__cb_client_data.channels);
 }
+
+backend_option_t TEST_RETURN__cb1__cb_u;
+
+void TEST_FUNC__cb1__cb_u(uint32_t idx, backend_entry_type type, pa_cvolume volme, int mute, const char *description, backend_option_t *options, void *userdata) {
+    strcpy(TEST_RETURN__cb1__cb_u.names[0], options->names[0]);
+    strcpy(TEST_RETURN__cb1__cb_u.descriptions[0], options->descriptions[0]);
+    strcpy(TEST_RETURN__cb1__cb_u.active, options->active);
+    TEST_RETURN__cb1__cb_u.size = options->size;
+}
+
+TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
+    // We'll use pa_sink_info here, but it scales to other pa_source_info
+    // structures as well.
+    TEST_RETURN__cb1__cb_u.names = (char**)malloc(sizeof(char*));
+    TEST_RETURN__cb1__cb_u.names[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
+    TEST_RETURN__cb1__cb_u.descriptions = (char**)malloc(sizeof(char*));
+    TEST_RETURN__cb1__cb_u.descriptions[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
+    TEST_RETURN__cb1__cb_u.active = (char*)malloc(sizeof(char) * STRING_SIZE);
+
+    int eol = 0;
+    void *userdata = NULL;
+    pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
+    info->index = PA_VALID_INDEX;
+    info->volume.channels = 2;
+    info->volume.values[0] = 90;
+    info->volume.values[1] = 120;
+    info->mute = 1;
+    strcpy(info->description, "test_desc");
+    info->n_ports = 1;
+    info->ports = (pa_sink_port_info**)malloc(sizeof(pa_sink_port_info*));
+    info->ports[0] = (pa_sink_port_info*)malloc(sizeof(pa_sink_port_info));
+    strcpy(info->ports[0]->name, "test_port_name");
+    strcpy(info->ports[0]->description, "test_port_desc");
+    info->active_port = (pa_sink_port_info*)malloc(sizeof(pa_sink_port_info));
+    strcpy(info->active_port->name, "test_active_port_name");
+    strcpy(info->active_port->description, "test_active_port_desc");
+
+    _CB_DO_OPTION(TEST_FUNC__cb1__cb_u, SINK);
+
+    REQUIRE(TEST_RETURN__cb1__cb_u.size == 1);
+    REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.names[0], "test_port_name") == 0);
+    REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.descriptions[0], "test_port_desc") == 0);
+    REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.active, "test_active_port_desc") == 0);
+
+    free(info->active_port);
+    free(info->ports[0]);
+    free(info->ports);
+    free(info);
+
+    free(TEST_RETURN__cb1__cb_u.descriptions[0]);
+    free(TEST_RETURN__cb1__cb_u.descriptions);
+}
+
+// For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
