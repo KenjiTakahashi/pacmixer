@@ -24,12 +24,7 @@
 
 #define PA_CHANNELS_MAX 32U // Taken from PA sources.
 
-
 typedef int pa_context_state_t;
-typedef struct PA_CLIENT_INFO {
-    uint32_t index;
-    const char *name;
-} pa_client_info;
 struct PA_PORT_INFO {
     char name[STRING_SIZE];
     char description[STRING_SIZE];
@@ -75,7 +70,6 @@ typedef struct PA_CARD_INFO {
 } pa_card_info;
 typedef int pa_subscription_event_type_t;
 
-
 enum {
     PA_SUBSCRIPTION_MASK_ALL,
     PA_SUBSCRIPTION_EVENT_TYPE_MASK,
@@ -90,20 +84,12 @@ enum {
     PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT
 };
 
-
-enum {
-    PA_INVALID_INDEX
-};
-
-
 enum {
     PA_PROP_DEVICE_DESCRIPTION
 };
 
-
 #define PA_VOLUME_UI_MAX 150
 #define PA_VOLUME_NORM 100
-
 
 pa_threaded_mainloop *pa_threaded_mainloop_new();
 pa_mainloop_api *pa_threaded_mainloop_get_api(pa_threaded_mainloop*);

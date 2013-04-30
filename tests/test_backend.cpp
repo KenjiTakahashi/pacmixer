@@ -282,5 +282,57 @@ TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
         REQUIRE(TEST_RETURN__cb_state_changed == 1);
     }
 
+    s_state = PA_CONTEXT_UNCONNECTED;
     free(sc);
+}
+
+char TEST_RETURN__cb_client_name[32];
+uint32_t TEST_RETURN__cb_client_idx = 0;
+backend_data_t TEST_RETURN__cb_client_data;
+
+void TEST_CALLBACK__cb_client(void *s, const char *name, backend_entry_type type, uint32_t idx, backend_data_t *data) {
+    strcpy(TEST_RETURN__cb_client_name, name);
+    TEST_RETURN__cb_client_idx = idx;
+    TEST_RETURN__cb_client_data.channels_num = data->channels_num;
+    *TEST_RETURN__cb_client_data.channels = *(data->channels);
+    *TEST_RETURN__cb_client_data.volumes = *(data->volumes);
+}
+
+TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
+    TEST_RETURN__cb_client_data.channels = (backend_channel_t*)malloc(sizeof(backend_channel_t));
+    TEST_RETURN__cb_client_data.volumes = (backend_volume_t*)malloc(sizeof(backend_volume_t));
+
+    pa_client_info info;
+    info.index = 1;
+    strcpy(info.name, "test_name");
+    callback_t *cb = (callback_t*)malloc(sizeof(callback_t));
+    cb->add = (void*)TEST_CALLBACK__cb_client;
+    client_callback_t *cc = (client_callback_t*)malloc(sizeof(client_callback_t));
+    cc->callback = cb;
+    cc->channels = (backend_channel_t*)malloc(sizeof(backend_channel_t));
+    cc->channels[0].maxLevel = 120;
+    cc->channels[0].normLevel = 90;
+    cc->channels[0].isMutable = 1;
+    cc->volumes = (backend_volume_t*)malloc(sizeof(backend_volume_t));
+    cc->volumes[0].level = 50;
+    cc->volumes[0].mute = 1;
+    cc->chnum = 1;
+    cc->index = PA_VALID_INDEX;
+
+    _cb_client(NULL, &info, 0, (void*)cc);
+
+    REQUIRE(strcmp(TEST_RETURN__cb_client_name, "test_name") == 0);
+    REQUIRE(TEST_RETURN__cb_client_idx == 1);
+    REQUIRE(TEST_RETURN__cb_client_data.option == NULL);
+    REQUIRE(TEST_RETURN__cb_client_data.channels_num == 1);
+    REQUIRE(TEST_RETURN__cb_client_data.channels[0].maxLevel == 120);
+    REQUIRE(TEST_RETURN__cb_client_data.channels[0].normLevel == 90);
+    REQUIRE(TEST_RETURN__cb_client_data.channels[0].isMutable == 1);
+    REQUIRE(TEST_RETURN__cb_client_data.volumes[0].level == 50);
+    REQUIRE(TEST_RETURN__cb_client_data.volumes[0].mute == 1);
+
+    free(cb);
+
+    free(TEST_RETURN__cb_client_data.volumes);
+    free(TEST_RETURN__cb_client_data.channels);
 }

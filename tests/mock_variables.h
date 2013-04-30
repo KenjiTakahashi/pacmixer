@@ -2,6 +2,7 @@
 #define MOCK_VARIABLES_H
 
 #include <string.h>
+#include <stdint.h>
 
 #define STRING_SIZE 32
 
@@ -45,6 +46,16 @@ enum {
     PA_CONTEXT_FAILED,
     PA_CONTEXT_TERMINATED
 };
+
+enum {
+    PA_INVALID_INDEX,
+    PA_VALID_INDEX
+};
+
+typedef struct PA_CLIENT_INFO {
+    uint32_t index;
+    char name[STRING_SIZE];
+} pa_client_info;
 
 void reset_mock_variables();
 
