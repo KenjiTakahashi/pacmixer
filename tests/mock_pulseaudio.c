@@ -151,8 +151,11 @@ pa_context_state_t pa_context_get_state(pa_context *context) {
     return s_state;
 }
 
-const char *pa_proplist_gets(pa_proplist proplist, int mask) {
-    return "str";
+const char *pa_proplist_gets(const pa_proplist proplist, int mask) {
+    if(mask == PA_PROP_DEVICE_DESCRIPTION) {
+        return proplist;
+    }
+    return "";
 }
 
 void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void *s, void *m) {}

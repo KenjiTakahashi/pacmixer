@@ -93,6 +93,19 @@ struct PA_PORT_INFO_INFO {
 typedef struct PA_PORT_INFO_INFO pa_sink_info;
 typedef struct PA_PORT_INFO_INFO pa_source_info;
 
+typedef struct PA_CARD_PROFILE_INFO {
+    const char *name;
+    const char *description;
+} pa_card_profile_info;
+typedef char pa_proplist[STRING_SIZE];
+typedef struct PA_CARD_INFO {
+    uint32_t index;
+    int n_profiles;
+    pa_proplist proplist;
+    pa_card_profile_info *profiles;
+    pa_card_profile_info *active_profile;
+} pa_card_info;
+
 void reset_mock_variables();
 
 #endif

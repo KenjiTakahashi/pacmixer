@@ -286,7 +286,7 @@ TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
     free(sc);
 }
 
-char TEST_RETURN__cb_client_name[32];
+char TEST_RETURN__cb_client_name[STRING_SIZE];
 uint32_t TEST_RETURN__cb_client_idx = 0;
 backend_data_t TEST_RETURN__cb_client_data;
 
@@ -389,8 +389,6 @@ TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
     free(TEST_RETURN__cb1__cb_u.descriptions);
 }
 
-// For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
-
 TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
     pa_context *c = NULL;
     int eol = 0;
@@ -464,4 +462,33 @@ TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
     }
 }
 
-// For _cb_s_sink/_cb_s_sink_input/_cb_s_source/_cb_s_source_output, see _CB_SET_VOLUME.
+char TEST_RETURN__cb_card_name[STRING_SIZE];
+uint32_t TEST_RETURN__cb_card_idx = 0;
+
+void TEST_CALLBACK__cb_card(void *s, const char *name, backend_entry_type type, uint32_t idx, backend_data_t *data) {
+    strcpy(TEST_RETURN__cb_card_name, name);
+    TEST_RETURN__cb_card_idx = idx;
+}
+
+TEST_CASE("_cb_card", "Should fire 'add' callback with card data") {
+    // We do 0 profiles here to avoid dealing with _do_card,
+    // which is tested elsewhere.
+    pa_card_info info;
+    info.index = PA_VALID_INDEX;
+    info.n_profiles = 0;
+    strcpy(info.proplist, "test_profile_desc");
+    callback_t cb;
+    cb.add = (void*)TEST_CALLBACK__cb_card;
+
+    _cb_card(NULL, &info, 0, (void*)&cb);
+
+    REQUIRE(TEST_RETURN__cb_card_idx == PA_VALID_INDEX);
+    REQUIRE(strcmp(TEST_RETURN__cb_card_name, "test_profile_desc") == 0);
+}
+
+
+// Other details:
+// 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
+// 2: For _cb_s_sink/_cb_s_sink_input/_cb_s_source/_cb_s_source_output, see _CB_SET_VOLUME.
+// 3: For _cb_sink_input/_cb_source_output, see _cb2.
+// 4: For _cb_u_sink_input/_cb_u_source_output, see _cb_u.

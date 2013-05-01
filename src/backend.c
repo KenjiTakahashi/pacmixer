@@ -241,11 +241,17 @@ void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) 
         callback_t *callback = userdata;
         int n = info->n_profiles;
         backend_data_t data;
-        data.option = _do_card(info, n);
-        data.option->size = n;
+        if(n > 0) {
+            data.option = _do_card(info, n);
+            data.option->size = n;
+        } else {
+            data.option = NULL;
+        }
         const char *desc = pa_proplist_gets(info->proplist, PA_PROP_DEVICE_DESCRIPTION);
         ((tcallback_add_func)(callback->add))(callback->self, desc, CARD, info->index, &data);
-        _do_option_free(data.option, n);
+        if(n > 0) {
+            _do_option_free(data.option, n);
+        }
     }
 }
 

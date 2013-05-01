@@ -23,18 +23,6 @@
 
 
 typedef int pa_context_state_t;
-typedef int pa_proplist;
-typedef struct PA_CARD_PROFILE_INFO {
-    const char *name;
-    const char *description;
-} pa_card_profile_info;
-typedef struct PA_CARD_INFO {
-    uint32_t index;
-    int n_profiles;
-    pa_proplist proplist;
-    pa_card_profile_info *profiles;
-    pa_card_profile_info *active_profile;
-} pa_card_info;
 typedef int pa_subscription_event_type_t;
 
 enum {
@@ -91,6 +79,6 @@ void pa_context_set_card_profile_by_index(pa_context*, uint32_t, const char*, vo
 void pa_context_set_sink_port_by_index(pa_context*, uint32_t, const char*, void*, void*);
 void pa_context_set_source_port_by_index(pa_context*, uint32_t, const char*, void*, void*);
 pa_context_state_t pa_context_get_state(pa_context*);
-const char *pa_proplist_gets(pa_proplist, int);
+const char *pa_proplist_gets(const pa_proplist, int);
 void pa_context_get_card_info_by_index(pa_context*, uint32_t, void*, void*);
 void pa_context_get_client_info(pa_context*, uint32_t, void*, void*);
