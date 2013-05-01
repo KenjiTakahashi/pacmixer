@@ -287,7 +287,7 @@ TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
 }
 
 char TEST_RETURN__cb_client_name[STRING_SIZE];
-uint32_t TEST_RETURN__cb_client_idx = 0;
+uint32_t TEST_RETURN__cb_client_idx = PA_INVALID_INDEX;
 backend_data_t TEST_RETURN__cb_client_data;
 
 void TEST_CALLBACK__cb_client(void *s, const char *name, backend_entry_type type, uint32_t idx, backend_data_t *data) {
@@ -460,10 +460,12 @@ TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
 
         free(info);
     }
+
+    reset_mock_variables();
 }
 
 char TEST_RETURN__cb_card_name[STRING_SIZE];
-uint32_t TEST_RETURN__cb_card_idx = 0;
+uint32_t TEST_RETURN__cb_card_idx = PA_INVALID_INDEX;
 
 void TEST_CALLBACK__cb_card(void *s, const char *name, backend_entry_type type, uint32_t idx, backend_data_t *data) {
     strcpy(TEST_RETURN__cb_card_name, name);
@@ -484,6 +486,26 @@ TEST_CASE("_cb_card", "Should fire 'add' callback with card data") {
 
     REQUIRE(TEST_RETURN__cb_card_idx == PA_VALID_INDEX);
     REQUIRE(strcmp(TEST_RETURN__cb_card_name, "test_profile_desc") == 0);
+}
+
+uint32_t TEST_RETURN__cb_u_card_idx = PA_INVALID_INDEX;
+
+void TEST_CALLBACK__cb_u_card(void *s, backend_entry_type type, uint32_t idx, backend_data_t data) {
+    TEST_RETURN__cb_u_card_idx = idx;
+}
+
+TEST_CASE("_cb_u_card", "Should fire 'update' callback with new card data") {
+    // We do 0 profiles here to avoid dealing with _do_card,
+    // which is tested elsewhere.
+    pa_card_info info;
+    info.index = PA_VALID_INDEX;
+    info.n_profiles = 0;
+    callback_t cb;
+    cb.update = (void*)TEST_CALLBACK__cb_u_card;
+
+    _cb_u_card(NULL, &info, 0, (void*)&cb);
+
+    REQUIRE(TEST_RETURN__cb_u_card_idx == PA_VALID_INDEX);
 }
 
 

@@ -260,10 +260,16 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
         callback_t *callback = userdata;
         int n = info->n_profiles;
         backend_data_t data;
-        data.option = _do_card(info, n);
-        data.option->size = n;
+        if(n > 0) {
+            data.option = _do_card(info, n);
+            data.option->size = n;
+        } else {
+            data.option = NULL;
+        }
         ((tcallback_update_func)(callback->update))(callback->self, CARD, info->index, &data);
-         _do_option_free(data.option, n);
+        if(n > 0) {
+            _do_option_free(data.option, n);
+        }
     }
 }
 
