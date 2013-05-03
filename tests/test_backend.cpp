@@ -49,33 +49,33 @@ TEST_CASE("backend_volume_set", "Should set volume for a single channel") {
     context_t *c = (context_t*)malloc(sizeof(context_t));
 
     SECTION("sink", "") {
-        backend_volume_set(c, SINK, 1, 2, 10);
+        backend_volume_set(c, SINK, PA_VALID_INDEX, 2, 10);
 
-        REQUIRE(output_sink_info[0] == 1);
+        REQUIRE(output_sink_info[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_info[1] == 2);
         REQUIRE(output_sink_info[2] == 10);
     }
 
     SECTION("sink input", "") {
-        backend_volume_set(c, SINK_INPUT, 1, 2, 10);
+        backend_volume_set(c, SINK_INPUT, PA_VALID_INDEX, 2, 10);
 
-        REQUIRE(output_sink_input_info[0] == 1);
+        REQUIRE(output_sink_input_info[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_input_info[1] == 2);
         REQUIRE(output_sink_input_info[2] == 10);
     }
 
     SECTION("source", "") {
-        backend_volume_set(c, SOURCE, 1, 2, 10);
+        backend_volume_set(c, SOURCE, PA_VALID_INDEX, 2, 10);
 
-        REQUIRE(output_source_info[0] == 1);
+        REQUIRE(output_source_info[0] == PA_VALID_INDEX);
         REQUIRE(output_source_info[1] == 2);
         REQUIRE(output_source_info[2] == 10);
     }
 
     SECTION("source output", "") {
-        backend_volume_set(c, SOURCE_OUTPUT, 1, 2, 10);
+        backend_volume_set(c, SOURCE_OUTPUT, PA_VALID_INDEX, 2, 10);
 
-        REQUIRE(output_source_output_info[0] == 1);
+        REQUIRE(output_source_output_info[0] == PA_VALID_INDEX);
         REQUIRE(output_source_output_info[1] == 2);
         REQUIRE(output_source_output_info[2] == 10);
     }
@@ -83,18 +83,18 @@ TEST_CASE("backend_volume_set", "Should set volume for a single channel") {
     reset_mock_variables();
 
     SECTION("other", "Should not do anything") {
-        backend_volume_set(c, CARD, 1, 2, 10);
+        backend_volume_set(c, CARD, PA_VALID_INDEX, 2, 10);
 
-        REQUIRE(output_sink_info[0] == 0);
+        REQUIRE(output_sink_info[0] == PA_INVALID_INDEX);
         REQUIRE(output_sink_info[1] == 0);
         REQUIRE(output_sink_info[2] == 0);
-        REQUIRE(output_sink_input_info[0] == 0);
+        REQUIRE(output_sink_input_info[0] == PA_INVALID_INDEX);
         REQUIRE(output_sink_input_info[1] == 0);
         REQUIRE(output_sink_input_info[2] == 0);
-        REQUIRE(output_source_info[0] == 0);
+        REQUIRE(output_source_info[0] == PA_INVALID_INDEX);
         REQUIRE(output_source_info[1] == 0);
         REQUIRE(output_source_info[2] == 0);
-        REQUIRE(output_source_output_info[0] == 0);
+        REQUIRE(output_source_output_info[0] == PA_INVALID_INDEX);
         REQUIRE(output_source_output_info[1] == 0);
         REQUIRE(output_source_output_info[2] == 0);
     }
@@ -108,33 +108,33 @@ TEST_CASE("backend_volume_setall", "Should set volume for all channels") {
     int e[2] = {10, 15};
 
     SECTION("sink", "") {
-        backend_volume_setall(c, SINK, 1, e, 2);
+        backend_volume_setall(c, SINK, PA_VALID_INDEX, e, 2);
 
-        REQUIRE(output_sink_volume[0] == 1);
+        REQUIRE(output_sink_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_volume[1] == 10);
         REQUIRE(output_sink_volume[2] == 15);
     }
 
     SECTION("sink input", "") {
-        backend_volume_setall(c, SINK_INPUT, 1, e, 2);
+        backend_volume_setall(c, SINK_INPUT, PA_VALID_INDEX, e, 2);
 
-        REQUIRE(output_sink_input_volume[0] == 1);
+        REQUIRE(output_sink_input_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_input_volume[1] == 10);
         REQUIRE(output_sink_input_volume[2] == 15);
     }
 
     SECTION("source", "") {
-        backend_volume_setall(c, SOURCE, 1, e, 2);
+        backend_volume_setall(c, SOURCE, PA_VALID_INDEX, e, 2);
 
-        REQUIRE(output_source_volume[0] == 1);
+        REQUIRE(output_source_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_source_volume[1] == 10);
         REQUIRE(output_source_volume[2] == 15);
     }
 
     SECTION("source output", "") {
-        backend_volume_setall(c, SOURCE_OUTPUT, 1, e, 2);
+        backend_volume_setall(c, SOURCE_OUTPUT, PA_VALID_INDEX, e, 2);
 
-        REQUIRE(output_source_output_volume[0] == 1);
+        REQUIRE(output_source_output_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_source_output_volume[1] == 10);
         REQUIRE(output_source_output_volume[2] == 15);
     }
@@ -142,18 +142,18 @@ TEST_CASE("backend_volume_setall", "Should set volume for all channels") {
     reset_mock_variables();
 
     SECTION("other", "Should not do anything") {
-        backend_volume_setall(c, CARD, 1, e, 2);
+        backend_volume_setall(c, CARD, PA_VALID_INDEX, e, 2);
 
-        REQUIRE(output_sink_volume[0] == 0);
+        REQUIRE(output_sink_volume[0] == PA_INVALID_INDEX);
         REQUIRE(output_sink_volume[1] == 0);
         REQUIRE(output_sink_volume[2] == 0);
-        REQUIRE(output_sink_input_volume[0] == 0);
+        REQUIRE(output_sink_input_volume[0] == PA_INVALID_INDEX);
         REQUIRE(output_sink_input_volume[1] == 0);
         REQUIRE(output_sink_input_volume[2] == 0);
-        REQUIRE(output_source_volume[0] == 0);
+        REQUIRE(output_source_volume[0] == PA_INVALID_INDEX);
         REQUIRE(output_source_volume[1] == 0);
         REQUIRE(output_source_volume[2] == 0);
-        REQUIRE(output_source_output_volume[0] == 0);
+        REQUIRE(output_source_output_volume[0] == PA_INVALID_INDEX);
         REQUIRE(output_source_output_volume[1] == 0);
         REQUIRE(output_source_output_volume[2] == 0);
     }
@@ -165,45 +165,45 @@ TEST_CASE("backend_mute_set", "Should set mute state for control") {
     context_t *c = (context_t*)malloc(sizeof(context_t));
 
     SECTION("sink", "") {
-        backend_mute_set(c, SINK, 1, 1);
+        backend_mute_set(c, SINK, PA_VALID_INDEX, 1);
 
-        REQUIRE(output_sink_mute[0] == 1);
+        REQUIRE(output_sink_mute[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_mute[1] == 1);
     }
 
     SECTION("sink input", "") {
-        backend_mute_set(c, SINK_INPUT, 1, 1);
+        backend_mute_set(c, SINK_INPUT, PA_VALID_INDEX, 1);
 
-        REQUIRE(output_sink_input_mute[0] == 1);
+        REQUIRE(output_sink_input_mute[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_input_mute[1] == 1);
     }
 
     SECTION("source", "") {
-        backend_mute_set(c, SOURCE, 1, 1);
+        backend_mute_set(c, SOURCE, PA_VALID_INDEX, 1);
 
-        REQUIRE(output_source_mute[0] == 1);
+        REQUIRE(output_source_mute[0] == PA_VALID_INDEX);
         REQUIRE(output_source_mute[1] == 1);
     }
 
     SECTION("source output", "") {
-        backend_mute_set(c, SOURCE_OUTPUT, 1, 1);
+        backend_mute_set(c, SOURCE_OUTPUT, PA_VALID_INDEX, 1);
 
-        REQUIRE(output_source_output_mute[0] == 1);
+        REQUIRE(output_source_output_mute[0] == PA_VALID_INDEX);
         REQUIRE(output_source_output_mute[1] == 1);
     }
 
     reset_mock_variables();
 
     SECTION("other", "Should not do anything") {
-        backend_mute_set(c, CARD, 1, 1);
+        backend_mute_set(c, CARD, PA_VALID_INDEX, 1);
 
-        REQUIRE(output_sink_mute[0] == 0);
+        REQUIRE(output_sink_mute[0] == PA_INVALID_INDEX);
         REQUIRE(output_sink_mute[1] == 0);
-        REQUIRE(output_sink_input_mute[0] == 0);
+        REQUIRE(output_sink_input_mute[0] == PA_INVALID_INDEX);
         REQUIRE(output_sink_input_mute[1] == 0);
-        REQUIRE(output_source_mute[0] == 0);
+        REQUIRE(output_source_mute[0] == PA_INVALID_INDEX);
         REQUIRE(output_source_mute[1] == 0);
-        REQUIRE(output_source_output_mute[0] == 0);
+        REQUIRE(output_source_output_mute[0] == PA_INVALID_INDEX);
         REQUIRE(output_source_output_mute[1] == 0);
     }
 
@@ -214,9 +214,9 @@ TEST_CASE("backend_card_profile_set", "Should set active card profile") {
     // The value of backend_entry_type is ignored.
     context_t *c = (context_t*)malloc(sizeof(context_t));
 
-    backend_card_profile_set(c, CARD, 1, "active_profile");
+    backend_card_profile_set(c, CARD, PA_VALID_INDEX, "active_profile");
 
-    REQUIRE(output_card_profile.index == 1);
+    REQUIRE(output_card_profile.index == PA_VALID_INDEX);
     REQUIRE(strcmp(output_card_profile.active, "active_profile") == 0);
 
     free(c);
@@ -226,16 +226,16 @@ TEST_CASE("backend_port_set", "Should set active port") {
     context_t *c = (context_t*)malloc(sizeof(context_t));
 
     SECTION("sink", "") {
-        backend_port_set(c, SINK, 1, "active_port");
+        backend_port_set(c, SINK, PA_VALID_INDEX, "active_port");
 
-        REQUIRE(output_sink_port.index == 1);
+        REQUIRE(output_sink_port.index == PA_VALID_INDEX);
         REQUIRE(strcmp(output_sink_port.active, "active_port") == 0);
     }
 
     SECTION("source", "") {
-        backend_port_set(c, SOURCE, 1, "active_port");
+        backend_port_set(c, SOURCE, PA_VALID_INDEX, "active_port");
 
-        REQUIRE(output_source_port.index == 1);
+        REQUIRE(output_source_port.index == PA_VALID_INDEX);
         REQUIRE(strcmp(output_source_port.active, "active_port") == 0);
     }
 
@@ -244,11 +244,11 @@ TEST_CASE("backend_port_set", "Should set active port") {
     SECTION("other", "Should not do anything") {
         backend_entry_type types[3] = {SINK_INPUT, SOURCE_OUTPUT, CARD};
         for(int i = 0; i < 3; ++i) {
-            backend_port_set(c, types[i], 1, "active_port");
+            backend_port_set(c, types[i], PA_VALID_INDEX, "active_port");
 
-            REQUIRE(output_sink_port.index == 0);
+            REQUIRE(output_sink_port.index == PA_INVALID_INDEX);
             REQUIRE(strcmp(output_sink_port.active, "") == 0);
-            REQUIRE(output_source_port.index == 0);
+            REQUIRE(output_source_port.index == PA_INVALID_INDEX);
             REQUIRE(strcmp(output_source_port.active, "") == 0);
         }
     }
@@ -303,7 +303,7 @@ TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
     TEST_RETURN__cb_client_data.volumes = (backend_volume_t*)malloc(sizeof(backend_volume_t));
 
     pa_client_info info;
-    info.index = 1;
+    info.index = PA_VALID_INDEX;
     strcpy(info.name, "test_name");
     callback_t *cb = (callback_t*)malloc(sizeof(callback_t));
     cb->add = (void*)TEST_CALLBACK__cb_client;
@@ -322,7 +322,7 @@ TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
     _cb_client(NULL, &info, 0, (void*)cc);
 
     REQUIRE(strcmp(TEST_RETURN__cb_client_name, "test_name") == 0);
-    REQUIRE(TEST_RETURN__cb_client_idx == 1);
+    REQUIRE(TEST_RETURN__cb_client_idx == PA_VALID_INDEX);
     REQUIRE(TEST_RETURN__cb_client_data.option == NULL);
     REQUIRE(TEST_RETURN__cb_client_data.channels_num == 1);
     REQUIRE(TEST_RETURN__cb_client_data.channels[0].maxLevel == 120);

@@ -1,6 +1,7 @@
 #ifndef MOCK_VARIABLES_H
 #define MOCK_VARIABLES_H
 
+
 #include <string.h>
 #include <stdint.h>
 
@@ -12,6 +13,56 @@ typedef int pa_threaded_mainloop;
 typedef int pa_mainloop_api;
 typedef int pa_context;
 typedef int pa_context_state_t;
+typedef struct PA_CLIENT_INFO {
+    uint32_t index;
+    char name[STRING_SIZE];
+} pa_client_info;
+typedef struct PA_CVOLUME {
+    int channels;
+    int values[PA_CHANNELS_MAX];
+} pa_cvolume;
+struct PA_INFO {
+    uint32_t index;
+    pa_cvolume volume;
+    int mute;
+    const char *name;
+    uint32_t client;
+    const char *description;
+};
+typedef struct PA_INFO pa_sink_input_info;
+typedef struct PA_INFO pa_source_output_info;
+struct PA_PORT_INFO {
+    char name[STRING_SIZE];
+    char description[STRING_SIZE];
+};
+typedef struct PA_PORT_INFO pa_sink_port_info;
+typedef struct PA_PORT_INFO pa_source_port_info;
+typedef struct PA_PORT_INFO pa_sink_port_info;
+typedef struct PA_PORT_INFO pa_source_port_info;
+struct PA_PORT_INFO_INFO {
+    uint32_t index;
+    pa_cvolume volume;
+    int mute;
+    char description[STRING_SIZE];
+    int n_ports;
+    struct PA_PORT_INFO **ports;
+    struct PA_PORT_INFO *active_port;
+};
+typedef struct PA_PORT_INFO_INFO pa_sink_info;
+typedef struct PA_PORT_INFO_INFO pa_source_info;
+typedef struct PA_CARD_PROFILE_INFO {
+    const char *name;
+    const char *description;
+} pa_card_profile_info;
+typedef char pa_proplist[STRING_SIZE];
+typedef struct PA_CARD_INFO {
+    uint32_t index;
+    int n_profiles;
+    pa_proplist proplist;
+    pa_card_profile_info *profiles;
+    pa_card_profile_info *active_profile;
+} pa_card_info;
+
 extern pa_threaded_mainloop s_instance;
 extern pa_mainloop_api s_api;
 extern pa_context s_context;
@@ -55,58 +106,6 @@ enum {
     PA_INVALID_INDEX,
     PA_VALID_INDEX
 };
-
-typedef struct PA_CLIENT_INFO {
-    uint32_t index;
-    char name[STRING_SIZE];
-} pa_client_info;
-
-typedef struct PA_CVOLUME {
-    int channels;
-    int values[PA_CHANNELS_MAX];
-} pa_cvolume;
-struct PA_INFO {
-    uint32_t index;
-    pa_cvolume volume;
-    int mute;
-    const char *name;
-    uint32_t client;
-    const char *description;
-};
-typedef struct PA_INFO pa_sink_input_info;
-typedef struct PA_INFO pa_source_output_info;
-struct PA_PORT_INFO {
-    char name[STRING_SIZE];
-    char description[STRING_SIZE];
-};
-typedef struct PA_PORT_INFO pa_sink_port_info;
-typedef struct PA_PORT_INFO pa_source_port_info;
-typedef struct PA_PORT_INFO pa_sink_port_info;
-typedef struct PA_PORT_INFO pa_source_port_info;
-struct PA_PORT_INFO_INFO {
-    uint32_t index;
-    pa_cvolume volume;
-    int mute;
-    char description[STRING_SIZE];
-    int n_ports;
-    struct PA_PORT_INFO **ports;
-    struct PA_PORT_INFO *active_port;
-};
-typedef struct PA_PORT_INFO_INFO pa_sink_info;
-typedef struct PA_PORT_INFO_INFO pa_source_info;
-
-typedef struct PA_CARD_PROFILE_INFO {
-    const char *name;
-    const char *description;
-} pa_card_profile_info;
-typedef char pa_proplist[STRING_SIZE];
-typedef struct PA_CARD_INFO {
-    uint32_t index;
-    int n_profiles;
-    pa_proplist proplist;
-    pa_card_profile_info *profiles;
-    pa_card_profile_info *active_profile;
-} pa_card_info;
 
 void reset_mock_variables();
 
