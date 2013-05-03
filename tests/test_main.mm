@@ -5,3 +5,4 @@
 extern "C" {
 #import "test_backend.cpp"
 }
+#import "test_types.mm"

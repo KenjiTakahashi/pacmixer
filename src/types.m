@@ -25,7 +25,7 @@
     self = [super init];
     maxLevel = [NSNumber numberWithInt: maxLevel_];
     normLevel = [NSNumber numberWithInt: normLevel_];
-    mutable = mutable_ ? YES : NO;
+    isMutable = mutable_ ? YES : NO;
     return self;
 }
 
@@ -38,7 +38,7 @@
 }
 
 -(BOOL) mutable {
-    return mutable;
+    return isMutable;
 }
 @end
 

@@ -24,7 +24,7 @@
     @private
         NSNumber *maxLevel;
         NSNumber *normLevel;
-        BOOL mutable;
+        BOOL isMutable;
 }
 
 -(channel_t*) initWithMaxLevel: (int) maxLevel_
