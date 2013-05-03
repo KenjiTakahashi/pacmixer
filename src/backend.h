@@ -223,19 +223,19 @@ typedef struct VOLUME_CALLBACK {
         uint32_t n = info->n_ports;\
         backend_option_t *optdata = NULL;\
         if(n > 0) {\
-            optdata = malloc(sizeof(backend_option_t));\
-            optdata->descriptions = malloc(n * sizeof(char*));\
-            optdata->names = malloc(n * sizeof(char*));\
+            optdata = (backend_option_t*)malloc(sizeof(backend_option_t));\
+            optdata->descriptions = (char**)malloc(n * sizeof(char*));\
+            optdata->names = (char**)malloc(n * sizeof(char*));\
             for(uint32_t i = 0; i < n; ++i) {\
                 const char *desc = info->ports[i]->description;\
-                optdata->descriptions[i] = malloc((strlen(desc) + 1) * sizeof(char));\
+                optdata->descriptions[i] = (char*)malloc((strlen(desc) + 1) * sizeof(char));\
                 strcpy(optdata->descriptions[i], desc);\
                 const char *name = info->ports[i]->name;\
-                optdata->names[i] = malloc((strlen(name) + 1) * sizeof(char));\
+                optdata->names[i] = (char*)malloc((strlen(name) + 1) * sizeof(char));\
                 strcpy(optdata->names[i], name);\
             }\
             const char *active_opt = info->active_port->description;\
-            optdata->active = malloc((strlen(active_opt) + 1) * sizeof(char));\
+            optdata->active = (char*)malloc((strlen(active_opt) + 1) * sizeof(char));\
             strcpy(optdata->active, active_opt);\
             optdata->size = n;\
         }\
@@ -245,7 +245,7 @@ typedef struct VOLUME_CALLBACK {
 
 #define _CB_SET_VOLUME(type, by_index)\
     if(!eol) {\
-        volume_callback_t *volume = userdata;\
+        volume_callback_t *volume = (volume_callback_t*)userdata;\
         if(info->index != PA_INVALID_INDEX) {\
             pa_cvolume cvolume = info->volume;\
             cvolume.values[volume->index] = volume->value;\
