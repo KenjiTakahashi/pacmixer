@@ -243,7 +243,6 @@ void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) 
         backend_data_t data;
         if(n > 0) {
             data.option = _do_card(info, n);
-            data.option->size = n;
         } else {
             data.option = NULL;
         }
@@ -262,7 +261,6 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
         backend_data_t data;
         if(n > 0) {
             data.option = _do_card(info, n);
-            data.option->size = n;
         } else {
             data.option = NULL;
         }
@@ -302,7 +300,7 @@ backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
     return volumes;
 }
 
-backend_option_t *_do_card(const pa_card_info* info, int n) {
+backend_option_t *_do_card(const pa_card_info *info, int n) {
     backend_option_t *card = malloc(sizeof(backend_option_t));
     pa_card_profile_info *profiles = info->profiles;
     card->descriptions = malloc(n * sizeof(char*));
@@ -318,6 +316,7 @@ backend_option_t *_do_card(const pa_card_info* info, int n) {
     const char *active = info->active_profile->description;
     card->active = malloc((strlen(active) + 1) * sizeof(char));
     strcpy(card->active, active);
+    card->size = n;
     return card;
 }
 

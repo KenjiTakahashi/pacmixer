@@ -724,6 +724,42 @@ TEST_CASE("_do_volumes", "Should compose backend_volume_t for given data") {
     }
 }
 
+TEST_CASE("_do_card", "Should compose backend_option_t for given card data") {
+    // Use 2 profiles, scale by induction.
+    pa_card_info info;
+    info.index = PA_VALID_INDEX;
+    info.n_profiles = 2;
+    info.profiles = (pa_card_profile_info*)malloc(2 * sizeof(pa_card_profile_info));
+    info.active_profile = (pa_card_profile_info*)malloc(sizeof(pa_card_profile_info));
+    strcpy(info.profiles[0].name, "test_p1_name");
+    strcpy(info.profiles[0].description, "test_p1_desc");
+    strcpy(info.profiles[1].name, "test_p2_name");
+    strcpy(info.profiles[1].description, "test_p2_desc");
+    strcpy(info.active_profile->name, "test_p2_name");
+    strcpy(info.active_profile->description, "test_p2_desc");
+
+    backend_option_t *result = _do_card(&info, 2);
+
+    REQUIRE(result->size == 2);
+    REQUIRE(strcmp(result->names[0], "test_p1_name") == 0);
+    REQUIRE(strcmp(result->descriptions[0], "test_p1_desc") == 0);
+    REQUIRE(strcmp(result->names[1], "test_p2_name") == 0);
+    REQUIRE(strcmp(result->descriptions[1], "test_p2_desc") == 0);
+    REQUIRE(strcmp(result->active, "test_p2_desc") == 0);
+
+    for(int i = 0; i < result->size; ++i) {
+        free(result->names[i]);
+        free(result->descriptions[i]);
+    }
+    free(result->names);
+    free(result->descriptions);
+    free(result->active);
+    free(result);
+
+    free(info.active_profile);
+    free(info.profiles);
+}
+
 
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.

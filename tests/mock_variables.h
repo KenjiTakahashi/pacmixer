@@ -51,8 +51,8 @@ struct PA_PORT_INFO_INFO {
 typedef struct PA_PORT_INFO_INFO pa_sink_info;
 typedef struct PA_PORT_INFO_INFO pa_source_info;
 typedef struct PA_CARD_PROFILE_INFO {
-    const char *name;
-    const char *description;
+    char name[STRING_SIZE];
+    char description[STRING_SIZE];
 } pa_card_profile_info;
 typedef char pa_proplist[STRING_SIZE];
 typedef struct PA_CARD_INFO {
