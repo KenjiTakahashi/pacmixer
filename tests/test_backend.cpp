@@ -694,6 +694,36 @@ TEST_CASE("_do_channels", "Should compose backend_channel_t for given data") {
     free(result);
 }
 
+TEST_CASE("_do_volumes", "Should compose backend_volume_t for given data") {
+    // Use 2 channels, scale by induction.
+    pa_cvolume cv;
+    cv.channels = 2;
+    cv.values[0] = 90;
+    cv.values[1] = 120;
+
+    SECTION("muted", "") {
+        backend_volume_t *result = _do_volumes(cv, 2, 1);
+
+        REQUIRE(result[0].level == 90);
+        REQUIRE(result[0].mute == 1);
+        REQUIRE(result[1].level == 120);
+        REQUIRE(result[1].mute == 1);
+
+        free(result);
+    }
+
+    SECTION("not muted", "") {
+        backend_volume_t *result = _do_volumes(cv, 2, 0);
+
+        REQUIRE(result[0].level == 90);
+        REQUIRE(result[0].mute == 0);
+        REQUIRE(result[1].level == 120);
+        REQUIRE(result[1].mute == 0);
+
+        free(result);
+    }
+}
+
 
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
