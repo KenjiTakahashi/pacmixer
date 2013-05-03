@@ -260,7 +260,7 @@ typedef struct VOLUME_CALLBACK {
             pa_context_get_ ## type ## _info ## by_index(c, idx, _cb_u_ ## type, userdata);\
         }\
         if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {\
-            callback_t *callback = userdata;\
+            callback_t *callback = (callback_t*)userdata;\
             ((tcallback_remove_func)(callback->remove))(callback->self, idx);\
         }\
         if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {\

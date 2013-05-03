@@ -508,6 +508,172 @@ TEST_CASE("_cb_u_card", "Should fire 'update' callback with new card data") {
     REQUIRE(TEST_RETURN__cb_u_card_idx == PA_VALID_INDEX);
 }
 
+int TEST_RETURN__CB_SINGLE_EVENT = 0;
+
+void TEST_CALLBACK__CB_SINGLE_EVENT(void *s, uint32_t idx) {
+    TEST_RETURN__CB_SINGLE_EVENT += 1;
+}
+
+TEST_CASE("_CB_SINGLE_EVENT", "Should fire appropriate callbacks for events") {
+    pa_context *c = NULL;
+    int idx = PA_VALID_INDEX;
+    callback_t cb;
+    cb.remove = (void*)TEST_CALLBACK__CB_SINGLE_EVENT;
+    void *userdata = (void*)&cb;
+    int t_;
+    int t__;
+
+    SECTION("card", "_by_index") {
+        t__ = PA_SUBSCRIPTION_EVENT_CARD;
+
+        SECTION("new", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_NEW;
+
+            _CB_SINGLE_EVENT(CARD, card, _by_index);
+
+            REQUIRE(output_card_info == PA_VALID_INDEX);
+        }
+
+        reset_mock_variables();
+
+        SECTION("change", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_CHANGE;
+
+            _CB_SINGLE_EVENT(CARD, card, _by_index);
+
+            REQUIRE(output_card_info == PA_VALID_INDEX);
+        }
+
+        SECTION("remove", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_REMOVE;
+
+            _CB_SINGLE_EVENT(CARD, card, _by_index);
+
+            REQUIRE(TEST_RETURN__CB_SINGLE_EVENT == 1);
+        }
+    }
+
+    SECTION("sink", "_by_index") {
+        t__ = PA_SUBSCRIPTION_EVENT_SINK;
+
+        SECTION("new", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_NEW;
+
+            _CB_SINGLE_EVENT(SINK, sink, _by_index);
+
+            REQUIRE(output_sink_info[0] == PA_VALID_INDEX);
+        }
+
+        reset_mock_variables();
+
+        SECTION("change", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_CHANGE;
+
+            _CB_SINGLE_EVENT(SINK, sink, _by_index);
+
+            REQUIRE(output_sink_info[0] == PA_VALID_INDEX);
+        }
+
+        SECTION("remove", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_REMOVE;
+
+            _CB_SINGLE_EVENT(SINK, sink, _by_index);
+
+            REQUIRE(TEST_RETURN__CB_SINGLE_EVENT == 2);
+        }
+    }
+
+    SECTION("sink input", "") {
+        t__ = PA_SUBSCRIPTION_EVENT_SINK_INPUT;
+
+        SECTION("new", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_NEW;
+
+            _CB_SINGLE_EVENT(SINK_INPUT, sink_input, );
+
+            REQUIRE(output_sink_input_info[0] == PA_VALID_INDEX);
+        }
+
+        reset_mock_variables();
+
+        SECTION("change", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_CHANGE;
+
+            _CB_SINGLE_EVENT(SINK_INPUT, sink_input, );
+
+            REQUIRE(output_sink_input_info[0] == PA_VALID_INDEX);
+        }
+
+        SECTION("remove", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_REMOVE;
+
+            _CB_SINGLE_EVENT(SINK_INPUT, sink_input, );
+
+            REQUIRE(TEST_RETURN__CB_SINGLE_EVENT == 3);
+        }
+    }
+
+    SECTION("source", "_by_index") {
+        t__ = PA_SUBSCRIPTION_EVENT_SOURCE;
+
+        SECTION("new", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_NEW;
+
+            _CB_SINGLE_EVENT(SOURCE, source, _by_index);
+
+            REQUIRE(output_source_info[0] == PA_VALID_INDEX);
+        }
+
+        reset_mock_variables();
+
+        SECTION("change", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_CHANGE;
+
+            _CB_SINGLE_EVENT(SOURCE, source, _by_index);
+
+            REQUIRE(output_source_info[0] == PA_VALID_INDEX);
+        }
+
+        SECTION("remove", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_REMOVE;
+
+            _CB_SINGLE_EVENT(SOURCE, source, _by_index);
+
+            REQUIRE(TEST_RETURN__CB_SINGLE_EVENT == 4);
+        }
+    }
+
+    SECTION("source output", "") {
+        t__ = PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT;
+
+        SECTION("new", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_NEW;
+
+            _CB_SINGLE_EVENT(SOURCE_OUTPUT, source_output, );
+
+            REQUIRE(output_source_output_info[0] == PA_VALID_INDEX);
+        }
+
+        SECTION("change", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_CHANGE;
+
+            _CB_SINGLE_EVENT(SOURCE_OUTPUT, source_output, );
+
+            REQUIRE(output_source_output_info[0] == PA_VALID_INDEX);
+        }
+
+        SECTION("remove", "") {
+            t_ = PA_SUBSCRIPTION_EVENT_REMOVE;
+
+            _CB_SINGLE_EVENT(SOURCE_OUTPUT, source_output, );
+
+            REQUIRE(TEST_RETURN__CB_SINGLE_EVENT == 5);
+        }
+    }
+
+    reset_mock_variables();
+}
+
 
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.

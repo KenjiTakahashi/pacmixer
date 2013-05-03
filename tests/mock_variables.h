@@ -32,6 +32,8 @@ extern int output_sink_input_mute[2];
 extern int output_source_mute[2];
 extern int output_source_output_mute[2];
 
+extern int output_card_info;
+
 typedef struct OUTPUT_INDEX_ACTIVE {
     int index;
     char active[STRING_SIZE];

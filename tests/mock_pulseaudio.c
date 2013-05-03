@@ -73,19 +73,19 @@ typedef struct VOLUME_CALLBACK {
     output[1] = volume->index;\
     output[2] = volume->value;\
 
-void pa_context_get_sink_info_by_index(pa_context *context, uint32_t idx, void *s, void *m) {
+void pa_context_get_sink_info_by_index(pa_context *context, uint32_t idx, void(*s)(pa_context *c, const pa_sink_info *info, int eol, void *a), void *m) {
     PA_CONTEXT_GET_INFO(output_sink_info);
 }
 
-void pa_context_get_sink_input_info(pa_context *context, uint32_t idx, void *s, void *m) {
+void pa_context_get_sink_input_info(pa_context *context, uint32_t idx, void(*s)(pa_context *c, const pa_sink_input_info *info, int eol, void *a), void *m) {
     PA_CONTEXT_GET_INFO(output_sink_input_info);
 }
 
-void pa_context_get_source_info_by_index(pa_context *context, uint32_t idx, void *s, void *m) {
+void pa_context_get_source_info_by_index(pa_context *context, uint32_t idx, void(*s)(pa_context *c, const pa_source_info *info, int eol, void *a), void *m) {
     PA_CONTEXT_GET_INFO(output_source_info);
 }
 
-void pa_context_get_source_output_info(pa_context *context, uint32_t idx, void *s, void *m) {
+void pa_context_get_source_output_info(pa_context *context, uint32_t idx, void(*s)(pa_context *c, const pa_source_output_info *info, int eol, void *a), void *m) {
     PA_CONTEXT_GET_INFO(output_source_output_info);
 }
 
@@ -158,6 +158,8 @@ const char *pa_proplist_gets(const pa_proplist proplist, int mask) {
     return "";
 }
 
-void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void *s, void *m) {}
+void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void(*s)(pa_context *c, const pa_card_info *info, int eol, void *a), void *m) {
+    output_card_info = idx;
+}
 
 void pa_context_get_client_info(pa_context *context, uint32_t idx, void *s, void *m) {}
