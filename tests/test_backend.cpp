@@ -805,6 +805,18 @@ TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
     REQUIRE(strcmp(TEST_RETURN__cb1_desc, "test_desc") == 0);
 }
 
+TEST_CASE("_cb2", "Should get client info for given control") {
+    //Using SINK_INPUT, it scales to SOURCE_OUTPUT as well.
+    pa_cvolume cv;
+    cv.channels = 0;
+    callback_t cb;
+
+    _cb2(NULL, PA_VALID_INDEX, cv, 1, "test_name", SINK_INPUT, PA_CLIENT_INDEX, (void*)&cb);
+
+    //This cast is necessary, although I don't know why...
+    REQUIRE(output_client_info == (int)PA_CLIENT_INDEX);
+}
+
 
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.

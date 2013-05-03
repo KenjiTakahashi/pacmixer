@@ -62,6 +62,10 @@ typedef struct PA_CARD_INFO {
     pa_card_profile_info *profiles;
     pa_card_profile_info *active_profile;
 } pa_card_info;
+typedef struct OUTPUT_INDEX_ACTIVE {
+    int index;
+    char active[STRING_SIZE];
+} output_index_active_t;
 
 extern pa_threaded_mainloop s_instance;
 extern pa_mainloop_api s_api;
@@ -83,17 +87,14 @@ extern int output_sink_input_mute[2];
 extern int output_source_mute[2];
 extern int output_source_output_mute[2];
 
-extern int output_card_info;
-
-typedef struct OUTPUT_INDEX_ACTIVE {
-    int index;
-    char active[STRING_SIZE];
-} output_index_active_t;
-
 extern output_index_active_t output_card_profile;
 
 extern output_index_active_t output_sink_port;
 extern output_index_active_t output_source_port;
+
+extern int output_card_info;
+
+extern int output_client_info;
 
 enum {
     PA_CONTEXT_UNCONNECTED,
@@ -104,7 +105,8 @@ enum {
 
 enum {
     PA_INVALID_INDEX,
-    PA_VALID_INDEX
+    PA_VALID_INDEX,
+    PA_CLIENT_INDEX
 };
 
 void reset_mock_variables();

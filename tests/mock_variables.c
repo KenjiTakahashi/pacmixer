@@ -21,12 +21,14 @@ int output_sink_input_mute[2] = {PA_INVALID_INDEX, 0};
 int output_source_mute[2] = {PA_INVALID_INDEX, 0};
 int output_source_output_mute[2] = {PA_INVALID_INDEX, 0};
 
-int output_card_info = PA_INVALID_INDEX;
-
 output_index_active_t output_card_profile = {.index = PA_INVALID_INDEX, .active = ""};
 
 output_index_active_t output_sink_port = {.index = PA_INVALID_INDEX, .active = ""};
 output_index_active_t output_source_port = {.index = PA_INVALID_INDEX, .active = ""};
+
+int output_card_info = PA_INVALID_INDEX;
+
+int output_client_info = PA_INVALID_INDEX;
 
 void reset_mock_variables() {
     s_instance = -1;
@@ -71,4 +73,5 @@ void reset_mock_variables() {
     output_source_port.index = 0;
     strcpy(output_source_port.active, "");
     output_card_info = PA_INVALID_INDEX;
+    output_client_info = PA_INVALID_INDEX;
 }

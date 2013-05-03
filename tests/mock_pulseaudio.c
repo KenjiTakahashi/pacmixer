@@ -162,4 +162,6 @@ void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void(*
     output_card_info = idx;
 }
 
-void pa_context_get_client_info(pa_context *context, uint32_t idx, void *s, void *m) {}
+void pa_context_get_client_info(pa_context *context, uint32_t idx, void *s, void *m) {
+    output_client_info = idx;
+}
