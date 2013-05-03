@@ -775,10 +775,34 @@ TEST_CASE("_cb_u", "Should fire 'update' callback for given data") {
     callback_t cb;
     cb.update = (void*)TEST_CALLBACK__cb_u;
 
-    _cb_u(PA_VALID_INDEX, SINK, cv, 1, "test_desc", NULL, (void*)&cb);
+    _cb_u(PA_VALID_INDEX, SINK, cv, 1, NULL, NULL, (void*)&cb);
 
     REQUIRE(TEST_RETURN__cb_u_type == SINK);
     REQUIRE(TEST_RETURN__cb_u_idx == PA_VALID_INDEX);
+}
+
+backend_entry_type TEST_RETURN__cb1_type = CARD;
+int TEST_RETURN__cb1_idx = PA_INVALID_INDEX;
+char TEST_RETURN__cb1_desc[STRING_SIZE];
+
+void TEST_CALLBACK__cb1(void *s, const char *desc, backend_entry_type type, uint32_t idx, void *data) {
+    TEST_RETURN__cb1_type = type;
+    TEST_RETURN__cb1_idx = idx;
+    strcpy(TEST_RETURN__cb1_desc, desc);
+}
+
+TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
+    //Using SINK, it scales to other types as well.
+    pa_cvolume cv;
+    cv.channels = 0;
+    callback_t cb;
+    cb.add = (void*)TEST_CALLBACK__cb1;
+
+    _cb1(PA_VALID_INDEX, SINK, cv, 1, "test_desc", NULL, (void*)&cb);
+
+    REQUIRE(TEST_RETURN__cb1_type == SINK);
+    REQUIRE(TEST_RETURN__cb1_idx == PA_VALID_INDEX);
+    REQUIRE(strcmp(TEST_RETURN__cb1_desc, "test_desc") == 0);
 }
 
 
