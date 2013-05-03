@@ -20,15 +20,15 @@ CCC=gcc
 CPP=g++
 CFLAGS=-std=gnu99 -Wall
 OFLAGS=-fconstant-string-class=NSConstantString
-CPPFLAGS=-Wall -g -O2 -D TESTS=1
+CPPFLAGS=-Wall -g -O2 -D TESTS=1 -fobjc-exceptions -D __STDC_LIMIT_MACROS
 LIBS=-lgnustep-base -lobjc -lpanel -lcurses
 PLIBS=-lpulse
 SOURCES=$(wildcard src/*.m) $(wildcard src/widgets/*.m)
 OBJECTS=$(SOURCES:.m=.o)
 CSOURCES=src/backend.c
 COBJECTS=$(CSOURCES:.c=.o)
-TSOURCES=tests/test_main.cpp
-TOBJECTS=$(TSOURCES:.cpp=.o)
+TSOURCES=tests/test_main.mm
+TOBJECTS=$(TSOURCES:.mm=.o)
 MSOURCES=$(wildcard tests/mock_*.c)
 MOBJECTS=$(MSOURCES:.c=.o)
 EXEC=pacmixer
@@ -60,8 +60,8 @@ install:
 	@cp -f pacmixer $(DESTDIR)$(PREFIX)/bin/
 	@chmod 755 $(DESTDIR)$(PREFIX)/bin/pacmixer
 
-%.o: %.cpp
-	$(CPP) $(CPPFLAGS) -c -o $@ $^
+%.o: %.mm
+	$(CPP) $(CPPFLAGS) $(OFLAGS) -c -o $@ $^
 
 $(TEXEC): $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS)
 	$(CPP) -o $@ $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS) $(LIBS)
