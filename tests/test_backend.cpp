@@ -760,6 +760,27 @@ TEST_CASE("_do_card", "Should compose backend_option_t for given card data") {
     free(info.profiles);
 }
 
+backend_entry_type TEST_RETURN__cb_u_type = CARD;
+int TEST_RETURN__cb_u_idx = PA_INVALID_INDEX;
+
+void TEST_CALLBACK__cb_u(void *s, backend_entry_type type, uint32_t idx, void *data) {
+    TEST_RETURN__cb_u_type = type;
+    TEST_RETURN__cb_u_idx = idx;
+}
+
+TEST_CASE("_cb_u", "Should fire 'update' callback for given data") {
+    //Using SINK, it scales to other types as well.
+    pa_cvolume cv;
+    cv.channels = 0;
+    callback_t cb;
+    cb.update = (void*)TEST_CALLBACK__cb_u;
+
+    _cb_u(PA_VALID_INDEX, SINK, cv, 1, "test_desc", NULL, (void*)&cb);
+
+    REQUIRE(TEST_RETURN__cb_u_type == SINK);
+    REQUIRE(TEST_RETURN__cb_u_idx == PA_VALID_INDEX);
+}
+
 
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
