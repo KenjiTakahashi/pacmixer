@@ -674,6 +674,26 @@ TEST_CASE("_CB_SINGLE_EVENT", "Should fire appropriate callbacks for events") {
     reset_mock_variables();
 }
 
+TEST_CASE("_do_channels", "Should compose backend_channel_t for given data") {
+    // As usual: Use 2 channels, scale by induction.
+    pa_cvolume cv;
+    cv.channels = 2;
+    cv.values[0] = 90;
+    cv.values[1] = 120;
+
+    backend_channel_t *result = _do_channels(cv, 2);
+
+    REQUIRE(result != NULL);
+    REQUIRE(result[0].maxLevel == PA_VOLUME_UI_MAX);
+    REQUIRE(result[0].normLevel == PA_VOLUME_NORM);
+    REQUIRE(result[0].isMutable == 1);
+    REQUIRE(result[1].maxLevel == PA_VOLUME_UI_MAX);
+    REQUIRE(result[1].normLevel == PA_VOLUME_NORM);
+    REQUIRE(result[1].isMutable == 1);
+
+    free(result);
+}
+
 
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
