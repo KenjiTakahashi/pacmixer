@@ -276,66 +276,11 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
     int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
-    if(t__ == PA_SUBSCRIPTION_EVENT_CARD) {
-        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
-            pa_context_get_card_info_by_index(c, idx, _cb_u_card, userdata);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
-            callback_t *callback = userdata;
-            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
-            pa_context_get_card_info_by_index(c, idx, _cb_card, userdata);
-        }
-    }
-    if(t__ == PA_SUBSCRIPTION_EVENT_SINK_INPUT) {
-        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
-            pa_context_get_sink_input_info(c, idx, _cb_u_sink_input, userdata);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
-            callback_t *callback = userdata;
-            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
-            pa_context_get_sink_input_info(c, idx, _cb_sink_input, userdata);
-        }
-    }
-    if(t__ == PA_SUBSCRIPTION_EVENT_SINK) {
-        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
-            pa_context_get_sink_info_by_index(c, idx, _cb_u_sink, userdata);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
-            callback_t *callback = userdata;
-            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
-            pa_context_get_sink_info_by_index(c, idx, _cb_sink, userdata);
-        }
-    }
-    if(t__ == PA_SUBSCRIPTION_EVENT_SOURCE) {
-        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
-            pa_context_get_source_info_by_index(c, idx, _cb_u_source, userdata);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
-            callback_t *callback = userdata;
-            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
-            pa_context_get_source_info_by_index(c, idx, _cb_source, userdata);
-        }
-    }
-    if(t__ == PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT) {
-        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {
-            pa_context_get_source_output_info(c, idx, _cb_u_source_output, userdata);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {
-            callback_t *callback = userdata;
-            ((tcallback_remove_func)(callback->remove))(callback->self, idx);
-        }
-        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {
-            pa_context_get_source_output_info(c, idx, _cb_source_output, userdata);
-        }
-    }
+    _CB_SINGLE_EVENT(CARD, card, _by_index);
+    _CB_SINGLE_EVENT(SINK, sink, _by_index);
+    _CB_SINGLE_EVENT(SINK_INPUT, sink_input, );
+    _CB_SINGLE_EVENT(SOURCE, source, _by_index);
+    _CB_SINGLE_EVENT(SOURCE_OUTPUT, source_output, );
 }
 
 backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {

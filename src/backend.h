@@ -254,6 +254,20 @@ typedef struct VOLUME_CALLBACK {
         free(volume);\
     }\
 
+#define _CB_SINGLE_EVENT(event, type, by_index)\
+    if(t__ == PA_SUBSCRIPTION_EVENT_ ## event) {\
+        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {\
+            pa_context_get_ ## type ## _info ## by_index(c, idx, _cb_u_ ## type, userdata);\
+        }\
+        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {\
+            callback_t *callback = userdata;\
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx);\
+        }\
+        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {\
+            pa_context_get_ ## type ## _info ## by_index(c, idx, _cb_ ## type, userdata);\
+        }\
+    }\
+
 /**
  * Internal function.
  * Callback. Fired when PA server changes state.
