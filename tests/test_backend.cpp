@@ -766,3 +766,4 @@ TEST_CASE("_do_card", "Should compose backend_option_t for given card data") {
 // 2: For _cb_s_sink/_cb_s_sink_input/_cb_s_source/_cb_s_source_output, see _CB_SET_VOLUME.
 // 3: For _cb_sink_input/_cb_source_output, see _cb2.
 // 4: For _cb_u_sink_input/_cb_u_source_output, see _cb_u.
+// 5: Testing _do_option_free doesn't make much sense.
