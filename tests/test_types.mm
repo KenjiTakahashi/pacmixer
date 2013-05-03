@@ -49,3 +49,29 @@ TEST_CASE("channel_t", "") {
         [channel_i release];
     }
 }
+
+TEST_CASE("volume_t", "") {
+    SECTION("mute", "") {
+        NSNumber *lvl = [NSNumber numberWithInt: 90];
+
+        volume_t *volume_i = [[volume_t alloc] initWithLevel: 90
+                                                     andMute: 1];
+
+        REQUIRE([[volume_i level] isEqualToNumber: lvl]);
+        REQUIRE([volume_i mute] == YES);
+
+        [volume_i release];
+    }
+
+    SECTION("do not mute", "") {
+        NSNumber *lvl = [NSNumber numberWithInt: 50];
+
+        volume_t *volume_i = [[volume_t alloc] initWithLevel: 50
+                                                     andMute: 0];
+
+        REQUIRE([[volume_i level] isEqualToNumber: lvl]);
+        REQUIRE([volume_i mute] == NO);
+
+        [volume_i release];
+    }
+}
