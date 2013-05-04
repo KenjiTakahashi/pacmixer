@@ -68,6 +68,7 @@ void callback_state_func(void*);
 }
 
 -(Middleware*) init;
+-(void) spawn;
 -(void) initContext;
 -(void) dealloc;
 -(Block*) addBlockWithId: (uint32_t) idx

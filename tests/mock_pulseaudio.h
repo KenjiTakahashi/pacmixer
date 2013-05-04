@@ -46,6 +46,10 @@ enum {
 #define PA_VOLUME_UI_MAX 150
 #define PA_VOLUME_NORM 100
 
+typedef struct S_CALLBACK {
+    pa_context_state_t *state;
+} s_callback_t;
+
 pa_threaded_mainloop *pa_threaded_mainloop_new();
 pa_mainloop_api *pa_threaded_mainloop_get_api(pa_threaded_mainloop*);
 pa_context *pa_context_new(pa_mainloop_api*, const char*);

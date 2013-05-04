@@ -38,7 +38,10 @@ int pa_context_connect(pa_context *context, void *s, int n, void *m) {
 
 void pa_context_unref(pa_context *context) {}
 
-void pa_context_set_state_callback(pa_context *context, void *s, void *m) {}
+void pa_context_set_state_callback(pa_context *context, void *s, void *m) {
+    s_callback_t *sc = (s_callback_t*)m;
+    *sc->state = PA_CONTEXT_READY;
+}
 
 void pa_threaded_mainloop_start(pa_threaded_mainloop *loop) {}
 

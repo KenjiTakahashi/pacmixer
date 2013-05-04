@@ -28,7 +28,7 @@ TEST_CASE("backend_new/connect", "Should successfully return PA context") {
     state_callback_t *sc = (state_callback_t*)malloc(sizeof(state_callback_t));
     context_t *e = (context_t*)malloc(sizeof(context_t));
     e->loop = &s_instance;
-    e->state = PA_CONTEXT_UNCONNECTED;
+    e->state = PA_CONTEXT_READY;
     e->context = &s_context;
     context_t *r = backend_new(sc);
 

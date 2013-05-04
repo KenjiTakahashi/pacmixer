@@ -285,10 +285,13 @@ void callback_state_func(void *self_) {
     state_callback = malloc(sizeof(state_callback_t));
     state_callback->func = callback_state_func;
     state_callback->self = self;
+    return self;
+}
+
+-(void) spawn {
     [NSThread detachNewThreadSelector: @selector(initContext)
                              toTarget: self
                            withObject: nil];
-    return self;
 }
 
 -(void) initContext {
@@ -302,7 +305,9 @@ void callback_state_func(void *self_) {
 
 -(void) dealloc {
     [blocks release];
-    backend_destroy(context);
+    if(context != NULL) {
+        backend_destroy(context);
+    }
     free(state_callback);
     free(callback);
     [super dealloc];
