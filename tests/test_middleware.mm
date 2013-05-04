@@ -171,3 +171,22 @@ TEST_CASE("callback_state_func", "Should fire 'backendGone' notification") {
 
     [middleware release];
 }
+
+TEST_CASE("callback_remove_func", "Should fire 'controlDisappeared' notification") {
+    //It passes disappearing control internal index along with notification.
+    Middleware *middleware = [[Middleware alloc] init];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
+    [center addObserver: results
+               selector: @selector(addObject:)
+                   name: @"controlDisappeared"
+                 object: middleware];
+
+    callback_remove_func((void*)middleware, PA_VALID_INDEX);
+
+    REQUIRE([results count] == 1);
+    NSNumber *idx = [[[results objectAtIndex: 0] userInfo] objectForKey: @"id"];
+    REQUIRE([idx isEqualToNumber: [NSNumber numberWithInt: PA_VALID_INDEX]]);
+
+    [middleware release];
+}
