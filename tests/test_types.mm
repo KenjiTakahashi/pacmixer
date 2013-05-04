@@ -18,6 +18,8 @@
 #import "../src/types.h"
 
 
+#define STRING_SIZE 32
+
 TEST_CASE("channel_t", "") {
     SECTION("mutable", "") {
         NSNumber *max = [NSNumber numberWithInt: 120];
@@ -74,4 +76,33 @@ TEST_CASE("volume_t", "") {
 
         [volume_i release];
     }
+}
+
+TEST_CASE("option_t", "") {
+    //Use 2 options, scale by induction.
+    NSString *opt1 = [NSString stringWithUTF8String: "test_desc1"];
+    NSString *opt2 = [NSString stringWithUTF8String: "test_desc2"];
+    NSString *active = [NSString stringWithUTF8String: "test_desc3"];
+
+    char **options = (char**)malloc(2 * sizeof(char*));
+    options[0] = (char*)malloc(STRING_SIZE * sizeof(char));
+    options[1] = (char*)malloc(STRING_SIZE * sizeof(char));
+    strcpy(options[0], "test_desc1");
+    strcpy(options[1], "test_desc2");
+
+    option_t *option_i = [[option_t alloc] initWithOptions: options
+                                               andNOptions: 2
+                                                 andActive: "test_desc3"];
+    NSArray *result_options = [option_i options];
+
+    REQUIRE([result_options count] == 2);
+    REQUIRE([[result_options objectAtIndex: 0] isEqualToString: opt1]);
+    REQUIRE([[result_options objectAtIndex: 1] isEqualToString: opt2]);
+    REQUIRE([[option_i active] isEqualToString: active]);
+
+    [option_i release];
+
+    free(options[1]);
+    free(options[0]);
+    free(options);
 }
