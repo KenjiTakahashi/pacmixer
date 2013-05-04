@@ -15,7 +15,9 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+extern "C" {
 #import "../src/middleware.h"
+}
 #import "mock_variables.h"
 
 
@@ -152,4 +154,20 @@ TEST_CASE("Block", "") {
     free(keys[0]);
     free(keys);
     [block release];
+}
+
+TEST_CASE("callback_state_func", "Should fire 'backendGone' notification") {
+    Middleware *middleware = [[Middleware alloc] init];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
+    [center addObserver: results
+               selector: @selector(addObject:)
+                   name: @"backendGone"
+                 object: middleware];
+
+    callback_state_func((void*)middleware);
+
+    REQUIRE([results count] == 1);
+
+    [middleware release];
 }
