@@ -190,3 +190,110 @@ TEST_CASE("callback_remove_func", "Should fire 'controlDisappeared' notification
 
     [middleware release];
 }
+
+TEST_CASE("callback_update_func", "Should fire appropriate update notification") {
+    Middleware *middleware = [[Middleware alloc] init];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
+
+    backend_data_t data;
+    data.volumes = (backend_volume_t*)malloc(2 * sizeof(backend_volume_t));
+    data.volumes[0].level = 120;
+    //This is not realistic, mute is per control, not per channel.
+    data.volumes[0].mute = 0;
+    data.volumes[1].level = 90;
+    data.volumes[1].mute = 1;
+    data.channels_num = 2;
+    data.option = NULL;
+
+    SECTION("control without options", "controlChanged{idx}_{type}, !ports") {
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: [NSString stringWithFormat:
+                              @"%@%d_%d", @"controlChanged",
+                              PA_VALID_INDEX, SINK] 
+                     object: middleware];
+
+        callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        NSMutableArray *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"volumes"];
+        REQUIRE([p count] == 2);
+        volume_t *v1 = [p objectAtIndex: 0];
+        volume_t *v2 = [p objectAtIndex: 1];
+        REQUIRE([[v1 level] isEqualToNumber: [NSNumber numberWithInt: 120]]);
+        REQUIRE([[v2 level] isEqualToNumber: [NSNumber numberWithInt: 90]]);
+        REQUIRE([v1 mute] == NO);
+        REQUIRE([v2 mute] == YES);
+    }
+
+    //Crapload of data to prepare :C.
+    data.option = (backend_option_t*)malloc(sizeof(backend_option_t));
+    data.option->names = (char**)malloc(2 * sizeof(char*));
+    data.option->names[0] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data.option->names[1] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data.option->descriptions = (char**)malloc(2 * sizeof(char*));
+    data.option->descriptions[0] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data.option->descriptions[1] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data.option->active = (char*)malloc(STRING_SIZE * sizeof(char));
+    strcpy(data.option->names[0], "test_name1");
+    strcpy(data.option->names[1], "test_name2");
+    strcpy(data.option->descriptions[0], "test_desc1");
+    strcpy(data.option->descriptions[1], "test_desc2");
+    strcpy(data.option->active, "test_desc2");
+    data.option->size = 2;
+
+    [results removeAllObjects];
+
+    SECTION("control with options", "controlChanged{idx}_{type}, ports") {
+        //We'll check only options here.
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: [NSString stringWithFormat:
+                              @"%@%d_%d", @"controlChanged",
+                              PA_VALID_INDEX, SINK] 
+                     object: middleware];
+
+        callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        REQUIRE([results count] == 1);
+        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"ports"];
+        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+    }
+
+    [results removeAllObjects];
+
+    SECTION("card", "cardProfileChanged{internal index}_{CARD}") {
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: [NSString stringWithFormat:
+                              @"%@%d_%d", @"cardProfileChanged",
+                              PA_VALID_INDEX, CARD]
+                     object: middleware];
+
+        callback_update_func(middleware, CARD, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"profile"];
+        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+    }
+
+    [center removeObserver: results];
+
+    free(data.option->active);
+    free(data.option->descriptions[1]);
+    free(data.option->descriptions[0]);
+    free(data.option->descriptions);
+    free(data.option->names[1]);
+    free(data.option->names[0]);
+    free(data.option->names);
+    free(data.option);
+
+    [results release];
+    [middleware release];
+}

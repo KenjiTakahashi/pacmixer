@@ -47,9 +47,14 @@
 -(volume_t*) initWithLevel: (int) level_
                    andMute: (int) mute_ {
     self = [super init];
-    level = [NSNumber numberWithInt: level_];
+    level = [[NSNumber alloc] initWithInt: level_];
     mute = mute_ ? YES : NO;
     return self;
+}
+
+-(void) dealloc {
+    [level release];
+    [super dealloc];
 }
 
 -(NSNumber*) level {
@@ -71,11 +76,12 @@
     for(int i = 0; i < n_options; ++i) {
         [options addObject: [NSString stringWithUTF8String: options_[i]]];
     }
-    active = [NSString stringWithUTF8String: active_];
+    active = [[NSString alloc] initWithUTF8String: active_];
     return self;
 }
 
 -(void) dealloc {
+    [active release];
     [options release];
     [super dealloc];
 }

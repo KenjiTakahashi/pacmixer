@@ -44,6 +44,7 @@
 
 -(volume_t*) initWithLevel: (int) level_
                    andMute: (int) mute_;
+-(void) dealloc;
 -(NSNumber*) level;
 -(BOOL) mute;
 @end

@@ -145,6 +145,7 @@ void callback_update_func(
                                               andActive: active];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             p, @"profile", nil];
+        [p release];
         NSString *nname = [NSString stringWithFormat:
             @"%@%d_%d", @"cardProfileChanged", idx, type];
         [center postNotificationName: nname
@@ -175,6 +176,7 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
                                                 andNOptions: pnum
                                                   andActive: active];
             [s setObject: p forKey: @"ports"];
+            [p release];
         }
         NSString *nname = [NSString stringWithFormat:
         @"%@%d_%d", @"controlChanged", idx, type];
