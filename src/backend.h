@@ -251,7 +251,6 @@ typedef struct VOLUME_CALLBACK {
             cvolume.values[volume->index] = volume->value;\
             pa_context_set_ ## type ## _volume ## by_index(c, info->index, &cvolume, NULL, NULL);\
         }\
-        free(volume);\
     }\
 
 #define _CB_SINGLE_EVENT(event, type, by_index)\

@@ -265,6 +265,8 @@ void TEST_CALLBACK__cb_state_changed(void *s) {
 TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
     state_callback_t *sc = (state_callback_t*)malloc(sizeof(state_callback_t));
     sc->func = (void*)TEST_CALLBACK__cb_state_changed;
+    pa_context_state_t a = 0;
+    sc->state = &a;
 
     SECTION("failed", "PA_CONTEXT_FAILED") {
         s_state = PA_CONTEXT_FAILED;
