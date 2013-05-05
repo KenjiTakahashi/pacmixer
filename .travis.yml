@@ -1,0 +1,11 @@
+language: cpp
+compiler:
+  - gcc
+before_install:
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq gobjc gobjc++ libgnustep-base-dev
+before_script: make tests
+script: ./pacmixer_run_tests
+branches:
+  only:
+    - master
