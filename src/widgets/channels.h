@@ -41,7 +41,7 @@
         int normLevel;
         int delta;
         BOOL mute;
-        BOOL mutable;
+        BOOL isMutable;
         BOOL inside;
         BOOL propagate;
         BOOL hidden;

@@ -33,9 +33,9 @@
     my = getmaxy(parent) - 1;
     win = derwin(parent, my, 1, 0, i + 1);
     if(mute_ != nil) {
-        mutable = YES;
+        isMutable = YES;
     } else {
-        mutable = NO;
+        isMutable = NO;
     }
     if(mlevel_ != nil) {
         maxLevel = [mlevel_ intValue];
@@ -60,7 +60,7 @@
             mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
         }
         int currentPos = my - 1;
-        if(mutable) {
+        if(isMutable) {
             currentPos -= 2;
         }
         float dy = (float)currentPos / (float)maxLevel;
@@ -98,7 +98,7 @@
 }
 
 -(void) setMute: (BOOL) mute_ {
-    if(mutable) {
+    if(isMutable) {
         mute = mute_;
     }
     [self print];
@@ -158,7 +158,7 @@
 }
 
 -(void) mute {
-    if(mutable) {
+    if(isMutable) {
         if(mute) {
             [self setMute: NO];
         } else {
