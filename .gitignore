@@ -1,6 +1,7 @@
 *~
 *swp
 *.o
+*.d
 .td
 pacmixer
 pacmixer_run_tests
