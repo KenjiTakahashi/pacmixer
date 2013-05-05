@@ -23,10 +23,16 @@
                   andNormLevel: (int) normLevel_
                     andMutable: (int) mutable_ {
     self = [super init];
-    maxLevel = [NSNumber numberWithInt: maxLevel_];
-    normLevel = [NSNumber numberWithInt: normLevel_];
+    maxLevel = [[NSNumber alloc] initWithInt: maxLevel_];
+    normLevel = [[NSNumber alloc] initWithInt: normLevel_];
     isMutable = mutable_ ? YES : NO;
     return self;
+}
+
+-(void) dealloc {
+    [normLevel release];
+    [maxLevel release];
+    [super dealloc];
 }
 
 -(NSNumber*) maxLevel {

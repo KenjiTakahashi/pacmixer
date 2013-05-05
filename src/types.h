@@ -30,6 +30,7 @@
 -(channel_t*) initWithMaxLevel: (int) maxLevel_
                   andNormLevel: (int) normLevel_
                     andMutable: (int) mutable_;
+-(void) dealloc;
 -(NSNumber*) maxLevel;
 -(NSNumber*) normLevel;
 -(BOOL) mutable;

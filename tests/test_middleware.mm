@@ -191,27 +191,69 @@ TEST_CASE("callback_remove_func", "Should fire 'controlDisappeared' notification
     [middleware release];
 }
 
-TEST_CASE("callback_update_func", "Should fire appropriate update notification") {
-    Middleware *middleware = [[Middleware alloc] init];
-    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
-
+backend_data_t TEST_PREPARE_backend_data_t_part1() {
     backend_data_t data;
+    //Those values are not really realistic, but work for testing purposes.
+    data.channels = (backend_channel_t*)malloc(2 * sizeof(backend_channel_t));
+    data.channels[0].maxLevel = 150;
+    data.channels[0].normLevel = 120;
+    data.channels[0].isMutable = 1;
+    data.channels[1].maxLevel = 130;
+    data.channels[1].normLevel = 90;
+    data.channels[1].isMutable = 0;
     data.volumes = (backend_volume_t*)malloc(2 * sizeof(backend_volume_t));
     data.volumes[0].level = 120;
-    //This is not realistic, mute is per control, not per channel.
     data.volumes[0].mute = 0;
     data.volumes[1].level = 90;
     data.volumes[1].mute = 1;
     data.channels_num = 2;
     data.option = NULL;
+    return data;
+}
+
+void TEST_PREPARE_backend_data_t_part2(backend_data_t *data) {
+    //Crapload of data to prepare :C.
+    data->option = (backend_option_t*)malloc(sizeof(backend_option_t));
+    data->option->names = (char**)malloc(2 * sizeof(char*));
+    data->option->names[0] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data->option->names[1] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data->option->descriptions = (char**)malloc(2 * sizeof(char*));
+    data->option->descriptions[0] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data->option->descriptions[1] = (char*)malloc(STRING_SIZE * sizeof(char));
+    data->option->active = (char*)malloc(STRING_SIZE * sizeof(char));
+    strcpy(data->option->names[0], "test_name1");
+    strcpy(data->option->names[1], "test_name2");
+    strcpy(data->option->descriptions[0], "test_desc1");
+    strcpy(data->option->descriptions[1], "test_desc2");
+    strcpy(data->option->active, "test_desc2");
+    data->option->size = 2;
+}
+
+void TEST_PREPARE_backend_data_t_free(backend_data_t data) {
+    free(data.option->active);
+    free(data.option->descriptions[1]);
+    free(data.option->descriptions[0]);
+    free(data.option->descriptions);
+    free(data.option->names[1]);
+    free(data.option->names[0]);
+    free(data.option->names);
+    free(data.option);
+    free(data.volumes);
+    free(data.channels);
+}
+
+TEST_CASE("callback_update_func", "Should fire appropriate update notification") {
+    Middleware *middleware = [[Middleware alloc] init];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
+
+    backend_data_t data = TEST_PREPARE_backend_data_t_part1();
 
     SECTION("control without options", "controlChanged{idx}_{type}, !ports") {
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
-                              @"%@%d_%d", @"controlChanged",
-                              PA_VALID_INDEX, SINK] 
+                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK] 
                      object: middleware];
 
         callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
@@ -227,21 +269,7 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         REQUIRE([v2 mute] == YES);
     }
 
-    //Crapload of data to prepare :C.
-    data.option = (backend_option_t*)malloc(sizeof(backend_option_t));
-    data.option->names = (char**)malloc(2 * sizeof(char*));
-    data.option->names[0] = (char*)malloc(STRING_SIZE * sizeof(char));
-    data.option->names[1] = (char*)malloc(STRING_SIZE * sizeof(char));
-    data.option->descriptions = (char**)malloc(2 * sizeof(char*));
-    data.option->descriptions[0] = (char*)malloc(STRING_SIZE * sizeof(char));
-    data.option->descriptions[1] = (char*)malloc(STRING_SIZE * sizeof(char));
-    data.option->active = (char*)malloc(STRING_SIZE * sizeof(char));
-    strcpy(data.option->names[0], "test_name1");
-    strcpy(data.option->names[1], "test_name2");
-    strcpy(data.option->descriptions[0], "test_desc1");
-    strcpy(data.option->descriptions[1], "test_desc2");
-    strcpy(data.option->active, "test_desc2");
-    data.option->size = 2;
+    TEST_PREPARE_backend_data_t_part2(&data);
 
     [results removeAllObjects];
 
@@ -250,13 +278,11 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
-                              @"%@%d_%d", @"controlChanged",
-                              PA_VALID_INDEX, SINK] 
+                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK] 
                      object: middleware];
 
         callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
 
-        REQUIRE([results count] == 1);
         REQUIRE([results count] == 1);
         option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"ports"];
         REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
@@ -270,7 +296,7 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
-                              @"%@%d_%d", @"cardProfileChanged",
+                              @"cardProfileChanged%d_%d",
                               PA_VALID_INDEX, CARD]
                      object: middleware];
 
@@ -285,14 +311,169 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
 
     [center removeObserver: results];
 
-    free(data.option->active);
-    free(data.option->descriptions[1]);
-    free(data.option->descriptions[0]);
-    free(data.option->descriptions);
-    free(data.option->names[1]);
-    free(data.option->names[0]);
-    free(data.option->names);
-    free(data.option);
+    TEST_PREPARE_backend_data_t_free(data);
+
+    [results release];
+    [middleware release];
+}
+
+TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
+    s_instance = 1;
+    s_state = PA_CONTEXT_READY;
+    Middleware *middleware = [[Middleware alloc] init];
+    [middleware initContext];
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
+
+    backend_data_t data = TEST_PREPARE_backend_data_t_part1();
+
+    reset_mock_variables();
+
+    SECTION("control without options", "controlAppeared, !ports") {
+        //Also connects "volumeChanged{idx}_{type}_{index}" and
+        //volumeChanged{idx}_{type}" and "muteChanged{idx}_{type}" signals.
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: @"controlAppeared"
+                     object: middleware];
+
+        callback_add_func(middleware, "test_c1", SINK, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        NSDictionary *p = [[results objectAtIndex: 0] userInfo];
+        NSArray *channels = [p objectForKey: @"channels"];
+        NSArray *volumes = [p objectForKey: @"volumes"];
+        REQUIRE([[p objectForKey: @"name"] isEqualToString: @"test_c1"]);
+        REQUIRE([[p objectForKey: @"id"] isEqualToNumber: [NSNumber numberWithInt: PA_VALID_INDEX]]);
+        REQUIRE([[p objectForKey: @"type"] isEqualToNumber: [NSNumber numberWithInt: SINK]]);
+        channel_t *c1 = [channels objectAtIndex: 0];
+        channel_t *c2 = [channels objectAtIndex: 1];
+        REQUIRE([[c1 maxLevel] isEqualToNumber: [NSNumber numberWithInt: 150]]);
+        REQUIRE([[c1 normLevel] isEqualToNumber: [NSNumber numberWithInt: 120]]);
+        REQUIRE([c1 mutable] == YES);
+        REQUIRE([[c2 maxLevel] isEqualToNumber: [NSNumber numberWithInt: 130]]);
+        REQUIRE([[c2 normLevel] isEqualToNumber: [NSNumber numberWithInt: 90]]);
+        REQUIRE([c2 mutable] == NO);
+        volume_t *v1 = [volumes objectAtIndex: 0];
+        volume_t *v2 = [volumes objectAtIndex: 1];
+        REQUIRE([[v1 level] isEqualToNumber: [NSNumber numberWithInt: 120]]);
+        REQUIRE([v1 mute] == NO);
+        REQUIRE([[v2 level] isEqualToNumber: [NSNumber numberWithInt: 90]]);
+        REQUIRE([v2 mute] == YES);
+        REQUIRE([p objectForKey: @"ports"] == NULL);
+
+        SECTION("volumeChanged", "") {
+            NSString *name = [NSString stringWithFormat:
+                @"volumeChanged%d_%d_%d", PA_VALID_INDEX, SINK, 1];
+            NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                [NSNumber numberWithInt: 90], @"volume", nil];
+            [center postNotificationName: name
+                                  object: nil
+                                userInfo: info];
+
+            REQUIRE(output_sink_info[0] == PA_VALID_INDEX);
+            REQUIRE(output_sink_info[1] == 1);
+            REQUIRE(output_sink_info[2] == 90);
+        }
+
+        SECTION("volumeChanged all", "") {
+            NSString *name = [NSString stringWithFormat:
+                @"volumeChanged%d_%d", PA_VALID_INDEX, SINK];
+            NSArray *v = [NSArray arrayWithObjects:
+                [NSNumber numberWithInt: 120],
+                [NSNumber numberWithInt: 90], nil];
+            NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                v, @"volume", nil];
+            [center postNotificationName: name
+                                  object: nil
+                                userInfo: info];
+
+            REQUIRE(output_sink_volume[0] == PA_VALID_INDEX);
+            REQUIRE(output_sink_volume[1] == 120);
+            REQUIRE(output_sink_volume[2] == 90);
+        }
+
+        SECTION("muteChanged", "") {
+            NSString *name = [NSString stringWithFormat:
+                @"muteChanged%d_%d", PA_VALID_INDEX, SINK];
+            NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                [NSNumber numberWithBool: YES], @"mute", nil];
+            [center postNotificationName: name
+                                  object: nil
+                                userInfo: info];
+
+            REQUIRE(output_sink_mute[0] == PA_VALID_INDEX);
+            REQUIRE(output_sink_mute[1] == 1);
+        }
+    }
+
+    TEST_PREPARE_backend_data_t_part2(&data);
+
+    [results removeAllObjects];
+
+    SECTION("control with options", "controlAppeared, ports") {
+        //Also connects "activeOptionChanged{idx}_{type}" signal.
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: @"controlAppeared"
+                     object: middleware];
+
+        callback_add_func(middleware, "test_c1", SINK, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"ports"];
+        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+
+        SECTION("activeOptionChanged", "") {
+            NSString *name = [NSString stringWithFormat:
+                @"activeOptionChanged%d_%d", PA_VALID_INDEX, SINK];
+            NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                @"test_desc2", @"option", nil];
+            [center postNotificationName: name
+                                  object: nil
+                                userInfo: info];
+
+            REQUIRE(output_sink_port.index == PA_VALID_INDEX);
+            REQUIRE(strcmp(output_sink_port.active, "test_name2") == 0);
+        }
+    }
+
+    [results removeAllObjects];
+
+    SECTION("card", "cardAppeared") {
+        //Also connects "activeOptionChanged{idx}_{CARD}" signal.
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: @"cardAppeared"
+                     object: middleware];
+
+        callback_add_func(middleware, "test_c1", CARD, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"profile"];
+        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+
+        SECTION("activeOptionChanged", "") {
+            NSString *name = [NSString stringWithFormat:
+                @"activeOptionChanged%d_%d", PA_VALID_INDEX, CARD];
+            NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                @"test_desc1", @"option", nil];
+            [center postNotificationName: name
+                                  object: nil
+                                userInfo: info];
+
+            REQUIRE(output_card_profile.index == PA_VALID_INDEX);
+            REQUIRE(strcmp(output_card_profile.active, "test_name1") == 0);
+        }
+    }
+
+    [center removeObserver: results];
+
+    TEST_PREPARE_backend_data_t_free(data);
 
     [results release];
     [middleware release];

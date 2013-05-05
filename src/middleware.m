@@ -28,12 +28,14 @@ void callback_add_func(
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     NSString *sname = nil;
     SEL ssel;
+    //This block is used to set control-wise values, so index is
+    //not important. This is *channel's* number, nothing to do with idx.
     Block *block = [self addBlockWithId: idx
                                andIndex: -1
                                 andType: type];
     if(type == CARD && data->option != NULL) {
         sname = [NSString stringWithFormat:
-            @"%@%d_%d", @"activeOptionChanged", idx, type];
+            @"activeOptionChanged%d_%d", idx, type];
         ssel = @selector(setCardActiveProfile:);
         char ** const profiles = data->option->descriptions;
         const char *active = data->option->active;
@@ -67,7 +69,7 @@ void callback_add_func(
                                        andIndex: i
                                         andType: type];
             NSString *siname = [NSString stringWithFormat:
-                @"%@%d_%d_%d", @"volumeChanged", idx, type, i];
+                @"volumeChanged%d_%d_%d", idx, type, i];
             [center addObserver: block
                        selector: @selector(setVolume:)
                            name: siname
@@ -77,10 +79,10 @@ debug_fprintf(__func__, "m:%s observer added", [siname UTF8String]);
 #endif
         }
         sname = [NSString stringWithFormat:
-            @"%@%d_%d", @"volumeChanged", idx, type];
+            @"volumeChanged%d_%d", idx, type];
         ssel = @selector(setVolumes:);
         NSString *mname = [NSString stringWithFormat:
-            @"%@%d_%d", @"muteChanged", idx, type];
+            @"muteChanged%d_%d", idx, type];
         [center addObserver: block
                    selector: @selector(setMute:)
                        name: mname
@@ -104,7 +106,7 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
                                                   andActive: active];
             [s setObject: p forKey: @"ports"];
             NSString *psname = [NSString stringWithFormat:
-                @"%@%d_%d", @"activeOptionChanged", idx, type];
+                @"activeOptionChanged%d_%d", idx, type];
             [block addDataByCArray: pnum
                         withValues: data->option->names
                            andKeys: ports];
@@ -147,7 +149,7 @@ void callback_update_func(
             p, @"profile", nil];
         [p release];
         NSString *nname = [NSString stringWithFormat:
-            @"%@%d_%d", @"cardProfileChanged", idx, type];
+            @"cardProfileChanged%d_%d", idx, type];
         [center postNotificationName: nname
                               object: self
                             userInfo: s];
@@ -179,7 +181,7 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
             [p release];
         }
         NSString *nname = [NSString stringWithFormat:
-        @"%@%d_%d", @"controlChanged", idx, type];
+        @"controlChanged%d_%d", idx, type];
         [center postNotificationName: nname
                               object: self
                             userInfo: s];
@@ -195,7 +197,7 @@ void callback_remove_func(void *self_, uint32_t idx) {
     Middleware *self = self_;
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithInt: idx], @"id", nil];
-    NSString *nname = [NSString stringWithString: @"controlDisappeared"];
+    NSString *nname = @"controlDisappeared";
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
@@ -255,6 +257,7 @@ void callback_state_func(void *self_) {
         values[j] = [[v objectAtIndex: j] intValue];
     }
     backend_volume_setall(context, type, idx, values, count);
+    free(values);
 }
 
 -(void) setMute: (NSNotification*) notification {
