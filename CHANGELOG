@@ -30,3 +30,8 @@
 - Fixed crash when trying to go inside on SETTINGS tab.
 - Fixed a small screen corruption introduced in 0.2.
 - Added ability to get/set control-wise options (e.g. ports).
+
+== 0.4:
+- Adjusted Makefile to work better on different distros.
+- Fixed some possible memory leaks.
+- Test suite.

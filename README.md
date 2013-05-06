@@ -1,4 +1,4 @@
-**pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
+[![Build Status](https://travis-ci.org/KenjiTakahashi/pacmixer.png?branch=master)](https://travis-ci.org/KenjiTakahashi/pacmixer) **pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
 
 I started this, because I've found no full-blown, terminal based mixers available for PA. All there are are either [CLI][CLI] or some kinds of GNOME/KDE applets. That's not what I wanted, so in the end I decided to go for it myself.
 
@@ -78,3 +78,13 @@ That will make it easier to identify the problem.
 
 [alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
 [CLI]: http://en.wikipedia.org/wiki/Command-line_interface
+
+## tests
+
+Type
+```sh
+$ make tests
+$ ./pacmixer_run_tests
+```
+
+**Note:** You will need `g++` for this.
