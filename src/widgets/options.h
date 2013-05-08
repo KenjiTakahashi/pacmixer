@@ -32,6 +32,7 @@
 @interface Options: NSObject <Hiding> {
     @protected
         WINDOW *win;
+        WINDOW *parent;
         NSString *label;
         NSString *internalId;
         NSArray *options;
@@ -48,18 +49,19 @@
                andName: (NSString*) label_
              andValues: (NSArray*) options_
                  andId: (NSString*) id_
-             andParent: (WINDOW*) parent;
+             andParent: (WINDOW*) parent_;
 -(id) initWithWidth: (int) width_
             andName: (NSString*) label_
           andValues: (NSArray*) options_
               andId: (NSString*) id_
-          andParent: (WINDOW*) parent;
+          andParent: (WINDOW*) parent_;
 -(id) initWithName: (NSString*) label_
          andValues: (NSArray*) options_
              andId: (NSString*) id_
-         andParent: (WINDOW*) parent;
+         andParent: (WINDOW*) parent_;
 -(void) dealloc;
 -(void) print;
+-(void) reprint: (int) height_;
 -(void) setCurrent: (int) i;
 -(void) setCurrentByName: (NSString*) name;
 -(void) setCurrentByNotification: (NSNotification*) notification;
@@ -82,14 +84,8 @@
     @private
         int owidth;
         PANEL *pan;
-        WINDOW *parent;
 }
 
--(ROptions*) initWithWidth: (int) width_
-                   andName: (NSString*) label_
-                 andValues: (NSArray*) options_
-                     andId: (NSString*) id_
-                 andParent: (WINDOW*) parent_;
 -(void) dealloc;
 -(void) reprint: (int) height_;
 -(void) setHighlighted: (BOOL) active;

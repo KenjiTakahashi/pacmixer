@@ -114,8 +114,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     wresize(win, my - 4, mx - 2);
     wresize(pad, my - 4, pmx);
     for(int i = 0; i < [widgets count]; ++i) {
-        Widget *w = [widgets objectAtIndex: i];
-        [w reprint: my - 4];
+        [(Widget*)[widgets objectAtIndex: i] reprint: my - 4];
     }
     [top reprint];
     [bottom reprint];

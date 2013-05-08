@@ -24,7 +24,7 @@
                andName: (NSString*) label_
              andValues: (NSArray*) options_
                  andId: (NSString*) id_
-             andParent: (WINDOW*) parent {
+             andParent: (WINDOW*) parent_ {
     width = 0;
     for(int i = 0; i < [options_ count]; ++i) {
         int length = [[options_ objectAtIndex: i] length];
@@ -36,28 +36,28 @@
     return [self initWithName: label_
                     andValues: options_
                         andId: id_
-                    andParent: parent];
+                    andParent: parent_];
 }
 
 -(id) initWithWidth: (int) width_
             andName: (NSString*) label_
           andValues: (NSArray*) options_
               andId: (NSString*) id_
-          andParent: (WINDOW*) parent {
+          andParent: (WINDOW*) parent_ {
     width = width_;
-    int my = getmaxy(parent);
-    position = my - [options_ count] - 3;
+    position = getmaxy(parent_) - [options_ count] - 3;
     return [self initWithName: label_
                     andValues: options_
                         andId: id_
-                    andParent: parent];
+                    andParent: parent_];
 }
 
 -(id) initWithName: (NSString*) label_
          andValues: (NSArray*) options_
              andId: (NSString*) id_
-         andParent: (WINDOW*) parent {
+         andParent: (WINDOW*) parent_ {
     self = [super init];
+    parent = parent_;
     label = [label_ copy];
     options = [options_ retain];
     internalId = [id_ copy];
@@ -125,6 +125,12 @@
         }
         [TUI refresh];
     }
+}
+
+-(void) reprint: (int) height_ {
+    [self setPosition: height_ - [options count] - 3];
+    wresize(win, height, width);
+    [self print];
 }
 
 -(void) setCurrent: (int) i {
@@ -211,20 +217,6 @@
 
 
 @implementation ROptions
--(ROptions*) initWithWidth: (int) width_
-                   andName: (NSString*) label_
-                 andValues: (NSArray*) options_
-                     andId: (NSString*) id_
-                 andParent: (WINDOW*) parent_ {
-    parent = parent_;
-    self = [super initWithWidth: width_
-                        andName: label_
-                      andValues: options_
-                          andId: id_
-                      andParent: parent];
-    return self;
-}
-
 -(void) dealloc {
     if(pan != NULL) {
         del_panel(pan);
@@ -233,10 +225,9 @@
 }
 
 -(void) reprint: (int) height_ {
-    height = height - 1;
+    [super reprint: height_];
     if(pan != NULL) {
-        int mx = getmaxx(stdscr);
-        wresize(win, [options count] + 2, mx);
+        wresize(win, [options count] + 2, getmaxx(stdscr));
         replace_panel(pan, win);
         move_panel(pan, height - [options count], 0);
     }

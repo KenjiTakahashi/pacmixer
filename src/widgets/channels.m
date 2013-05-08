@@ -272,13 +272,13 @@
         height -= 2;
     }
     my = height;
-    for(int i = 0; i < [channels count]; ++i) {
-        [(Channel*)[channels objectAtIndex: i] reprint: height];
-    }
     if(hasPeak) {
         wresize(win, height, mx);
     } else {
         mvderwin(win, height - 4, position);
+    }
+    for(int i = 0; i < [channels count]; ++i) {
+        [(Channel*)[channels objectAtIndex: i] reprint: height];
     }
     [self print];
 }

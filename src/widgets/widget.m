@@ -70,10 +70,10 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(void) reprint: (int) height_ {
     werase(win);
     height = height_;
-    [channels reprint: height];
-    [ports reprint: height];
     wresize(win, height, width);
     [self printName];
+    [channels reprint: height - ([ports height] > 2 ? [ports height] : 0)];
+    [ports reprint: height];
 }
 
 -(void) printName {
