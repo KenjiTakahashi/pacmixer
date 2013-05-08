@@ -88,7 +88,8 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
                           withString: @" "
                      startingAtIndex: 0]
     );
-    mvwprintw(win, height - 1, length, "%@", name);
+    NSString *sn = [name length] > 8 ? [name substringToIndex: width] : name;
+    mvwprintw(win, height - 1, length, "%@", sn);
     wattroff(win, color | A_BOLD);
 }
 

@@ -34,4 +34,5 @@
 == 0.4:
 - Adjusted Makefile to work better on different distros.
 - Fixed some possible memory leaks.
-- Test suite.
+- Added a test suite.
+- Fixed screen corruptions happening on terminal resizes.
