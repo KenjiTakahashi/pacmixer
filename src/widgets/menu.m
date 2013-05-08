@@ -142,8 +142,6 @@
 }
 
 -(void) reprint {
-    werase(win);
-    wrefresh(win);
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);

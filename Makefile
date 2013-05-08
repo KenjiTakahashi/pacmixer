@@ -40,7 +40,7 @@ debug: CFLAGS += -g -O0 -D DEBUG=1
 debug: LIBS += -lrt
 debug: $(OBJECTS) $(COBJECTS)
 	$(CCC) $(CFLAGS) -c -o src/debug.o src/debug.c
-	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) src/debug.o $(LIBS)
+	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) src/debug.o $(LIBS) $(PLIBS)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)
 	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(LIBS) $(PLIBS)
