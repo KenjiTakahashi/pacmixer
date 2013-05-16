@@ -59,7 +59,7 @@ Used to adjust specific channel's volume.
 All shortcuts (besides ```q```) work the same, except that they affect single channel instead of the whole sink/source.
 
 #### settings mode
-Used to change controls settings (e.g. profiles).
+Used to change controls settings (e.g. ports).
 
 Shortcuts work like in outside mode, except that:
 
@@ -76,9 +76,6 @@ then run it, reproduce the problem and send the contents of ```~/.pacmixer.log``
 
 That will make it easier to identify the problem.
 
-[alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
-[CLI]: http://en.wikipedia.org/wiki/Command-line_interface
-
 ## tests
 
 Type
@@ -88,3 +85,9 @@ $ ./pacmixer_run_tests
 ```
 
 **Note:** You will need `g++` for this.
+**Note:** It is a [Catch][catch] executable, all [options] apply.
+
+[alsamixer]: http://en.wikipedia.org/wiki/Alsamixer
+[CLI]: http://en.wikipedia.org/wiki/Command-line_interface
+[catch]: https://github.com/philsquared/Catch
+[options]: https://github.com/philsquared/Catch/wiki/Command-line
