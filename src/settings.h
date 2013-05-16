@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -31,12 +31,12 @@
 }
 
 -(Values*) initWithType: (Class) type_
-              andValues: (NSString*) firstString, ...;
+              andValues: (id) firstString, ...;
+-(void) dealloc;
 -(int) count;
 -(id) objectAtIndex: (int) i;
 -(Class) type;
 -(NSArray*) values;
--(void) dealloc;
 @end
 
 
@@ -48,6 +48,7 @@
 }
 
 -(Settings*) init;
+-(void) dealloc;
 -(int) count;
 -(id) objectForKey: (NSString*) key;
 -(NSArray*) allKeys;
@@ -55,5 +56,4 @@
 -(void) setValue: (id) value
           forKey: (NSString*) key;
 -(id) getValue: (NSString*) key;
--(void) dealloc;
 @end

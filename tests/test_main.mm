@@ -7,3 +7,4 @@ extern "C" {
 }
 #import "test_types.mm"
 #import "test_middleware.mm"
+#import "test_settings.mm"

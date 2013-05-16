@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,17 +20,22 @@
 
 @implementation Values
 -(Values*) initWithType: (Class) type_
-              andValues: (NSString*) firstString, ... {
+              andValues: (id) firstString, ... {
     self = [super init];
     values = [[NSMutableArray alloc] init];
     va_list args;
     va_start(args, firstString);
-    for(NSString *str = firstString; str != nil; str = va_arg(args, NSString*)) {
+    for(id str = firstString; str != nil; str = va_arg(args, id)) {
         [values addObject: str];
     }
     type = type_;
     va_end(args);
     return self;
+}
+
+-(void) dealloc {
+    [values release];
+    [super dealloc];
 }
 
 -(int) count {
@@ -48,11 +53,6 @@
 -(NSArray*) values {
     return values;
 }
-
--(void) dealloc {
-    [values release];
-    [super dealloc];
-}
 @end
 
 
@@ -62,15 +62,12 @@
     storage = [NSUserDefaults standardUserDefaults];
     defaults = [NSDictionary dictionaryWithObjectsAndKeys:
         [NSNumber numberWithInt: 1], @"Filter/PulseAudio internals",
-        [NSNumber numberWithInt: 0], @"Filter/Monitors",
-        nil];
+        [NSNumber numberWithInt: 0], @"Filter/Monitors", nil];
     Values *filters = [[Values alloc] initWithType: [CheckBox class]
                                          andValues: @"PulseAudio internals",
-                                                    @"Monitors",
-                                                    nil];
+                                                    @"Monitors", nil];
     names = [NSDictionary dictionaryWithObjectsAndKeys:
-        filters, @"Filter",
-        nil];
+        filters, @"Filter", nil];
     [filters release];
     NSString *name = @"SettingChanged";
     [[NSNotificationCenter defaultCenter] addObserver: self
@@ -78,6 +75,12 @@
                                                  name: name
                                                object: nil];
     return self;
+}
+
+-(void) dealloc {
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [storage synchronize];
+    [super dealloc];
 }
 
 -(int) count {
@@ -116,11 +119,5 @@
         return nil;  // FIXME (Kenji): Do something nasty, this shouldn't happen
     }
     return value;
-}
-
--(void) dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver: self];
-    [storage synchronize];
-    [super dealloc];
 }
 @end
