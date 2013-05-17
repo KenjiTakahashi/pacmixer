@@ -189,12 +189,15 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     return widget;
 }
 
--(void) removeWidget: (NSNumber*) id_ {
+-(void) removeWidget: (NSString*) id_ {
     NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
     wclear(pad);
     for(int i = 0; i < [widgets count]; ++i) {
-        Widget *widget = [widgets objectAtIndex: i];
-        if([[widget internalId] isEqualToNumber: id_]) {
+        id widget = [widgets objectAtIndex: i];
+        if([[widget internalId] isEqualToString: id_]) {
+#ifdef DEBUG
+debug_fprintf(__func__, "f(v):%s removed at index %d", [id_ UTF8String], i);
+#endif
             [indexes addIndex: i];
             if(highlight >= i) {
                 if(highlight > 0) {
@@ -209,10 +212,10 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     [indexes removeAllIndexes];
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
-        if([[widget internalId] isEqualToNumber: id_]) {
+        if([[widget internalId] isEqualToString: id_]) {
             [indexes addIndex: i];
 #ifdef DEBUG
-debug_fprintf(__func__, "f:%d removed at index %d", [id_ intValue], i);
+debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
 #endif
         }
     }

@@ -58,7 +58,7 @@
 -(Widget*) addWidgetWithName: (NSString*) name
                      andType: (View) type
                        andId: (NSString*) id_;
--(void) removeWidget: (NSNumber*) id_;
+-(void) removeWidget: (NSString*) id_;
 -(void) addProfiles: (NSArray*) profiles
          withActive: (NSString*) active
             andName: (NSString*) name

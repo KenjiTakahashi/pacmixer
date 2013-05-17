@@ -202,7 +202,7 @@ void backend_port_set(context_t*, backend_entry_type, uint32_t, const char*);
 
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_data_t*);
 typedef void (*tcallback_update_func)(void*, backend_entry_type, uint32_t, backend_data_t*);
-typedef void (*tcallback_remove_func)(void*, uint32_t);
+typedef void (*tcallback_remove_func)(void*, uint32_t, backend_entry_type);
 typedef void (*tstate_callback_func)(void*);
 
 typedef struct CLIENT_CALLBACK {
@@ -260,7 +260,7 @@ typedef struct VOLUME_CALLBACK {
         }\
         if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {\
             callback_t *callback = (callback_t*)userdata;\
-            ((tcallback_remove_func)(callback->remove))(callback->self, idx);\
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx, event);\
         }\
         if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {\
             pa_context_get_ ## type ## _info ## by_index(c, idx, _cb_ ## type, userdata);\

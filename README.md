@@ -85,6 +85,7 @@ $ ./pacmixer_run_tests
 ```
 
 **Note:** You will need `g++` for this.
+
 **Note:** It is a [Catch][catch] executable, all [options] apply.
 
 [alsamixer]: http://en.wikipedia.org/wiki/Alsamixer

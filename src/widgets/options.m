@@ -199,10 +199,8 @@
     return label;
 }
 
--(NSNumber*) internalId {
-    NSArray *components = [internalId componentsSeparatedByString: @"_"];
-    int i = [[components objectAtIndex: 0] integerValue];
-    return [NSNumber numberWithInt: i];
+-(NSString*) internalId {
+    return internalId;
 }
 
 -(void) show {

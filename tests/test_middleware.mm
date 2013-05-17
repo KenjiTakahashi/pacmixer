@@ -182,11 +182,12 @@ TEST_CASE("callback_remove_func", "Should fire 'controlDisappeared' notification
                    name: @"controlDisappeared"
                  object: middleware];
 
-    callback_remove_func((void*)middleware, PA_VALID_INDEX);
+    callback_remove_func((void*)middleware, PA_VALID_INDEX, SINK);
 
     REQUIRE([results count] == 1);
-    NSNumber *idx = [[[results objectAtIndex: 0] userInfo] objectForKey: @"id"];
-    REQUIRE([idx isEqualToNumber: [NSNumber numberWithInt: PA_VALID_INDEX]]);
+    NSString *idx = [[[results objectAtIndex: 0] userInfo] objectForKey: @"id"];
+    NSString *res = [NSString stringWithFormat: @"%d_%d", PA_VALID_INDEX, SINK];
+    REQUIRE([idx isEqualToString: res]);
 
     [middleware release];
 }

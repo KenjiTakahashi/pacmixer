@@ -192,11 +192,11 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
     [pool release];
 }
 
-void callback_remove_func(void *self_, uint32_t idx) {
+void callback_remove_func(void *self_, uint32_t idx, backend_entry_type type) {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [NSNumber numberWithInt: idx], @"id", nil];
+        [NSString stringWithFormat: @"%d_%d", idx, type], @"id", nil];
     NSString *nname = @"controlDisappeared";
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self

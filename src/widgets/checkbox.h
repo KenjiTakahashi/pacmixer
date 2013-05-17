@@ -57,7 +57,7 @@
 -(void) switchValue;
 -(int) height;
 -(int) endPosition;
--(NSNumber*) internalId;
+-(NSString*) internalId;
 -(void) show;
 -(void) hide;
 @end

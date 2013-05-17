@@ -70,7 +70,7 @@
 -(int) endPosition;
 -(View) type;
 -(NSString*) name;
--(NSNumber*) internalId;
+-(NSString*) internalId;
 -(void) show;
 -(void) hide;
 @end
