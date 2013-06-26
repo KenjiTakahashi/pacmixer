@@ -1,4 +1,7 @@
-[![Build Status](https://travis-ci.org/KenjiTakahashi/pacmixer.png?branch=master)](https://travis-ci.org/KenjiTakahashi/pacmixer) **pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
+[![Build Status](https://travis-ci.org/KenjiTakahashi/pacmixer.png?branch=master)](https://travis-ci.org/KenjiTakahashi/pacmixer)
+[![Flattr This](https://api.flattr.com/button/flattr-badge-large.png)(https://flattr.com/submit/auto?user_id=KenjiTakahashi&url=https://github.com/KenjiTakahashi/pacmixer&title=pacmixer&language=en_GB&tags=github&category=software)
+
+**pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
 
 I started this, because I've found no full-blown, terminal based mixers available for PA. All there are are either [CLI][CLI] or some kinds of GNOME/KDE applets. That's not what I wanted, so in the end I decided to go for it myself.
 
@@ -52,6 +55,8 @@ q (or Esc): exit the application
 ```
 
 **Note:** All settings are applied and saved automatically.
+
+**Note:** Tired of the `~/GNUstep` directory? Rename it and replace the value of `GNUSTEP_USER_DEFAULTS_DIR` variable in the `/etc/GNUstep/GNUstep.conf` file.
 
 #### inside mode
 Used to adjust specific channel's volume.
