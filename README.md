@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/KenjiTakahashi/pacmixer.png?branch=master)](https://travis-ci.org/KenjiTakahashi/pacmixer)
-[![Flattr This](https://api.flattr.com/button/flattr-badge-large.png)(https://flattr.com/submit/auto?user_id=KenjiTakahashi&url=https://github.com/KenjiTakahashi/pacmixer&title=pacmixer&language=en_GB&tags=github&category=software)
+[![Flattr This](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=KenjiTakahashi&url=https://github.com/KenjiTakahashi/pacmixer&title=pacmixer&language=en_GB&tags=github&category=software)
 
 **pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
 
