@@ -20,19 +20,25 @@
 
 
 @implementation Options
+
+@synthesize win = _win;
+@synthesize parent = _parent;
+@synthesize width = _width;
+@synthesize position = _position;
+
 -(id) initWithPosition: (int) ypos
                andName: (NSString*) label_
              andValues: (NSArray*) options_
                  andId: (NSString*) id_
              andParent: (WINDOW*) parent_ {
-    width = 0;
+    _width = 0;
     for(int i = 0; i < [options_ count]; ++i) {
         int length = [[options_ objectAtIndex: i] length];
-        if(length > width) {
-            width = length;
+        if(length > _width) {
+            _width = length;
         }
     }
-    position = ypos;
+    _position = ypos;
     return [self initWithName: label_
                     andValues: options_
                         andId: id_
@@ -44,8 +50,8 @@
           andValues: (NSArray*) options_
               andId: (NSString*) id_
           andParent: (WINDOW*) parent_ {
-    width = width_;
-    position = getmaxy(parent_) - [options_ count] - 3;
+    _width = width_;
+    _position = getmaxy(parent_) - [options_ count] - 3;
     return [self initWithName: label_
                     andValues: options_
                         andId: id_
@@ -57,30 +63,30 @@
              andId: (NSString*) id_
          andParent: (WINDOW*) parent_ {
     self = [super init];
-    parent = parent_;
+    _parent = parent_;
     label = [label_ copy];
     options = [options_ retain];
     internalId = [id_ copy];
     highlighted = NO;
     highlight = 0;
-    height = [options count] + 2;
+    _height = [options count] + 2;
     int my;
     int mx;
-    getmaxyx(parent, my, mx);
-    width += 2;
+    getmaxyx(_parent, my, mx);
+    _width += 2;
     BOOL resizeParent = NO;
-    if(width > mx) {
-        mx = width;
+    if(_width > mx) {
+        mx = _width;
         resizeParent = YES;
     }
-    if(position + height > my) {
-        my = position + height;
+    if(_position + _height > my) {
+        my = _position + _height;
         resizeParent = YES;
     }
     if(resizeParent) {
-        wresize(parent, my, mx);
+        wresize(_parent, my, mx);
     }
-    win = derwin(parent, height, width, position, 0);
+    _win = derwin(_parent, _height, _width, _position, 0);
     hidden = YES;
     [self print];
     return self;
@@ -88,7 +94,7 @@
 
 -(void) dealloc {
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-    delwin(win);
+    delwin(_win);
     [internalId release];
     [options release];
     [label release];
@@ -97,31 +103,31 @@
 
 -(void) print {
     if(!hidden) {
-        box(win, 0, 0);
-        if([label length] > width - 2) {
-            mvwprintw(win, 0, 1, "%@", [label substringToIndex: width - 2]);
+        box(self.win, 0, 0);
+        if([label length] > self.width - 2) {
+            mvwprintw(self.win, 0, 1, "%@", [label substringToIndex: self.width - 2]);
         } else {
-            mvwprintw(win, 0, 1, "%@", label);
+            mvwprintw(self.win, 0, 1, "%@", label);
         }
         for(int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
             if(i == current) {
-                wattron(win, COLOR_PAIR(6));
+                wattron(self.win, COLOR_PAIR(6));
             }
             if(highlighted && i == highlight) {
-                wattroff(win, COLOR_PAIR(6));
-                wattron(win, A_REVERSE);
+                wattroff(self.win, COLOR_PAIR(6));
+                wattron(self.win, A_REVERSE);
             }
-            mvwprintw(win, i + 1, 1, "      ");
-            if([obj length] > width - 2) {
-                mvwprintw(win, i + 1, 1, "%@",
-                    [obj substringToIndex: width - 2]
+            mvwprintw(self.win, i + 1, 1, "      ");
+            if([obj length] > self.width - 2) {
+                mvwprintw(self.win, i + 1, 1, "%@",
+                    [obj substringToIndex: self.width - 2]
                 );
             } else {
-                mvwprintw(win, i + 1, 1, "%@", obj);
+                mvwprintw(self.win, i + 1, 1, "%@", obj);
             }
-            wattroff(win, A_REVERSE);
-            wattroff(win, COLOR_PAIR(6));
+            wattroff(self.win, A_REVERSE);
+            wattroff(self.win, COLOR_PAIR(6));
         }
         [TUI refresh];
     }
@@ -129,7 +135,7 @@
 
 -(void) reprint: (int) height_ {
     [self setPosition: height_ - [options count] - 3];
-    wresize(win, height, width);
+    wresize(self.win, [self height], self.width);
     [self print];
 }
 
@@ -167,8 +173,8 @@
 }
 
 -(void) setPosition: (int) position_ {
-    position = position_;
-    mvderwin(win, position, 0);
+    _position = position_;
+    mvderwin(self.win, self.position, 0);
 }
 
 -(void) switchValue {
@@ -188,7 +194,7 @@
 }
 
 -(int) endPosition {
-    return position + [self height];
+    return self.position + [self height];
 }
 
 -(View) type {
@@ -210,51 +216,5 @@
 
 -(void) hide {
     hidden = YES;
-}
-@end
-
-
-@implementation ROptions
--(void) dealloc {
-    if(pan != NULL) {
-        del_panel(pan);
-    }
-    [super dealloc];
-}
-
--(void) reprint: (int) height_ {
-    [super reprint: height_];
-    if(pan != NULL) {
-        wresize(win, [options count] + 2, getmaxx(stdscr));
-        replace_panel(pan, win);
-        move_panel(pan, height - [options count], 0);
-    }
-}
-
--(void) setHighlighted: (BOOL) active {
-    if(active) {
-        owidth = width;
-        int by = getbegy(win);
-        width = getmaxx(stdscr);
-        delwin(win);
-        win = newwin([options count] + 2, width, by + 2, 0);
-        pan = new_panel(win);
-        [super setHighlighted: active];
-    } else {
-        width = owidth;
-        if(pan != NULL) {
-            del_panel(pan);
-            pan = NULL;
-        }
-        delwin(win);
-        win = derwin(parent, height, width, position, 0);
-        [super setHighlighted: active];
-    }
-}
-
--(void) adjust {
-    if(pan == NULL) {
-        mvderwin(win, position, 0);
-    }
 }
 @end

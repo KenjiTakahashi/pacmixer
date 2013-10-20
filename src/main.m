@@ -96,8 +96,8 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
         }
         option_t *ports = [info objectForKey: @"ports"];
         if(ports != nil) {
-            ROptions *opt = [w addOptions: [ports options]
-                                 withName: @"Ports"];
+            id opt = [w addOptions: [ports options]
+                          withName: @"Ports"];
             [opt setCurrentByName: [ports active]];
         }
     } else {

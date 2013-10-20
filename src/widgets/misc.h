@@ -16,6 +16,8 @@
 
 
 #import <Foundation/NSObject.h>
+#import <Foundation/NSInvocation.h>
+#import <panel.h>
 
 
 typedef enum {
@@ -46,4 +48,32 @@ typedef enum {
 @protocol Hiding <NSObject>
 -(void) show;
 -(void) hide;
+@end
+
+
+@protocol Modal <NSObject>
+@property WINDOW *win;
+@property WINDOW *parent;
+@property int width;
+@property(readonly) int height;
+@property int position;
+
+-(void) reprint: (int) height_;
+-(void) setHighlighted: (BOOL) active;
+@end
+
+
+@interface Modal: NSObject {
+    @private
+        id<Modal> window;
+        int owidth;
+        PANEL *pan;
+}
+
+-(Modal*) initWithWindow: (id<Modal>) window_;
+-(void) dealloc;
+-(void) reprint: (int) height_;
+-(void) setHighlighted: (BOOL) active;
+-(void) adjust;
+-(void) forwardInvocation: (NSInvocation*) inv;
 @end

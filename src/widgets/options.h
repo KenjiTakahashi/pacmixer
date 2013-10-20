@@ -21,7 +21,6 @@
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSDictionary.h>
 #import <curses.h>
-#import <panel.h>
 #import "misc.h"
 #import "../types.h"
 
@@ -29,21 +28,27 @@
 @class TUI;
 
 
-@interface Options: NSObject <Hiding> {
+@interface Options: NSObject <Hiding, Modal> {
     @protected
-        WINDOW *win;
-        WINDOW *parent;
+        WINDOW *_win;
+        WINDOW *_parent;
+        int _width;
+        int _height;
         NSString *label;
         NSString *internalId;
         NSArray *options;
         BOOL highlighted;
         int current;
         int highlight;
-        int position;
-        int width;
-        int height;
+        int _position;
         BOOL hidden;
 }
+
+@property WINDOW *win;
+@property WINDOW *parent;
+@property int width;
+@property(readonly) int height;
+@property int position;
 
 -(id) initWithPosition: (int) ypos
                andName: (NSString*) label_
@@ -77,17 +82,4 @@
 -(NSString*) internalId;
 -(void) show;
 -(void) hide;
-@end
-
-
-@interface ROptions: Options {
-    @private
-        int owidth;
-        PANEL *pan;
-}
-
--(void) dealloc;
--(void) reprint: (int) height_;
--(void) setHighlighted: (BOOL) active;
--(void) adjust;
 @end

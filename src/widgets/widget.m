@@ -111,14 +111,16 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     return channels;
 }
 
--(ROptions*) addOptions: (NSArray*) options_
-               withName: (NSString*) optname {
+-(id) addOptions: (NSArray*) options_
+        withName: (NSString*) optname {
     [channels reprint: height - [options_ count] - 2];
-    ports = [[ROptions alloc] initWithWidth: width - 2
-                                    andName: optname
-                                  andValues: options_
-                                      andId: internalId
-                                  andParent: win];
+    Options *p = [[Options alloc] initWithWidth: width - 2
+                                        andName: optname
+                                      andValues: options_
+                                          andId: internalId
+                                      andParent: win];
+    ports = [[Modal alloc] initWithWindow: p];
+    [p release];
     if(!hidden) {
         [ports show];
     }

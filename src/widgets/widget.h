@@ -33,7 +33,7 @@
         View type;
         NSString *internalId;
         Channels *channels;
-        ROptions *ports;
+        id ports;
         BOOL highlighted;
         Mode mode;
         BOOL hidden;
@@ -50,8 +50,8 @@
 -(void) reprint: (int) height_;
 -(void) printName;
 -(Channels*) addChannels: (NSArray*) channels_;
--(ROptions*) addOptions: (NSArray*) options_
-               withName: (NSString*) optname;
+-(id) addOptions: (NSArray*) options_
+        withName: (NSString*) optname;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(void) setValuesByNotification: (NSNotification*) notification;
