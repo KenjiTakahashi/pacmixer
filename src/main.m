@@ -36,6 +36,10 @@
                    name: @"cardAppeared"
                  object: nil];
     tui = [[TUI alloc] init];
+    [center addObserver: tui
+               selector: @selector(setDefaults:)
+                   name: @"serverDefaultsChanged"
+                 object: nil];
     middleware = [[Middleware alloc] init];
     [middleware spawn];
     return self;
@@ -56,13 +60,13 @@
     View type;
     switch(typeb) {
         case SINK:
-            type = INPUTS;
+            type = OUTPUTS;
             break;
         case SINK_INPUT:
             type = PLAYBACK;
             break;
         case SOURCE:
-            type = OUTPUTS;
+            type = INPUTS;
             break;
         case SOURCE_OUTPUT:
             type = RECORDING;
@@ -86,6 +90,7 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
         Widget *w = [tui addWidgetWithName: name
                                    andType: type
                                      andId: internalId];
+        w.internalName = [info objectForKey: @"internalName"];
         Channels *channelsWidgets = [w addChannels: channels];
         for(int i = 0; i < [channels count]; ++i) {
             volume_t *volume = [volumes objectAtIndex: i];

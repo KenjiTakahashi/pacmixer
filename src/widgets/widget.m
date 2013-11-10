@@ -20,6 +20,9 @@
 
 
 @implementation Widget
+
+@synthesize internalName = _internalName;
+
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
                     andType: (View) type_
@@ -34,6 +37,8 @@
     width = 8;
     hidden = YES;
     mode = MODE_OUTSIDE;
+    hasDefault = type == INPUTS || type == OUTPUTS;
+    isDefault = NO;
     [self print];
 #ifdef DEBUG
 debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8String]);
@@ -51,6 +56,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     }
     [name release];
     [internalId release];
+    [_internalName release];
     delwin(win);
     [super dealloc];
 }
@@ -72,11 +78,15 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     height = height_;
     wresize(win, height, width);
     [self printName];
+    [self printDefault];
     [channels reprint: height - ([ports height] > 2 ? [ports height] : 0)];
     [ports reprint: height];
 }
 
 -(void) printName {
+    if(hidden) {
+        return;
+    }
     int color = highlighted ? COLOR_PAIR(6) : COLOR_PAIR(5);
     int length = (width - (int)[name length]) / 2;
     if(length < 0) {
@@ -93,6 +103,24 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     wattroff(win, color | A_BOLD);
 }
 
+-(void) printDefault {
+    if(!hasDefault || hidden) {
+        return;
+    }
+    int y = height - [ports height] - 4;
+    mvwaddch(win, y, 0, ACS_ULCORNER);
+    whline(win, 0, width - 2);
+    mvwaddch(win, y++, width - 1, ACS_URCORNER);
+    mvwaddch(win, y++, 0, ACS_VLINE);
+    for(int _ = 0; _ < width - 2; ++_) {
+        waddch(win, ' ' | (isDefault ? COLOR_PAIR(2) : COLOR_PAIR(4)));
+    }
+    waddch(win, ACS_VLINE);
+    mvwaddch(win, y, 0, ACS_LLCORNER);
+    whline(win, 0, width - 2);
+    mvwaddch(win, y, width - 1, ACS_LRCORNER);
+}
+
 -(Channels*) addChannels: (NSArray*) channels_ {
     int width_ = [channels_ count] + 2;
     int position_ = (width - width_) / 2;
@@ -100,10 +128,12 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
         width = width_;
         [self print];
         [self printName];
+        [self printDefault];
     }
     channels = [[Channels alloc] initWithChannels: channels_
                                       andPosition: position_
                                             andId: internalId
+                                       andDefault: hasDefault
                                         andParent: win];
     if(!hidden) {
         [channels show];
@@ -113,7 +143,8 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 
 -(id) addOptions: (NSArray*) options_
         withName: (NSString*) optname {
-    [channels reprint: height - [options_ count] - 2];
+    int dy = hasDefault ? 5 : 2;
+    [channels reprint: height - [options_ count] - dy];
     Options *p = [[Options alloc] initWithWidth: width - 2
                                         andName: optname
                                       andValues: options_
@@ -123,7 +154,11 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     [p release];
     if(!hidden) {
         [ports show];
+        [self printDefault];
     }
+#ifdef DEBUG
+debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UTF8String]);
+#endif
     return ports;
 }
 
@@ -153,6 +188,14 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     if(ports_ != nil) {
         [ports setCurrentByName: [ports_ active]];
     }
+}
+
+-(void) setDefault: (BOOL) default_ {
+#ifdef DEBUG
+debug_fprintf(__func__, "f:%d:%s set as default", [internalId intValue], [name UTF8String]);
+#endif
+    isDefault = default_;
+    [self printDefault];
 }
 
 -(BOOL) canGoInside {
@@ -251,6 +294,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 -(void) show {
     hidden = NO;
     [self printName];
+    [self printDefault];
     [channels show];
     [ports show];
 }

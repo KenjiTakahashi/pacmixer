@@ -93,6 +93,7 @@
 -(Channels*) initWithChannels: (NSArray*) channels_
                   andPosition: (int) position_
                         andId: (NSString*) id_
+                   andDefault: (BOOL) default_
                     andParent: (WINDOW*) parent;
 -(void) dealloc;
 -(void) print;

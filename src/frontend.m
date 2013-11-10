@@ -312,6 +312,22 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     }
 }
 
+-(void) setDefaults: (NSNotification*) notification {
+    NSDictionary *userInfo = [notification userInfo];
+    NSDictionary *defaults = [userInfo objectForKey: @"defaults"];
+    NSString *default_sink = [defaults objectForKey: @"sink"];
+    NSString *default_source = [defaults objectForKey: @"source"];
+
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *w = [allWidgets objectAtIndex: i];
+        if([w type] == INPUTS) {
+            [w setDefault: [default_source isEqualToString: w.internalName]];
+        } else if([w type] == OUTPUTS) {
+            [w setDefault: [default_sink isEqualToString: w.internalName]];
+        }
+    }
+}
+
 -(void) showSettings {
     if([bottom mode] == MODE_SETTINGS) {
         [(Widget*)[widgets objectAtIndex: highlight] outside];

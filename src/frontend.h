@@ -66,6 +66,7 @@
 -(void) setCurrent: (int) i;
 -(void) setFirst;
 -(void) setFilter: (View) type;
+-(void) setDefaults: (NSNotification*) notification;
 -(void) showSettings;
 -(void) switchSetting;
 -(void) previous;

@@ -32,13 +32,18 @@
         NSString *name;
         View type;
         NSString *internalId;
+        NSString *_internalName;
         Channels *channels;
         id ports;
         BOOL highlighted;
         Mode mode;
         BOOL hidden;
+        BOOL isDefault;
+        BOOL hasDefault;
         WINDOW *parent;
 }
+
+@property(retain) NSString *internalName;
 
 -(Widget*) initWithPosition: (int) p
                     andName: (NSString*) name_
@@ -49,12 +54,14 @@
 -(void) print;
 -(void) reprint: (int) height_;
 -(void) printName;
+-(void) printDefault;
 -(Channels*) addChannels: (NSArray*) channels_;
 -(id) addOptions: (NSArray*) options_
         withName: (NSString*) optname;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(void) setValuesByNotification: (NSNotification*) notification;
+-(void) setDefault: (BOOL) default_;
 -(BOOL) canGoInside;
 -(BOOL) canGoSettings;
 -(void) inside;

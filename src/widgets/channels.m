@@ -53,38 +53,35 @@
 }
 
 -(void) print {
-    if(!hidden) {
-        if(mute) {
-            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(4));
-        } else {
-            mvwaddch(win, my - 1, 0, ' ' | COLOR_PAIR(2));
-        }
-        int currentPos = my - 1;
-        if(isMutable) {
-            currentPos -= 2;
-        }
-        float dy = (float)currentPos / (float)maxLevel;
-        int limit = dy * currentLevel;
-        int high = dy * normLevel;
-        int medium = high * (4. / 5.);
-        int low = high * (2. / 5.);
-        for(int i = 0; i < my - 3; ++i) {
-            int color = COLOR_PAIR(2);
-            if(i < limit) {
-                if(i >= high) {
-                    color = COLOR_PAIR(5);
-                } else if(i >= medium) {
-                    color = COLOR_PAIR(4);
-                } else if(i >= low) {
-                    color = COLOR_PAIR(3);
-                }
-            } else {
-                color = COLOR_PAIR(1);
-            }
-            mvwaddch(win, currentPos - i, 0, ' ' | color);
-        }
-        [TUI refresh];
+    if(hidden) {
+        return;
     }
+    mvwaddch(win, my - 1, 0, ' ' | (mute ? COLOR_PAIR(4) : COLOR_PAIR(2)));
+    int currentPos = my - 1;
+    if(isMutable) {
+        currentPos -= 2;
+    }
+    float dy = (float)currentPos / (float)maxLevel;
+    int limit = dy * currentLevel;
+    int high = dy * normLevel;
+    int medium = high * (4. / 5.);
+    int low = high * (2. / 5.);
+    for(int i = 0; i < my - 3; ++i) {
+        int color = COLOR_PAIR(2);
+        if(i < limit) {
+            if(i >= high) {
+                color = COLOR_PAIR(5);
+            } else if(i >= medium) {
+                color = COLOR_PAIR(4);
+            } else if(i >= low) {
+                color = COLOR_PAIR(3);
+            }
+        } else {
+            color = COLOR_PAIR(1);
+        }
+        mvwaddch(win, currentPos - i, 0, ' ' | color);
+    }
+    [TUI refresh];
 }
 
 -(void) reprint: (int) height {
@@ -186,12 +183,13 @@
 -(Channels*) initWithChannels: (NSArray*) channels_
                   andPosition: (int) position_
                         andId: (NSString*) id_
+                   andDefault: (BOOL) default_
                     andParent: (WINDOW*) parent {
     self = [super init];
     highlight = 0;
     position = position_;
     getmaxyx(parent, my, mx);
-    my -= 1;
+    my -= default_ ? 4 : 1;
     mx = [channels_ count] + 2;
     hasPeak = NO;
     hasMute = NO;

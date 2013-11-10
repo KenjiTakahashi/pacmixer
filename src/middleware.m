@@ -96,7 +96,10 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
             [NSString stringWithUTF8String: name], @"name",
             [NSNumber numberWithInt: idx], @"id",
             ch, @"channels", chv, @"volumes",
-            [NSNumber numberWithInt: type], @"type", nil];
+            [NSNumber numberWithInt: type], @"type",
+            [NSString stringWithUTF8String: data->internalName],
+            @"internalName",
+        nil];
         if(data->option != NULL) {
             char ** const ports = data->option->descriptions;
             const char *active = data->option->active;
@@ -138,7 +141,22 @@ void callback_update_func(
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     Middleware *self = self_;
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
-    if(type == CARD && data->option != NULL) {
+    if(type == SERVER && data->defaults != NULL) {
+        NSString *default_sink = [NSString stringWithUTF8String:
+            data->defaults->sink];
+        NSString *default_source = [NSString stringWithUTF8String:
+            data->defaults->source];
+
+        NSDictionary *p = [NSDictionary dictionaryWithObjectsAndKeys:
+            default_sink, @"sink", default_source, @"source", nil];
+        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+            p, @"defaults", nil];
+        NSString *nname = @"serverDefaultsChanged";
+
+        [center postNotificationName: nname
+                              object: self
+                            userInfo: s];
+    } else if(type == CARD && data->option != NULL) {
         char ** const profiles = data->option->descriptions;
         const char *active = data->option->active;
         uint8_t chnum = data->option->size;

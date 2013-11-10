@@ -37,3 +37,6 @@
 - Added a test suite.
 - Fixed screen corruptions happening on terminal resizes.
 - Fixed settings sometimes disappearing after card profile change.
+
+== 0.5:
+- Fixed INPUTS filtered as OUTPUTS and vice versa.

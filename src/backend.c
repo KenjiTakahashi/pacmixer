@@ -60,6 +60,7 @@ void backend_init(context_t *context, callback_t *callback) {
     pa_context_get_source_info_list(context->context, _cb_source, callback);
     pa_context_get_source_output_info_list(context->context, _cb_source_output, callback);
     pa_context_get_card_info_list(context->context, _cb_card, callback);
+    pa_context_get_server_info(context->context, _cb_server, callback);
 }
 
 void backend_destroy(context_t *context) {
@@ -180,6 +181,41 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
     }
 }
 
+#define _CB_DO_OPTION(_cb_func, type)\
+    if(!eol) {\
+        uint32_t n = info->n_ports;\
+        backend_option_t *optdata = NULL;\
+        if(n > 0) {\
+            optdata = (backend_option_t*)malloc(sizeof(backend_option_t));\
+            optdata->descriptions = (char**)malloc(n * sizeof(char*));\
+            optdata->names = (char**)malloc(n * sizeof(char*));\
+            for(uint32_t i = 0; i < n; ++i) {\
+                const char *desc = info->ports[i]->description;\
+                optdata->descriptions[i] = (char*)malloc((strlen(desc) + 1) * sizeof(char));\
+                strcpy(optdata->descriptions[i], desc);\
+                const char *name = info->ports[i]->name;\
+                optdata->names[i] = (char*)malloc((strlen(name) + 1) * sizeof(char));\
+                strcpy(optdata->names[i], name);\
+            }\
+            const char *active_opt = info->active_port->description;\
+            optdata->active = (char*)malloc((strlen(active_opt) + 1) * sizeof(char));\
+            strcpy(optdata->active, active_opt);\
+            optdata->size = n;\
+        }\
+        _cb_func(info->index, type, info->volume, info->mute, info->description, info->name, optdata, userdata);\
+        _do_option_free(optdata, n);\
+    }\
+
+#define _CB_SET_VOLUME(type, by_index)\
+    if(!eol) {\
+        volume_callback_t *volume = (volume_callback_t*)userdata;\
+        if(info->index != PA_INVALID_INDEX) {\
+            pa_cvolume cvolume = info->volume;\
+            cvolume.values[volume->index] = volume->value;\
+            pa_context_set_ ## type ## _volume ## by_index(c, info->index, &cvolume, NULL, NULL);\
+        }\
+    }\
+
 void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
     _CB_DO_OPTION(_cb1, SINK);
 }
@@ -200,7 +236,7 @@ void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void
 
 void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
     if(!eol) {
-        _cb_u(info->index, SINK_INPUT, info->volume, info->mute, NULL, NULL, userdata);
+        _cb_u(info->index, SINK_INPUT, info->volume, info->mute, NULL, NULL, NULL, userdata);
     }
 }
 
@@ -228,7 +264,7 @@ void _cb_source_output(pa_context *c, const pa_source_output_info *info, int eol
 
 void _cb_u_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
     if(!eol) {
-        _cb_u(info->index, SOURCE_OUTPUT, info->volume, info->mute, NULL, NULL, userdata);
+        _cb_u(info->index, SOURCE_OUTPUT, info->volume, info->mute, NULL, NULL, NULL, userdata);
     }
 }
 
@@ -271,6 +307,41 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
     }
 }
 
+void _cb_server(pa_context *c, const pa_server_info *info, void *userdata) {
+    callback_t *callback = userdata;
+
+    backend_data_t data;
+    data.defaults = malloc(sizeof(backend_default_t));
+
+    const char *sink_name = info->default_sink_name;
+    data.defaults->sink = malloc((strlen(sink_name) + 1) * sizeof(char));
+    strcpy(data.defaults->sink, sink_name);
+
+    const char *source_name = info->default_source_name;
+    data.defaults->source = malloc((strlen(source_name) + 1) * sizeof(char));
+    strcpy(data.defaults->source, source_name);
+
+    ((tcallback_update_func)(callback->update))(callback->self, SERVER, 0, &data);
+
+    free(data.defaults->source);
+    free(data.defaults->sink);
+    free(data.defaults);
+}
+
+#define _CB_SINGLE_EVENT(event, type, by_index)\
+    if(t__ == PA_SUBSCRIPTION_EVENT_ ## event) {\
+        if(t_ == PA_SUBSCRIPTION_EVENT_CHANGE && idx != PA_INVALID_INDEX) {\
+            pa_context_get_ ## type ## _info ## by_index(c, idx, _cb_u_ ## type, userdata);\
+        }\
+        if(t_ == PA_SUBSCRIPTION_EVENT_REMOVE && idx != PA_INVALID_INDEX) {\
+            callback_t *callback = (callback_t*)userdata;\
+            ((tcallback_remove_func)(callback->remove))(callback->self, idx, event);\
+        }\
+        if(t_ == PA_SUBSCRIPTION_EVENT_NEW && idx != PA_INVALID_INDEX) {\
+            pa_context_get_ ## type ## _info ## by_index(c, idx, _cb_ ## type, userdata);\
+        }\
+    }\
+
 void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void *userdata) {
     int t_ = t & PA_SUBSCRIPTION_EVENT_TYPE_MASK;
     int t__ = t & PA_SUBSCRIPTION_EVENT_FACILITY_MASK;
@@ -279,6 +350,9 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
     _CB_SINGLE_EVENT(SINK_INPUT, sink_input, );
     _CB_SINGLE_EVENT(SOURCE, source, _by_index);
     _CB_SINGLE_EVENT(SOURCE_OUTPUT, source_output, );
+    if(t__ == PA_SUBSCRIPTION_EVENT_SERVER) {
+        pa_context_get_server_info(c, _cb_server, userdata);
+    }
 }
 
 backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
@@ -334,7 +408,7 @@ void _do_option_free(backend_option_t *option, int n) {
     free(option);
 }
 
-void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, backend_option_t *optdata, void *userdata) {
+void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, const char *internalName, backend_option_t *optdata, void *userdata) {
     if(index != PA_INVALID_INDEX) {
         callback_t *callback = userdata;
         uint8_t chnum = volume.channels;
@@ -347,7 +421,7 @@ void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute,
     }
 }
 
-void _cb1(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, backend_option_t *options, void *userdata) {
+void _cb1(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, const char *internalName, backend_option_t *options, void *userdata) {
     if(index != PA_INVALID_INDEX) {
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", index, description);
@@ -359,6 +433,8 @@ debug_fprintf(__func__, "%d:%s appeared", index, description);
         data.volumes = _do_volumes(volume, chnum, mute);
         data.channels_num = chnum;
         data.option = options;
+        data.internalName = (char*)malloc((strlen(internalName) + 1) * sizeof(char));
+        strcpy(data.internalName, internalName);
         ((tcallback_add_func)(callback->add))(callback->self, description, type, index, &data);
         free(data.channels);
         free(data.volumes);
