@@ -36,7 +36,8 @@ enum {
     PA_SUBSCRIPTION_EVENT_SINK_INPUT,
     PA_SUBSCRIPTION_EVENT_SINK,
     PA_SUBSCRIPTION_EVENT_SOURCE,
-    PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT
+    PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT,
+    PA_SUBSCRIPTION_EVENT_SERVER
 };
 
 enum {
@@ -86,3 +87,4 @@ pa_context_state_t pa_context_get_state(pa_context*);
 const char *pa_proplist_gets(const pa_proplist, int);
 void pa_context_get_card_info_by_index(pa_context*, uint32_t, void(*)(pa_context*, const pa_card_info*, int, void*), void*);
 void pa_context_get_client_info(pa_context*, uint32_t, void*, void*);
+void pa_context_get_server_info(pa_context*, void*, void*);

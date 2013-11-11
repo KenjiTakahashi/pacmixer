@@ -15,6 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#import "catch.hpp"
 #import "../src/settings.h"
 #import "mock_variables.h"
 

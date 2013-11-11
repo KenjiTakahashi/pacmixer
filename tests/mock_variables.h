@@ -62,6 +62,7 @@ struct PA_PORT_INFO_INFO {
     uint32_t index;
     pa_cvolume volume;
     int mute;
+    char name[STRING_SIZE];
     char description[STRING_SIZE];
     int n_ports;
     struct PA_PORT_INFO **ports;
@@ -81,6 +82,10 @@ typedef struct PA_CARD_INFO {
     pa_card_profile_info *profiles;
     pa_card_profile_info *active_profile;
 } pa_card_info;
+typedef struct PA_SERVER_INFO {
+    const char *default_sink_name;
+    const char *default_source_name;
+} pa_server_info;
 typedef struct OUTPUT_INDEX_ACTIVE {
     int index;
     char active[STRING_SIZE];

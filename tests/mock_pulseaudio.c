@@ -168,3 +168,6 @@ void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void(*
 void pa_context_get_client_info(pa_context *context, uint32_t idx, void *s, void *m) {
     output_client_info = idx;
 }
+
+void pa_context_get_server_info(pa_context *context, void *s, void *m) {
+}

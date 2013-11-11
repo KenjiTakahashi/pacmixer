@@ -27,10 +27,17 @@ SOURCES=$(wildcard src/*.m) $(wildcard src/widgets/*.m)
 OBJECTS=$(SOURCES:.m=.o)
 CSOURCES=src/backend.c
 COBJECTS=$(CSOURCES:.c=.o)
-TSOURCES=tests/test_main.mm
+
+TSOURCES=$(wildcard tests/*.mm)
 TOBJECTS=$(TSOURCES:.mm=.o)
+TSOURCES+=tests/test_backend.cpp
+TOBJECTS+=tests/test_backend.o
 MSOURCES=$(wildcard tests/mock_*.c)
 MOBJECTS=$(MSOURCES:.c=.o)
+
+DEBUGSRC=src/debug.c
+DEBUGOBJ=src/debug.o
+
 EXEC=pacmixer
 TEXEC=pacmixer_run_tests
 
@@ -38,15 +45,15 @@ all: CFLAGS += -O2
 all: $(CSOURCES) $(SOURCES) $(EXEC)
 debug: CFLAGS += -g -O0 -D DEBUG=1
 debug: LIBS += -lrt
-debug: $(OBJECTS) $(COBJECTS)
-	$(CCC) $(CFLAGS) -c -o src/debug.o src/debug.c
-	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) src/debug.o $(LIBS) $(PLIBS)
+debug: $(OBJECTS) $(COBJECTS) $(DEBUGOBJ)
+	$(CCC) $(CFLAGS) -c -o $(DEBUGOBJ) $(DEBUGSRC)
+	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) $(DEBUGOBJ) $(LIBS) $(PLIBS)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)
 	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(LIBS) $(PLIBS)
 
 clean:
-	rm -rf $(OBJECTS) $(COBJECTS) src/debug.o $(EXEC)
+	rm -rf $(OBJECTS) $(COBJECTS) $(DEBUGOBJ) $(EXEC)
 
 %.o: %.m
 	$(CCC) $(CFLAGS) $(OFLAGS) -c -o $@ $^
@@ -60,16 +67,19 @@ install:
 	@cp -f pacmixer $(DESTDIR)$(PREFIX)/bin/
 	@chmod 755 $(DESTDIR)$(PREFIX)/bin/pacmixer
 
+%.o: %.cpp
+	$(CPP) $(CPPFLAGS) -c -o $@ $^
+
 %.o: %.mm
 	$(CPP) $(CPPFLAGS) $(OFLAGS) -c -o $@ $^
 
-$(TEXEC): $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS)
-	$(CPP) -o $@ $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS) $(LIBS)
+$(TEXEC): $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS) $(DEBUGOBJ)
+	$(CPP) -o $@ $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS) $(DEBUGOBJ) $(LIBS)
 
 tests: CFLAGS += -g -O2 -D TESTS=1
 tests: SOURCES := $(filter-out src/main.m, $(SOURCES))
 tests: OBJECTS := $(filter-out src/main.o, $(OBJECTS))
-tests: $(CSOURCES) $(SOURCES) $(TSOURCES) $(MSOURCES) $(TEXEC)
+tests: $(CSOURCES) $(SOURCES) $(TSOURCES) $(MSOURCES) $(DEBUGSRC) $(TEXEC)
 
 clean_tests: clean
 	rm -rf $(TOBJECTS) $(MOBJECTS) $(TEXEC)

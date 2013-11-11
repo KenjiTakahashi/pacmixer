@@ -17,6 +17,7 @@
 */
 
 
+#include "catch.hpp"
 extern "C" {
 #include "../src/backend.h"
 #include "mock_variables.h"
