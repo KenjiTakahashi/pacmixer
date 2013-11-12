@@ -21,7 +21,7 @@
 
 
 context_t *backend_new(state_callback_t *state_callback) {
-    context_t *context = malloc(sizeof(context_t));
+    context_t *context = (context_t*)malloc(sizeof(context_t));
     context->loop = pa_threaded_mainloop_new();
     context->state = PA_CONTEXT_UNCONNECTED;
     pa_mainloop_api *api = pa_threaded_mainloop_get_api(context->loop);
@@ -154,7 +154,7 @@ void backend_port_set(context_t *c, backend_entry_type type, uint32_t idx, const
 }
 
 void _cb_state_changed(pa_context *c, void *userdata) {
-    state_callback_t *state_callback = userdata;
+    state_callback_t *state_callback = (state_callback_t*)userdata;
     pa_context_state_t nstate = pa_context_get_state(c);
     *state_callback->state = nstate;
     if(nstate == PA_CONTEXT_FAILED || nstate == PA_CONTEXT_TERMINATED) {
@@ -164,7 +164,7 @@ void _cb_state_changed(pa_context *c, void *userdata) {
 
 void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
-        client_callback_t *client_callback = userdata;
+        client_callback_t *client_callback = (client_callback_t*)userdata;
         callback_t *callback = client_callback->callback;
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
@@ -274,7 +274,7 @@ void _cb_s_source_output(pa_context *c, const pa_source_output_info *info, int e
 
 void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
+        callback_t *callback = (callback_t*)userdata;
         int n = info->n_profiles;
         backend_data_t data;
         if(n > 0) {
@@ -292,7 +292,7 @@ void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) 
 
 void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
+        callback_t *callback = (callback_t*)userdata;
         int n = info->n_profiles;
         backend_data_t data;
         if(n > 0) {
@@ -308,17 +308,17 @@ void _cb_u_card(pa_context *c, const pa_card_info *info, int eol, void *userdata
 }
 
 void _cb_server(pa_context *c, const pa_server_info *info, void *userdata) {
-    callback_t *callback = userdata;
+    callback_t *callback = (callback_t*)userdata;
 
     backend_data_t data;
-    data.defaults = malloc(sizeof(backend_default_t));
+    data.defaults = (backend_default_t*)malloc(sizeof(backend_default_t));
 
     const char *sink_name = info->default_sink_name;
-    data.defaults->sink = malloc((strlen(sink_name) + 1) * sizeof(char));
+    data.defaults->sink = (char*)malloc((strlen(sink_name) + 1) * sizeof(char));
     strcpy(data.defaults->sink, sink_name);
 
     const char *source_name = info->default_source_name;
-    data.defaults->source = malloc((strlen(source_name) + 1) * sizeof(char));
+    data.defaults->source = (char*)malloc((strlen(source_name) + 1) * sizeof(char));
     strcpy(data.defaults->source, source_name);
 
     ((tcallback_update_func)(callback->update))(callback->self, SERVER, 0, &data);
@@ -356,7 +356,7 @@ void _cb_event(pa_context *c, pa_subscription_event_type_t t, uint32_t idx, void
 }
 
 backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
-    backend_channel_t *channels = malloc(chnum * sizeof(backend_channel_t));
+    backend_channel_t *channels = (backend_channel_t*)malloc(chnum * sizeof(backend_channel_t));
     for(int i = 0; i < chnum; ++i) {
         channels[i].maxLevel = PA_VOLUME_UI_MAX;
         channels[i].normLevel = PA_VOLUME_NORM;
@@ -366,7 +366,7 @@ backend_channel_t *_do_channels(pa_cvolume volume, uint8_t chnum) {
 }
 
 backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
-    backend_volume_t *volumes = malloc(chnum * sizeof(backend_volume_t));
+    backend_volume_t *volumes = (backend_volume_t*)malloc(chnum * sizeof(backend_volume_t));
     for(int i = 0; i < chnum; ++i) {
         volumes[i].level = volume.values[i];
         volumes[i].mute = mute;
@@ -375,20 +375,20 @@ backend_volume_t *_do_volumes(pa_cvolume volume, uint8_t chnum, int mute) {
 }
 
 backend_option_t *_do_card(const pa_card_info *info, int n) {
-    backend_option_t *card = malloc(sizeof(backend_option_t));
+    backend_option_t *card = (backend_option_t*)malloc(sizeof(backend_option_t));
     pa_card_profile_info *profiles = info->profiles;
-    card->descriptions = malloc(n * sizeof(char*));
-    card->names = malloc(n * sizeof(char*));
+    card->descriptions = (char**)malloc(n * sizeof(char*));
+    card->names = (char**)malloc(n * sizeof(char*));
     for(int i = 0; i < n; ++i) {
         const char *desc = profiles[i].description;
-        card->descriptions[i] = malloc((strlen(desc) + 1) * sizeof(char));
+        card->descriptions[i] = (char*)malloc((strlen(desc) + 1) * sizeof(char));
         strcpy(card->descriptions[i], desc);
         const char *name = profiles[i].name;
-        card->names[i] = malloc((strlen(name) + 1) * sizeof(char));
+        card->names[i] = (char*)malloc((strlen(name) + 1) * sizeof(char));
         strcpy(card->names[i], name);
     }
     const char *active = info->active_profile->description;
-    card->active = malloc((strlen(active) + 1) * sizeof(char));
+    card->active = (char*)malloc((strlen(active) + 1) * sizeof(char));
     strcpy(card->active, active);
     card->size = n;
     return card;
@@ -410,7 +410,7 @@ void _do_option_free(backend_option_t *option, int n) {
 
 void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, const char *internalName, backend_option_t *optdata, void *userdata) {
     if(index != PA_INVALID_INDEX) {
-        callback_t *callback = userdata;
+        callback_t *callback = (callback_t*)userdata;
         uint8_t chnum = volume.channels;
         backend_data_t data;
         data.volumes = _do_volumes(volume, chnum, mute);
@@ -426,7 +426,7 @@ void _cb1(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, 
 #ifdef DEBUG
 debug_fprintf(__func__, "%d:%s appeared", index, description);
 #endif
-        callback_t *callback = userdata;
+        callback_t *callback = (callback_t*)userdata;
         uint8_t chnum = volume.channels;
         backend_data_t data;
         data.channels = _do_channels(volume, chnum);
@@ -445,11 +445,11 @@ void _cb2(pa_context *c, uint32_t index, pa_cvolume volume, int mute, const char
     if(index != PA_INVALID_INDEX) {
         /* TODO: We'll need this name once status line is done. */
         if(client != PA_INVALID_INDEX) {
-            callback_t *callback = userdata;
+            callback_t *callback = (callback_t*)userdata;
             uint8_t chnum = volume.channels;
             backend_channel_t *channels = _do_channels(volume, chnum);
             backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-            client_callback_t *client_callback = malloc(sizeof(client_callback_t));
+            client_callback_t *client_callback = (client_callback_t*)malloc(sizeof(client_callback_t));
             client_callback->callback = callback;
             client_callback->channels = channels;
             client_callback->volumes = volumes;

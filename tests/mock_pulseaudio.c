@@ -38,26 +38,26 @@ int pa_context_connect(pa_context *context, void *s, int n, void *m) {
 
 void pa_context_unref(pa_context *context) {}
 
-void pa_context_set_state_callback(pa_context *context, void *s, void *m) {
+void pa_context_set_state_callback(pa_context *context, void(*s)(pa_context*, void*), void *m) {
     s_callback_t *sc = (s_callback_t*)m;
     *sc->state = PA_CONTEXT_READY;
 }
 
 void pa_threaded_mainloop_start(pa_threaded_mainloop *loop) {}
 
-void pa_context_set_subscribe_callback(pa_context *context, void *s, void *m) {}
+void pa_context_set_subscribe_callback(pa_context *context, void(*s)(pa_context*, pa_subscription_event_type_t, uint32_t, void*), void *m) {}
 
 void pa_context_subscribe(pa_context *context, int mask, void *s, void *m) {}
 
-void pa_context_get_sink_input_info_list(pa_context *context, void *s, void *m) {}
+void pa_context_get_sink_input_info_list(pa_context *context, void(*s)(pa_context*, const pa_sink_input_info*, int, void*), void *m) {}
 
-void pa_context_get_source_output_info_list(pa_context *context, void *s, void *m) {}
+void pa_context_get_source_output_info_list(pa_context *context, void(*s)(pa_context*, const pa_source_output_info*, int, void*), void *m) {}
 
-void pa_context_get_sink_info_list(pa_context *context, void *s, void *m) {}
+void pa_context_get_sink_info_list(pa_context *context, void(*s)(pa_context*, const pa_sink_info*, int, void*), void *m) {}
 
-void pa_context_get_source_info_list(pa_context *context, void *s, void *m) {}
+void pa_context_get_source_info_list(pa_context *context, void(*s)(pa_context*, const pa_source_info*, int, void*), void *m) {}
 
-void pa_context_get_card_info_list(pa_context *context, void *s, void *m) {}
+void pa_context_get_card_info_list(pa_context *context, void(*s)(pa_context*, const pa_card_info*, int, void*), void *m) {}
 
 void pa_threaded_mainloop_stop(pa_threaded_mainloop* loop) {}
 
@@ -165,9 +165,9 @@ void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void(*
     output_card_info = idx;
 }
 
-void pa_context_get_client_info(pa_context *context, uint32_t idx, void *s, void *m) {
+void pa_context_get_client_info(pa_context *context, uint32_t idx, void(*s)(pa_context*, const pa_client_info*, int, void*), void *m) {
     output_client_info = idx;
 }
 
-void pa_context_get_server_info(pa_context *context, void *s, void *m) {
+void pa_context_get_server_info(pa_context *context, void(*s)(pa_context*, const pa_server_info*, void*), void *m) {
 }

@@ -19,8 +19,8 @@
 
 #include "catch.hpp"
 extern "C" {
-#include "../src/backend.h"
 #include "mock_variables.h"
+#include "../src/backend.c"
 }
 
 
@@ -342,7 +342,7 @@ TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
 
 backend_option_t TEST_RETURN__cb1__cb_u;
 
-void TEST_FUNC__cb1__cb_u(uint32_t idx, backend_entry_type type, pa_cvolume volme, int mute, const char *description, backend_option_t *options, void *userdata) {
+void TEST_FUNC__cb1__cb_u(uint32_t idx, backend_entry_type type, pa_cvolume volme, int mute, const char *description, const char *name, backend_option_t *options, void *userdata) {
     strcpy(TEST_RETURN__cb1__cb_u.names[0], options->names[0]);
     strcpy(TEST_RETURN__cb1__cb_u.descriptions[0], options->descriptions[0]);
     strcpy(TEST_RETURN__cb1__cb_u.active, options->active);
@@ -778,7 +778,7 @@ TEST_CASE("_cb_u", "Should fire 'update' callback for given data") {
     callback_t cb;
     cb.update = (void*)TEST_CALLBACK__cb_u;
 
-    _cb_u(PA_VALID_INDEX, SINK, cv, 1, NULL, NULL, (void*)&cb);
+    _cb_u(PA_VALID_INDEX, SINK, cv, 1, NULL, NULL, NULL, (void*)&cb);
 
     REQUIRE(TEST_RETURN__cb_u_type == SINK);
     REQUIRE(TEST_RETURN__cb_u_idx == PA_VALID_INDEX);
@@ -787,11 +787,14 @@ TEST_CASE("_cb_u", "Should fire 'update' callback for given data") {
 backend_entry_type TEST_RETURN__cb1_type = CARD;
 int TEST_RETURN__cb1_idx = PA_INVALID_INDEX;
 char TEST_RETURN__cb1_desc[STRING_SIZE];
+char TEST_RETURN__cb1_iname[STRING_SIZE];
 
 void TEST_CALLBACK__cb1(void *s, const char *desc, backend_entry_type type, uint32_t idx, void *data) {
+    backend_data_t *d = (backend_data_t*)data;
     TEST_RETURN__cb1_type = type;
     TEST_RETURN__cb1_idx = idx;
     strcpy(TEST_RETURN__cb1_desc, desc);
+    strcpy(TEST_RETURN__cb1_iname, d->internalName);
 }
 
 TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
@@ -801,11 +804,12 @@ TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
     callback_t cb;
     cb.add = (void*)TEST_CALLBACK__cb1;
 
-    _cb1(PA_VALID_INDEX, SINK, cv, 1, "test_desc", NULL, (void*)&cb);
+    _cb1(PA_VALID_INDEX, SINK, cv, 1, "test_desc", "test_iname", NULL, (void*)&cb);
 
     REQUIRE(TEST_RETURN__cb1_type == SINK);
     REQUIRE(TEST_RETURN__cb1_idx == PA_VALID_INDEX);
     REQUIRE(strcmp(TEST_RETURN__cb1_desc, "test_desc") == 0);
+    REQUIRE(strcmp(TEST_RETURN__cb1_iname, "test_iname") == 0);
 }
 
 TEST_CASE("_cb2", "Should get client info for given control") {

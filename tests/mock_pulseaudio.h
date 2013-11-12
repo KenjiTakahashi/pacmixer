@@ -23,9 +23,8 @@
 
 
 typedef int pa_context_state_t;
-typedef int pa_subscription_event_type_t;
 
-enum {
+typedef enum {
     PA_SUBSCRIPTION_MASK_ALL,
     PA_SUBSCRIPTION_EVENT_TYPE_MASK,
     PA_SUBSCRIPTION_EVENT_FACILITY_MASK,
@@ -38,7 +37,7 @@ enum {
     PA_SUBSCRIPTION_EVENT_SOURCE,
     PA_SUBSCRIPTION_EVENT_SOURCE_OUTPUT,
     PA_SUBSCRIPTION_EVENT_SERVER
-};
+} pa_subscription_event_type_t;
 
 enum {
     PA_PROP_DEVICE_DESCRIPTION
@@ -56,15 +55,15 @@ pa_mainloop_api *pa_threaded_mainloop_get_api(pa_threaded_mainloop*);
 pa_context *pa_context_new(pa_mainloop_api*, const char*);
 int pa_context_connect(pa_context*, void*, int, void*);
 void pa_context_unref(pa_context*);
-void pa_context_set_state_callback(pa_context*, void*, void*);
+void pa_context_set_state_callback(pa_context*, void(*)(pa_context*, void*), void*);
 void pa_threaded_mainloop_start(pa_threaded_mainloop*);
-void pa_context_set_subscribe_callback(pa_context*, void*, void*);
+void pa_context_set_subscribe_callback(pa_context*, void(*)(pa_context*, pa_subscription_event_type_t, uint32_t, void*), void*);
 void pa_context_subscribe(pa_context*, int, void*, void*);
-void pa_context_get_sink_input_info_list(pa_context*, void*, void*);
-void pa_context_get_sink_info_list(pa_context*, void*, void*);
-void pa_context_get_source_output_info_list(pa_context*, void*, void*);
-void pa_context_get_source_info_list(pa_context*, void*, void*);
-void pa_context_get_card_info_list(pa_context*, void*, void*);
+void pa_context_get_sink_input_info_list(pa_context*, void(*)(pa_context*, const pa_sink_input_info*, int, void*), void*);
+void pa_context_get_sink_info_list(pa_context*, void(*)(pa_context*, const pa_sink_info*, int, void*), void*);
+void pa_context_get_source_output_info_list(pa_context*, void(*)(pa_context*, const pa_source_output_info*, int, void*), void*);
+void pa_context_get_source_info_list(pa_context*, void(*)(pa_context*, const pa_source_info*, int, void*), void*);
+void pa_context_get_card_info_list(pa_context*, void(*)(pa_context*, const pa_card_info*, int, void*), void*);
 void pa_threaded_mainloop_stop(pa_threaded_mainloop*);
 void pa_context_disconnect(pa_context*);
 void pa_threaded_mainloop_free(pa_threaded_mainloop*);
@@ -86,5 +85,5 @@ void pa_context_set_source_port_by_index(pa_context*, uint32_t, const char*, voi
 pa_context_state_t pa_context_get_state(pa_context*);
 const char *pa_proplist_gets(const pa_proplist, int);
 void pa_context_get_card_info_by_index(pa_context*, uint32_t, void(*)(pa_context*, const pa_card_info*, int, void*), void*);
-void pa_context_get_client_info(pa_context*, uint32_t, void*, void*);
-void pa_context_get_server_info(pa_context*, void*, void*);
+void pa_context_get_client_info(pa_context*, uint32_t, void(*)(pa_context*, const pa_client_info*, int, void*), void*);
+void pa_context_get_server_info(pa_context*, void(*)(pa_context*, const pa_server_info*, void*), void*);

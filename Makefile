@@ -30,8 +30,8 @@ COBJECTS=$(CSOURCES:.c=.o)
 
 TSOURCES=$(wildcard tests/*.mm)
 TOBJECTS=$(TSOURCES:.mm=.o)
-TSOURCES+=tests/test_backend.cpp
-TOBJECTS+=tests/test_backend.o
+T2SOURCES=$(wildcard tests/*.cpp)
+T2OBJECTS=$(T2SOURCES:.cpp=.o)
 MSOURCES=$(wildcard tests/mock_*.c)
 MOBJECTS=$(MSOURCES:.c=.o)
 
@@ -73,13 +73,13 @@ install:
 %.o: %.mm
 	$(CPP) $(CPPFLAGS) $(OFLAGS) -c -o $@ $^
 
-$(TEXEC): $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS) $(DEBUGOBJ)
-	$(CPP) -o $@ $(OBJECTS) $(COBJECTS) $(TOBJECTS) $(MOBJECTS) $(DEBUGOBJ) $(LIBS)
+$(TEXEC): $(OBJECTS) $(TOBJECTS) $(T2OBJECTS) $(MOBJECTS) $(DEBUGOBJ)
+	$(CPP) -o $@ $(OBJECTS) $(TOBJECTS) $(T2OBJECTS) $(MOBJECTS) $(DEBUGOBJ) $(LIBS)
 
 tests: CFLAGS += -g -O2 -D TESTS=1
 tests: SOURCES := $(filter-out src/main.m, $(SOURCES))
 tests: OBJECTS := $(filter-out src/main.o, $(OBJECTS))
-tests: $(CSOURCES) $(SOURCES) $(TSOURCES) $(MSOURCES) $(DEBUGSRC) $(TEXEC)
+tests: $(SOURCES) $(TSOURCES) $(T2SOURCES) $(MSOURCES) $(DEBUGSRC) $(TEXEC)
 
 clean_tests: clean
-	rm -rf $(TOBJECTS) $(MOBJECTS) $(TEXEC)
+	rm -rf $(TOBJECTS) $(T2OBJECTS) $(MOBJECTS) $(TEXEC)
