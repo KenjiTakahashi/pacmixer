@@ -74,6 +74,7 @@
 -(void) up;
 -(void) down;
 -(void) mute;
+-(void) setAsDefault;
 -(void) inside;
 -(void) settings;
 -(BOOL) outside;

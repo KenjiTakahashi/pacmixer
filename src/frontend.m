@@ -485,6 +485,13 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     }
 }
 
+-(void) setAsDefault {
+    if([widgets count]) {
+        [[widgets objectAtIndex: highlight] switchDefault];
+        [[self class] refresh];
+    }
+}
+
 -(void) inside {
     if([top view] != SETTINGS && [widgets count]) {
         Widget *widget = [widgets objectAtIndex: highlight];

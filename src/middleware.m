@@ -151,7 +151,7 @@ void callback_update_func(
             default_sink, @"sink", default_source, @"source", nil];
         NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
             p, @"defaults", nil];
-        NSString *nname = @"serverDefaultsChanged";
+        NSString *nname = @"serverDefaultsAppeared";
 
         [center postNotificationName: nname
                               object: self
@@ -294,6 +294,20 @@ void callback_state_func(void *self_) {
     const char *name = [[data objectForKey: key] UTF8String];
     backend_port_set(context, type, idx, name);
 }
+
+-(void) setDefaults: (NSNotification*) notification {
+    NSDictionary *userInfo = [notification userInfo];
+    NSDictionary *defaults = [userInfo objectForKey: @"defaults"];
+    NSString *default_sink = [defaults objectForKey: @"sink"];
+    NSString *default_source = [defaults objectForKey: @"source"];
+
+    if(default_sink != nil) {
+        backend_default_set(context, SINK, [default_sink UTF8String]);
+    }
+    if(default_source != nil) {
+        backend_default_set(context, SOURCE, [default_source UTF8String]);
+    }
+}
 @end
 
 @implementation Middleware
@@ -324,6 +338,15 @@ void callback_state_func(void *self_) {
     [[NSNotificationCenter defaultCenter] postNotificationName: name
                                                         object: self
                                                       userInfo: nil];
+
+    Block *block = [self addBlockWithId: -1
+                               andIndex: -1
+                                andType: CARD]; //It does not matter.
+    NSString *dname = @"serverDefaultsChanged";
+    [[NSNotificationCenter defaultCenter] addObserver: block
+                                             selector: @selector(setDefaults:)
+                                                 name: dname
+                                               object: nil];
 }
 
 -(void) dealloc {

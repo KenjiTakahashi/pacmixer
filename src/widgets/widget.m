@@ -119,6 +119,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     mvwaddch(win, y, 0, ACS_LLCORNER);
     whline(win, 0, width - 2);
     mvwaddch(win, y, width - 1, ACS_LRCORNER);
+    [TUI refresh];
 }
 
 -(Channels*) addChannels: (NSArray*) channels_ {
@@ -196,6 +197,22 @@ debug_fprintf(__func__, "f:%d:%s set as default", [internalId intValue], [name U
 #endif
     isDefault = default_;
     [self printDefault];
+}
+
+-(void) switchDefault {
+    //We cannot un-set default in PA, so only switch if it is not set.
+    if(!isDefault) {
+        [self setDefault: YES];
+
+        NSString *dname = @"serverDefaultsChanged";
+        NSDictionary *p = [NSDictionary dictionaryWithObjectsAndKeys:
+            self.internalName, type == INPUTS ? @"source" : @"sink", nil];
+        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+            p, @"defaults", nil];
+        [[NSNotificationCenter defaultCenter] postNotificationName: dname
+                                                            object: self
+                                                          userInfo: s];
+    }
 }
 
 -(BOOL) canGoInside {

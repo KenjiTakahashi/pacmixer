@@ -62,6 +62,7 @@
 -(void) setPosition: (int) position_;
 -(void) setValuesByNotification: (NSNotification*) notification;
 -(void) setDefault: (BOOL) default_;
+-(void) switchDefault;
 -(BOOL) canGoInside;
 -(BOOL) canGoSettings;
 -(void) inside;

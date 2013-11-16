@@ -38,7 +38,7 @@
     tui = [[TUI alloc] init];
     [center addObserver: tui
                selector: @selector(setDefaults:)
-                   name: @"serverDefaultsChanged"
+                   name: @"serverDefaultsAppeared"
                  object: nil];
     middleware = [[Middleware alloc] init];
     [middleware spawn];
@@ -156,6 +156,9 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
                 break;
             case 's':
                 [tui settings];
+                break;
+            case 'd':
+                [tui setAsDefault];
                 break;
             case KEY_F(1):
             case '1':

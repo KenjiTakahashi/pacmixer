@@ -110,6 +110,7 @@
             @"h/l: previous/next control, "
             @"j/k: volume down/up, "
             @"m: (un)mute, "
+            @"d: set as default, "
             @"q: Exit";
     } else if(mode == MODE_INSIDE) {
         line =
@@ -117,7 +118,8 @@
             @"s: settings mode, "
             @"h/l: previous/next channel, "
             @"j/k: volume down/up, "
-            @"m: (un)mute";
+            @"m: (un)mute"
+            @"d: set as default, ";
         mode_ = 'i';
         color = COLOR_PAIR(7);
     } else if(mode == MODE_SETTINGS) {
