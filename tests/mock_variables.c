@@ -49,6 +49,9 @@ int output_card_info = PA_INVALID_INDEX;
 
 int output_client_info = PA_INVALID_INDEX;
 
+char default_sink[STRING_SIZE];
+char default_source[STRING_SIZE];
+
 void reset_mock_variables() {
     s_instance = -1;
     s_api = 1;
@@ -93,4 +96,6 @@ void reset_mock_variables() {
     strcpy(output_source_port.active, "");
     output_card_info = PA_INVALID_INDEX;
     output_client_info = PA_INVALID_INDEX;
+    strcpy(default_sink, "");
+    strcpy(default_source, "");
 }

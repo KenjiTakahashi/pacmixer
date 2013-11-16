@@ -223,6 +223,35 @@ TEST_CASE("backend_card_profile_set", "Should set active card profile") {
     free(c);
 }
 
+TEST_CASE("backend_default_set", "Should set defaults") {
+    context_t *c = (context_t*)malloc(sizeof(context_t));
+
+    SECTION("sink", "") {
+        backend_default_set(c, SINK, "sink.1");
+
+        REQUIRE(strcmp(default_sink, "sink.1") == 0);
+    }
+
+    SECTION("source", "") {
+        backend_default_set(c, SOURCE, "source.1");
+
+        REQUIRE(strcmp(default_source, "source.1") == 0);
+    }
+
+    reset_mock_variables();
+
+    SECTION("other", "Should not do anything") {
+        backend_default_set(c, SINK_INPUT, "other");
+        backend_default_set(c, SOURCE_OUTPUT, "other");
+        backend_default_set(c, CARD, "other");
+
+        REQUIRE(strcmp(default_sink, "") == 0);
+        REQUIRE(strcmp(default_source, "") == 0);
+    }
+
+    free(c);
+}
+
 TEST_CASE("backend_port_set", "Should set active port") {
     context_t *c = (context_t*)malloc(sizeof(context_t));
 

@@ -150,6 +150,14 @@ void pa_context_set_source_port_by_index(pa_context *context, uint32_t idx, cons
     PA_CONTEXT_SET_PORT(output_source_port);
 }
 
+void pa_context_set_default_sink(pa_context *context, const char *name, void *s, void *m) {
+    strcpy(default_sink, name);
+}
+
+void pa_context_set_default_source(pa_context *context, const char *name, void *s, void *m) {
+    strcpy(default_source, name);
+}
+
 pa_context_state_t pa_context_get_state(pa_context *context) {
     return s_state;
 }

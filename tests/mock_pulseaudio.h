@@ -82,6 +82,8 @@ void pa_context_set_source_output_mute(pa_context*, uint32_t, int, void*, void*)
 void pa_context_set_card_profile_by_index(pa_context*, uint32_t, const char*, void*, void*);
 void pa_context_set_sink_port_by_index(pa_context*, uint32_t, const char*, void*, void*);
 void pa_context_set_source_port_by_index(pa_context*, uint32_t, const char*, void*, void*);
+void pa_context_set_default_sink(pa_context*, const char*, void*, void*);
+void pa_context_set_default_source(pa_context*, const char*, void*, void*);
 pa_context_state_t pa_context_get_state(pa_context*);
 const char *pa_proplist_gets(const pa_proplist, int);
 void pa_context_get_card_info_by_index(pa_context*, uint32_t, void(*)(pa_context*, const pa_card_info*, int, void*), void*);

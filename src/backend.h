@@ -202,6 +202,17 @@ void backend_mute_set(context_t*, backend_entry_type, uint32_t, int);
 void backend_card_profile_set(context_t*, backend_entry_type, uint32_t, const char*);
 
 /**
+ * Sets default sink/source for given context.
+ * Only SINK and SOURCE entry types have this property,
+ * for other types this function does nothing.
+ *
+ * @param c CONTEXT as returned by backend_init().
+ * @param type Type of the control.
+ * @param internalName Name of the control to be set as default.
+ */
+void backend_default_set(context_t*, backend_entry_type, const char*);
+
+/**
  * Sets active port value for a control.
  *
  * @param c CONTEXT as returned by backend_init().

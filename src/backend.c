@@ -140,6 +140,19 @@ void backend_card_profile_set(context_t *c, backend_entry_type type, uint32_t id
     pa_context_set_card_profile_by_index(c->context, idx, active, NULL, NULL);
 }
 
+void backend_default_set(context_t *c, backend_entry_type type, const char *internalName) {
+    switch(type) {
+        case SINK:
+            pa_context_set_default_sink(c->context, internalName, NULL, NULL);
+            break;
+        case SOURCE:
+            pa_context_set_default_source(c->context, internalName, NULL, NULL);
+            break;
+        default:
+            break;
+    }
+}
+
 void backend_port_set(context_t *c, backend_entry_type type, uint32_t idx, const char *active) {
     switch(type) {
         case SINK:

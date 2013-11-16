@@ -120,6 +120,9 @@ extern int output_card_info;
 
 extern int output_client_info;
 
+extern char default_sink[STRING_SIZE];
+extern char default_source[STRING_SIZE];
+
 enum {
     PA_CONTEXT_UNCONNECTED,
     PA_CONTEXT_READY,
