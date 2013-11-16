@@ -46,7 +46,6 @@ all: $(CSOURCES) $(SOURCES) $(EXEC)
 debug: CFLAGS += -g -O0 -D DEBUG=1
 debug: LIBS += -lrt
 debug: $(OBJECTS) $(COBJECTS) $(DEBUGOBJ)
-	$(CCC) $(CFLAGS) -c -o $(DEBUGOBJ) $(DEBUGSRC)
 	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) $(DEBUGOBJ) $(LIBS) $(PLIBS)
 
 $(EXEC): $(OBJECTS) $(COBJECTS)

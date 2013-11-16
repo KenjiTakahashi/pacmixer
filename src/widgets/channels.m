@@ -97,8 +97,8 @@
 -(void) setMute: (BOOL) mute_ {
     if(isMutable) {
         mute = mute_;
+        [self print];
     }
-    [self print];
 }
 
 -(void) setLevel: (int) level_ {
@@ -155,13 +155,7 @@
 }
 
 -(void) mute {
-    if(isMutable) {
-        if(mute) {
-            [self setMute: NO];
-        } else {
-            [self setMute: YES];
-        }
-    }
+    [self setMute: !mute];
 }
 
 -(BOOL) isMuted {
