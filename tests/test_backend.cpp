@@ -540,6 +540,27 @@ TEST_CASE("_cb_u_card", "Should fire 'update' callback with new card data") {
     REQUIRE(TEST_RETURN__cb_u_card_idx == PA_VALID_INDEX);
 }
 
+char TEST_RETURN__cb_server_sink[STRING_SIZE];
+char TEST_RETURN__cb_server_source[STRING_SIZE];
+
+void TEST_CALLBACK__cb_server(void *s, backend_entry_type type, uint32_t idx, backend_data_t data) {
+    strcpy(TEST_RETURN__cb_server_sink, data.defaults->sink);
+    strcpy(TEST_RETURN__cb_server_source, data.defaults->source);
+}
+
+TEST_CASE("_cb_server", "Should fire 'update' callback with server defaults data") {
+    pa_server_info info;
+    info.default_sink_name = "sink.1";
+    info.default_source_name = "source.1";
+    callback_t cb;
+    cb.update = (void*)TEST_CALLBACK__cb_server;
+
+    _cb_server(NULL, &info, (void*)&cb);
+
+    REQUIRE(strcmp(TEST_RETURN__cb_server_sink, "sink.1") == 0);
+    REQUIRE(strcmp(TEST_RETURN__cb_server_source, "source.1") == 0);
+}
+
 int TEST_RETURN__CB_SINGLE_EVENT = 0;
 
 void TEST_CALLBACK__CB_SINGLE_EVENT(void *s, uint32_t idx) {

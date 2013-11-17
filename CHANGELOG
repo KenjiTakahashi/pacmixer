@@ -40,3 +40,4 @@
 
 == 0.5:
 - Fixed INPUTS filtered as OUTPUTS and vice versa.
+- Added ability to set SINKs and SOURCEs as default/fallback.
