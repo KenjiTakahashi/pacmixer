@@ -27,7 +27,7 @@ $ make
 and you're done.
 
 ## usage
-**Note:** There is also an introductory video available [here](http://www.youtube.com/watch?v=s3qk_Fn1Yeo), thanks to @gotbletu.
+**Note:** There is also an introductory video available [here](http://www.youtube.com/watch?v=s3qk_Fn1Yeo), thanks to [**@gotbletu**](https://github.com/gotbletu).
 
 **pacmixer** comes with built-in help, but here's the shortcuts reference, just in case.
 
