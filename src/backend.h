@@ -240,6 +240,105 @@ typedef struct VOLUME_CALLBACK {
     int value;
 } volume_callback_t;
 
+
+/**
+ * Internal macro.
+ * Generates internal device adding/updating functions.
+ * Generated function deocumentation follows.
+ *
+ * Callback. Fired after getting info about new or updated `type`.
+ *
+ * @param c PA context. It is NOT our backend CONTEXT.
+ * @param info `type` info.
+ * @param eol Stop indicator.
+ * @param userdata Additional data of type CALLBACK.
+ *
+ * @see _cb1()
+ * @see _cb_u()
+ */
+#define _CB_DEVICE(func, info_type, _cb_func, type)\
+    void func(pa_context *c, const info_type *info, int eol, void *userdata) {\
+        if(!eol) {\
+            uint32_t n = info->n_ports;\
+            backend_option_t *optdata = NULL;\
+            if(n > 0) {\
+                optdata = (backend_option_t*)malloc(sizeof(backend_option_t));\
+                optdata->descriptions = (char**)malloc(n * sizeof(char*));\
+                optdata->names = (char**)malloc(n * sizeof(char*));\
+                for(uint32_t i = 0; i < n; ++i) {\
+                    const char *desc = info->ports[i]->description;\
+                    optdata->descriptions[i] = (char*)malloc((strlen(desc) + 1) * sizeof(char));\
+                    strcpy(optdata->descriptions[i], desc);\
+                    const char *name = info->ports[i]->name;\
+                    optdata->names[i] = (char*)malloc((strlen(name) + 1) * sizeof(char));\
+                    strcpy(optdata->names[i], name);\
+                }\
+                const char *active_opt = info->active_port->description;\
+                optdata->active = (char*)malloc((strlen(active_opt) + 1) * sizeof(char));\
+                strcpy(optdata->active, active_opt);\
+                optdata->size = n;\
+            }\
+            _cb_func(info->index, type, info->volume, info->mute, info->description, info->name, optdata, userdata);\
+            _do_option_free(optdata, n);\
+        }\
+    }\
+
+/**
+ *
+ */
+#define _CB_STREAM_(c, info, type, userdata)\
+    if(info->index != PA_INVALID_INDEX) {\
+        /* TODO: We'll need this name once status line is done. */\
+        if(info->client != PA_INVALID_INDEX) {\
+            callback_t *callback = (callback_t*)userdata;\
+            uint8_t chnum = info->volume.channels;\
+            backend_channel_t *channels = _do_channels(info->volume, chnum);\
+            backend_volume_t *volumes = _do_volumes(info->volume, chnum, info->mute);\
+            client_callback_t *client_cb = (client_callback_t*)malloc(sizeof(client_callback_t));\
+            client_cb->callback = callback;\
+            client_cb->channels = channels;\
+            client_cb->volumes = volumes;\
+            client_cb->chnum = chnum;\
+            client_cb->index = info->index;\
+            pa_context_get_client_info(c, info->client, _cb_client, client_cb);\
+        }\
+    }
+#define _CB_STREAM_U(c, info, type, userdata)\
+    _cb_u(info->index, type, info->volume, info->mute, NULL, NULL, NULL, userdata);
+#define _CB_STREAM(func, info_type, _cb_func, type)\
+    void func(pa_context *c, const info_type *info, int eol, void *userdata) {\
+        if(!eol) {\
+            _cb_func(c, info, type, userdata);\
+        }\
+    }\
+
+/**
+ * Internal macro.
+ * Generates internal volume setting functions.
+ * Generated function documentation follows.
+ *
+ * Callback. Fired after getting `type` info for setter.
+ * Note: It frees userdata.
+ *
+ * @param c PA context. It is NOT our backend CONTEXT.
+ * @param info `type` info.
+ * @param eol Stop indicator.
+ * @param userdata Additional data of type VOLUME_CALLBACK.
+ *
+ * @see backend_volume_set()
+ */
+#define _CB_SET_VOLUME(func, info_type, type, by_index)\
+    void func(pa_context *c, const info_type *info, int eol, void *userdata) {\
+        if(!eol) {\
+            volume_callback_t *volume = (volume_callback_t*)userdata;\
+            if(info->index != PA_INVALID_INDEX) {\
+                pa_cvolume cvolume = info->volume;\
+                cvolume.values[volume->index] = volume->value;\
+                pa_context_set_ ## type ## _volume ## by_index(c, info->index, &cvolume, NULL, NULL);\
+            }\
+        }\
+    }\
+
 /**
  * Internal function.
  * Callback. Fired when PA server changes state.
@@ -264,50 +363,6 @@ void _cb_state_changed(pa_context*, void*);
  * @see _cb2()
  */
 void _cb_client(pa_context*, const pa_client_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting info about new SINK.
- * Merely checks if we are done with iteration and calls _cb1().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SINK info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb1()
- * @see _cb_u_sink()
- */
-void _cb_sink(pa_context*, const pa_sink_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting updated info about existing SINK.
- * Merely checks if we are done with iteration and calls _cb_u().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SINK info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb_u()
- */
-void _cb_u_sink(pa_context*, const pa_sink_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting SINK info for setter.
- * Sets new volume value for specified SINK.
- * Note: It frees userdata.
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SINK info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type VOLUME_CALLBACK.
- *
- * @see backend_volume_set()
- */
-void _cb_s_sink(pa_context*, const pa_sink_info*, int, void*);
 
 /**
  * Internal function.
@@ -339,64 +394,6 @@ void _cb_u_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
 
 /**
  * Internal function.
- * Callback. Fired after getting SINK_INPUT info for setter.
- * Sets new volume value for specified SINK_INPUT.
- * Note: It frees userdata.
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SINK_INPUT info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type VOLUME_CALLBACK.
- *
- * @see backend_volume_set()
- */
-void _cb_s_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting info about new SOURCE.
- * Merely checks if we are done with iteration and calls _cb1().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SOURCE info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb1()
- */
-void _cb_source(pa_context*, const pa_source_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting updated info about existing SOURCE.
- * Merely checks if we are done with iteration and calls _cb_u().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SOURCE info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb_u()
- */
-void _cb_u_source(pa_context*, const pa_source_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting SOURCE info for setter.
- * Sets new volume value for specified SOURCE.
- * Note: It frees userdata.
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SOURCE info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type VOLUME_CALLBACK.
- *
- * @see backend_volume_set()
- */
-void _cb_s_source(pa_context*, const pa_source_info*, int, void*);
-
-/**
- * Internal function.
  * Callback. Fired after getting info about new SOURCE_OUTPUT.
  * Merely checks if we are done with iteration and calls _cb2().
  *
@@ -422,21 +419,6 @@ void _cb_source_output(pa_context*, const pa_source_output_info*, int, void*);
  * @see _cb_u()
  */
 void _cb_u_source_output(pa_context*, const pa_source_output_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting SOURCE_OUTPUT info for setter.
- * Sets new volume value for specified SOURCE_OUTPUT.
- * Note: It frees userdata.
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SOURCE_OUTPUT info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type VOLUME_CALLBACK.
- *
- * @see backend_volume_set()
- */
-void _cb_s_source_output(pa_context*, const pa_source_output_info*, int, void*);
 
 /**
  * Internal function.

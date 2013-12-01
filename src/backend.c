@@ -20,6 +20,23 @@
 #include "backend.h"
 
 
+_CB_DEVICE(_cb_sink, pa_sink_info, _cb1, SINK);
+_CB_DEVICE(_cb_u_sink, pa_sink_info, _cb_u, SINK);
+_CB_DEVICE(_cb_source, pa_source_info, _cb1, SOURCE);
+_CB_DEVICE(_cb_u_source, pa_source_info, _cb_u, SOURCE);
+
+
+_CB_STREAM(_cb_sink_input, pa_sink_input_info, _CB_STREAM_, SINK_INPUT);
+_CB_STREAM(_cb_u_sink_input, pa_sink_input_info, _CB_STREAM_U, SINK_INPUT);
+_CB_STREAM(_cb_source_output, pa_source_output_info, _CB_STREAM_, SOURCE_OUTPUT);
+_CB_STREAM(_cb_u_source_output, pa_source_output_info, _CB_STREAM_U, SOURCE_OUTPUT);
+
+_CB_SET_VOLUME(_cb_s_sink, pa_sink_info, sink, _by_index);
+_CB_SET_VOLUME(_cb_s_sink_input, pa_sink_input_info, sink_input, );
+_CB_SET_VOLUME(_cb_s_source, pa_source_info, source, _by_index);
+_CB_SET_VOLUME(_cb_s_source_output, pa_source_output_info, source_output, );
+
+
 context_t *backend_new(state_callback_t *state_callback) {
     context_t *context = (context_t*)malloc(sizeof(context_t));
     context->loop = pa_threaded_mainloop_new();
@@ -194,97 +211,6 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
     }
 }
 
-#define _CB_DO_OPTION(_cb_func, type)\
-    if(!eol) {\
-        uint32_t n = info->n_ports;\
-        backend_option_t *optdata = NULL;\
-        if(n > 0) {\
-            optdata = (backend_option_t*)malloc(sizeof(backend_option_t));\
-            optdata->descriptions = (char**)malloc(n * sizeof(char*));\
-            optdata->names = (char**)malloc(n * sizeof(char*));\
-            for(uint32_t i = 0; i < n; ++i) {\
-                const char *desc = info->ports[i]->description;\
-                optdata->descriptions[i] = (char*)malloc((strlen(desc) + 1) * sizeof(char));\
-                strcpy(optdata->descriptions[i], desc);\
-                const char *name = info->ports[i]->name;\
-                optdata->names[i] = (char*)malloc((strlen(name) + 1) * sizeof(char));\
-                strcpy(optdata->names[i], name);\
-            }\
-            const char *active_opt = info->active_port->description;\
-            optdata->active = (char*)malloc((strlen(active_opt) + 1) * sizeof(char));\
-            strcpy(optdata->active, active_opt);\
-            optdata->size = n;\
-        }\
-        _cb_func(info->index, type, info->volume, info->mute, info->description, info->name, optdata, userdata);\
-        _do_option_free(optdata, n);\
-    }\
-
-#define _CB_SET_VOLUME(type, by_index)\
-    if(!eol) {\
-        volume_callback_t *volume = (volume_callback_t*)userdata;\
-        if(info->index != PA_INVALID_INDEX) {\
-            pa_cvolume cvolume = info->volume;\
-            cvolume.values[volume->index] = volume->value;\
-            pa_context_set_ ## type ## _volume ## by_index(c, info->index, &cvolume, NULL, NULL);\
-        }\
-    }\
-
-void _cb_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    _CB_DO_OPTION(_cb1, SINK);
-}
-
-void _cb_u_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    _CB_DO_OPTION(_cb_u, SINK);
-}
-
-void _cb_s_sink(pa_context *c, const pa_sink_info *info, int eol, void *userdata) {
-    _CB_SET_VOLUME(sink, _by_index);
-}
-
-void _cb_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
-    if(!eol) {
-        _cb2(c, info->index, info->volume, info->mute, info->name, SINK_INPUT, info->client, userdata);
-    }
-}
-
-void _cb_u_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
-    if(!eol) {
-        _cb_u(info->index, SINK_INPUT, info->volume, info->mute, NULL, NULL, NULL, userdata);
-    }
-}
-
-void _cb_s_sink_input(pa_context *c, const pa_sink_input_info *info, int eol, void *userdata) {
-    _CB_SET_VOLUME(sink_input, );
-}
-
-void _cb_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
-    _CB_DO_OPTION(_cb1, SOURCE);
-}
-
-void _cb_u_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
-    _CB_DO_OPTION(_cb_u, SOURCE);
-}
-
-void _cb_s_source(pa_context *c, const pa_source_info *info, int eol, void *userdata) {
-    _CB_SET_VOLUME(source, _by_index);
-}
-
-void _cb_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
-    if(!eol) {
-        _cb2(c, info->index, info->volume, info->mute, info->name, SOURCE_OUTPUT, info->client, userdata);
-    }
-}
-
-void _cb_u_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
-    if(!eol) {
-        _cb_u(info->index, SOURCE_OUTPUT, info->volume, info->mute, NULL, NULL, NULL, userdata);
-    }
-}
-
-void _cb_s_source_output(pa_context *c, const pa_source_output_info *info, int eol, void *userdata) {
-    _CB_SET_VOLUME(source_output, );
-}
-
 void _cb_card(pa_context *c, const pa_card_info *info, int eol, void *userdata) {
     if(!eol && info->index != PA_INVALID_INDEX) {
         callback_t *callback = (callback_t*)userdata;
@@ -451,24 +377,5 @@ debug_fprintf(__func__, "%d:%s appeared", index, description);
         ((tcallback_add_func)(callback->add))(callback->self, description, type, index, &data);
         free(data.channels);
         free(data.volumes);
-    }
-}
-
-void _cb2(pa_context *c, uint32_t index, pa_cvolume volume, int mute, const char *name, backend_entry_type type, uint32_t client, void *userdata) {
-    if(index != PA_INVALID_INDEX) {
-        /* TODO: We'll need this name once status line is done. */
-        if(client != PA_INVALID_INDEX) {
-            callback_t *callback = (callback_t*)userdata;
-            uint8_t chnum = volume.channels;
-            backend_channel_t *channels = _do_channels(volume, chnum);
-            backend_volume_t *volumes = _do_volumes(volume, chnum, mute);
-            client_callback_t *client_callback = (client_callback_t*)malloc(sizeof(client_callback_t));
-            client_callback->callback = callback;
-            client_callback->channels = channels;
-            client_callback->volumes = volumes;
-            client_callback->chnum = chnum;
-            client_callback->index = index;
-            pa_context_get_client_info(c, client, _cb_client, client_callback);
-        }
     }
 }

@@ -378,7 +378,8 @@ void TEST_FUNC__cb1__cb_u(uint32_t idx, backend_entry_type type, pa_cvolume volm
     TEST_RETURN__cb1__cb_u.size = options->size;
 }
 
-TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
+_CB_DEVICE(_TEST_cb_sink, pa_sink_info, TEST_FUNC__cb1__cb_u, SINK);
+TEST_CASE("_CB_DEVICE", "Should generate device adding/updating function") {
     // We'll use pa_sink_info here, but it scales to other pa_source_info
     // structures as well.
     TEST_RETURN__cb1__cb_u.names = (char**)malloc(sizeof(char*));
@@ -387,8 +388,6 @@ TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
     TEST_RETURN__cb1__cb_u.descriptions[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
     TEST_RETURN__cb1__cb_u.active = (char*)malloc(sizeof(char) * STRING_SIZE);
 
-    int eol = 0;
-    void *userdata = NULL;
     pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
     info->index = PA_VALID_INDEX;
     info->volume.channels = 2;
@@ -405,7 +404,7 @@ TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
     strcpy(info->active_port->name, "test_active_port_name");
     strcpy(info->active_port->description, "test_active_port_desc");
 
-    _CB_DO_OPTION(TEST_FUNC__cb1__cb_u, SINK);
+    _TEST_cb_sink(NULL, info, 0, NULL);
 
     REQUIRE(TEST_RETURN__cb1__cb_u.size == 1);
     REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.names[0], "test_port_name") == 0);
@@ -421,9 +420,11 @@ TEST_CASE("_CB_DO_OPTION", "Should compose backend_option_t for given data") {
     free(TEST_RETURN__cb1__cb_u.descriptions);
 }
 
-TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
-    pa_context *c = NULL;
-    int eol = 0;
+_CB_SET_VOLUME(_TEST_cb_s_sink, pa_sink_info, sink, _by_index);
+_CB_SET_VOLUME(_TEST_cb_s_sink_input, pa_sink_input_info, sink_input, );
+_CB_SET_VOLUME(_TEST_cb_s_source, pa_source_info, source, _by_index);
+_CB_SET_VOLUME(_TEST_cb_s_source_output, pa_source_output_info, source_output, );
+TEST_CASE("_CB_SET_VOLUME", "Should generate volume setting function") {
     volume_callback_t *vc = (volume_callback_t*)malloc(sizeof(volume_callback_t));
     vc->index = 1;
     vc->value = 75;
@@ -436,7 +437,7 @@ TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
         info->volume.values[0] = 90;
         info->volume.values[1] = 120;
 
-        _CB_SET_VOLUME(sink, _by_index);
+        _TEST_cb_s_sink(NULL, info, 0, userdata);
 
         REQUIRE(output_sink_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_volume[1] == 90);
@@ -452,7 +453,7 @@ TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
         info->volume.values[0] = 90;
         info->volume.values[1] = 120;
 
-        _CB_SET_VOLUME(sink_input, );
+        _TEST_cb_s_sink_input(NULL, info, 0, userdata);
 
         REQUIRE(output_sink_input_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_sink_input_volume[1] == 90);
@@ -468,7 +469,7 @@ TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
         info->volume.values[0] = 90;
         info->volume.values[1] = 120;
 
-        _CB_SET_VOLUME(source, _by_index);
+        _TEST_cb_s_source(NULL, info, 0, userdata);
 
         REQUIRE(output_source_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_source_volume[1] == 90);
@@ -484,7 +485,7 @@ TEST_CASE("_CB_SET_VOLUME", "Should set volume for specified channel") {
         info->volume.values[0] = 90;
         info->volume.values[1] = 120;
 
-        _CB_SET_VOLUME(source_output, );
+        _TEST_cb_s_source_output(NULL, info, 0, userdata);
 
         REQUIRE(output_source_output_volume[0] == PA_VALID_INDEX);
         REQUIRE(output_source_output_volume[1] == 90);
@@ -862,22 +863,9 @@ TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
     REQUIRE(strcmp(TEST_RETURN__cb1_iname, "test_iname") == 0);
 }
 
-TEST_CASE("_cb2", "Should get client info for given control") {
-    //Using SINK_INPUT, it scales to SOURCE_OUTPUT as well.
-    pa_cvolume cv;
-    cv.channels = 0;
-    callback_t cb;
-
-    _cb2(NULL, PA_VALID_INDEX, cv, 1, "test_name", SINK_INPUT, PA_CLIENT_INDEX, (void*)&cb);
-
-    //This cast is necessary, although I don't know why...
-    REQUIRE(output_client_info == (int)PA_CLIENT_INDEX);
-}
-
 
 // Other details:
-// 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DO_OPTION.
+// 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DEVICE.
 // 2: For _cb_s_sink/_cb_s_sink_input/_cb_s_source/_cb_s_source_output, see _CB_SET_VOLUME.
-// 3: For _cb_sink_input/_cb_source_output, see _cb2.
-// 4: For _cb_u_sink_input/_cb_u_source_output, see _cb_u.
-// 5: Testing _do_option_free doesn't make much sense.
+// 3: For _cb_u_sink_input/_cb_u_source_output, see _cb_u.
+// 4: Testing _do_option_free does not make much sense.
