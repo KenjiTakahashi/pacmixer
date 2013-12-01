@@ -27,6 +27,8 @@ $ make
 and you're done.
 
 ## usage
+**Note:** There is also an introductory video available [here](http://www.youtube.com/watch?v=s3qk_Fn1Yeo), thanks to @gotbletu.
+
 **pacmixer** comes with built-in help, but here's the shortcuts reference, just in case.
 
 ```
@@ -35,6 +37,7 @@ l (or right arrow): move to the next control
 k (or up arrow): increase the volume
 j (or down arrow): lower the volume
 m: mute the volume
+d: set as default
 i: enter inside mode
 s: enter settings mode
 q (or Esc): exit settings/inside mode or exit the application
