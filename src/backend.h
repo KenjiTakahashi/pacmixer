@@ -244,9 +244,9 @@ typedef struct VOLUME_CALLBACK {
 /**
  * Internal macro.
  * Generates internal device adding/updating functions.
- * Generated function deocumentation follows.
+ * Generated function documentation follows.
  *
- * Callback. Fired after getting info about new or updated `type`.
+ * Callback. Fired after getting info about new or updated `type` device.
  *
  * @param c PA context. It is NOT our backend CONTEXT.
  * @param info `type` info.
@@ -284,7 +284,20 @@ typedef struct VOLUME_CALLBACK {
     }\
 
 /**
+ * Internal macro.
+ * Generates internal stream adding/updating functions.
+ * Generated function documentation follows.
  *
+ * Callback. Fired after getting info about new or updated `type` stream.
+ * For new streams, it creates necessary structures and fires _cb_client.
+ * For updated streams, it just calls _cb_u().
+ *
+ * @param c PA context. It is NOT our backend CONTEXT.
+ * @param info `type` info.
+ * @param eol Stop indicator.
+ * @param userdata Additional data of type CALLBACK.
+ *
+ * @see _cb_u()
  */
 #define _CB_STREAM_(c, info, type, userdata)\
     if(info->index != PA_INVALID_INDEX) {\
@@ -551,24 +564,3 @@ void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, const char*, const cha
  * @see _do_volumes()
  */
 void _cb1(uint32_t, backend_entry_type, pa_cvolume, int, const char*, const char*, backend_option_t*, void*);
-
-/**
- * Internal helper function.
- * Used to propagate info about newly appearing SINK_INPUTs and SOURCE_OUTPUTs.
- * Makes up necessary information using BACKEND_CHANNEL type
- * and triggers _cb_client() with this info as userdata.
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param index PA internal control index.
- * @param volume Volume values.
- * @param mute Mute value.
- * @param name Human readable name of the control.
- * @param type Type of the control.
- * @param client Reference to proper INPUT/OUTPUT client.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _do_channels()
- * @see _do_volumes()
- * @see _cb_client()
- */
-void _cb2(pa_context*, uint32_t, pa_cvolume, int, const char*, backend_entry_type, uint32_t, void*);

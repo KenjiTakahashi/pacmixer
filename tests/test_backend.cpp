@@ -420,6 +420,58 @@ TEST_CASE("_CB_DEVICE", "Should generate device adding/updating function") {
     free(TEST_RETURN__cb1__cb_u.descriptions);
 }
 
+backend_entry_type TEST_RETURN__CB_STREAM_U_type = CARD;
+int TEST_RETURN__CB_STREAM_U_idx = PA_INVALID_INDEX;
+
+void TEST_CALLBACK__CB_STREAM_U(void *s, backend_entry_type type, uint32_t idx, void *data) {
+    TEST_RETURN__CB_STREAM_U_type = type;
+    TEST_RETURN__CB_STREAM_U_idx = idx;
+}
+
+_CB_STREAM(_TEST_cb_sink_input, pa_sink_input_info, _CB_STREAM_, SINK_INPUT);
+_CB_STREAM(_TEST_cb_u_sink_input, pa_sink_input_info, _CB_STREAM_U, SINK_INPUT);
+TEST_CASE("_CB_STREAM", "Should generate stream adding/updating function") {
+    TEST_RETURN__cb_client_data.channels = (backend_channel_t*)malloc(sizeof(backend_channel_t));
+    TEST_RETURN__cb_client_data.volumes = (backend_volume_t*)malloc(sizeof(backend_volume_t));
+
+    pa_sink_input_info info;
+    info.index = PA_VALID_INDEX;
+    info.volume.channels = 1;
+    info.volume.values[0] = 10;
+    info.mute = 0;
+    info.client = PA_CLIENT_INDEX;
+    callback_t *cb = (callback_t*)malloc(sizeof(callback_t));
+    cb->add = (void*)TEST_CALLBACK__cb_client;
+    cb->update = (void*)TEST_CALLBACK__CB_STREAM_U;
+
+    SECTION("new", "") {
+        _TEST_cb_sink_input(NULL, &info, 0, (void*)cb);
+
+        REQUIRE(output_client_info == (int)PA_CLIENT_INDEX);
+        REQUIRE(strcmp(TEST_RETURN__cb_client_name, "client_name") == 0);
+        REQUIRE(TEST_RETURN__cb_client_idx == PA_VALID_INDEX);
+        REQUIRE(TEST_RETURN__cb_client_data.option == NULL);
+        REQUIRE(TEST_RETURN__cb_client_data.channels_num == 1);
+        REQUIRE(TEST_RETURN__cb_client_data.channels[0].maxLevel == 150);
+        REQUIRE(TEST_RETURN__cb_client_data.channels[0].normLevel == 100);
+        REQUIRE(TEST_RETURN__cb_client_data.channels[0].isMutable == 1);
+        REQUIRE(TEST_RETURN__cb_client_data.volumes[0].level == 10);
+        REQUIRE(TEST_RETURN__cb_client_data.volumes[0].mute == 0);
+    }
+
+    SECTION("updated", "") {
+        _TEST_cb_u_sink_input(NULL, &info, 0, (void*)cb);
+
+        REQUIRE(TEST_RETURN__CB_STREAM_U_type == SINK_INPUT);
+        REQUIRE(TEST_RETURN__CB_STREAM_U_idx == PA_VALID_INDEX);
+    }
+
+    free(cb);
+
+    free(TEST_RETURN__cb_client_data.volumes);
+    free(TEST_RETURN__cb_client_data.channels);
+}
+
 _CB_SET_VOLUME(_TEST_cb_s_sink, pa_sink_info, sink, _by_index);
 _CB_SET_VOLUME(_TEST_cb_s_sink_input, pa_sink_input_info, sink_input, );
 _CB_SET_VOLUME(_TEST_cb_s_source, pa_source_info, source, _by_index);
@@ -534,6 +586,7 @@ TEST_CASE("_cb_u_card", "Should fire 'update' callback with new card data") {
     info.index = PA_VALID_INDEX;
     info.n_profiles = 0;
     callback_t cb;
+    cb.self = NULL;
     cb.update = (void*)TEST_CALLBACK__cb_u_card;
 
     _cb_u_card(NULL, &info, 0, (void*)&cb);
@@ -824,6 +877,7 @@ void TEST_CALLBACK__cb_u(void *s, backend_entry_type type, uint32_t idx, void *d
 
 TEST_CASE("_cb_u", "Should fire 'update' callback for given data") {
     //Using SINK, it scales to other types as well.
+    //TODO: More thorough tests.
     pa_cvolume cv;
     cv.channels = 0;
     callback_t cb;
@@ -867,5 +921,6 @@ TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
 // Other details:
 // 1: For _cb_sink/_cb_u_sink/_cb_source/_cb_u_source, see _CB_DEVICE.
 // 2: For _cb_s_sink/_cb_s_sink_input/_cb_s_source/_cb_s_source_output, see _CB_SET_VOLUME.
-// 3: For _cb_u_sink_input/_cb_u_source_output, see _cb_u.
-// 4: Testing _do_option_free does not make much sense.
+// 3: For _cb_sink_input/_cb_source_output, see _CB_STREAM.
+// 4: For _cb_u_sink_input/_cb_u_source_output, see _cb_u.
+// 5: Testing _do_option_free does not make much sense.

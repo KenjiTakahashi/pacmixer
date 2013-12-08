@@ -175,6 +175,10 @@ void pa_context_get_card_info_by_index(pa_context *context, uint32_t idx, void(*
 
 void pa_context_get_client_info(pa_context *context, uint32_t idx, void(*s)(pa_context*, const pa_client_info*, int, void*), void *m) {
     output_client_info = idx;
+    pa_client_info info;
+    info.index = PA_CLIENT_INDEX;
+    strcpy(info.name, "client_name");
+    s(context, &info, 0, m);
 }
 
 void pa_context_get_server_info(pa_context *context, void(*s)(pa_context*, const pa_server_info*, void*), void *m) {

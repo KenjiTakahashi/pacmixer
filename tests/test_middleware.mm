@@ -210,6 +210,7 @@ backend_data_t TEST_PREPARE_backend_data_t_part1() {
     data.volumes[1].mute = 1;
     data.channels_num = 2;
     data.option = NULL;
+    data.internalName = (char*)"iname";
     return data;
 }
 
