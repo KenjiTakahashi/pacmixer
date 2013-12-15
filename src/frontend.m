@@ -88,6 +88,8 @@ static int ypadding;
 }
 
 -(void) addWaiter: (NSNotification*) _ {
+    [allWidgets removeAllObjects];
+    [widgets removeAllObjects];
     wclear(pad);
     NSString *message = @"Waiting for connection...";
     notice = [[Notice alloc] initWithMessage: message

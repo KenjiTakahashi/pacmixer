@@ -79,7 +79,9 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
     wresize(win, height, width);
     [self printName];
     [self printDefault];
-    [channels reprint: height - ([ports height] > 2 ? [ports height] : 0)];
+    int ch_height = height - ([ports height] > 2 ? [ports height] : 0);
+    ch_height -= hasDefault ? 3 : 0;
+    [channels reprint: ch_height];
     [ports reprint: height];
 }
 
