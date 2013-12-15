@@ -26,15 +26,13 @@ extern "C" {
 
 TEST_CASE("backend_new/connect", "Should successfully return PA context") {
     s_instance = 1;
-    state_callback_t *sc = (state_callback_t*)malloc(sizeof(state_callback_t));
+    callback_t *sc = (callback_t*)malloc(sizeof(callback_t));
     context_t *e = (context_t*)malloc(sizeof(context_t));
     e->loop = &s_instance;
-    e->state = PA_CONTEXT_READY;
     e->context = &s_context;
     context_t *r = backend_new(sc);
 
     REQUIRE(r->loop == e->loop);
-    REQUIRE(r->state == e->state);
     REQUIRE(r->context == e->context);
 
     free(r);
@@ -293,10 +291,15 @@ void TEST_CALLBACK__cb_state_changed(void *s) {
 }
 
 TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
-    state_callback_t *sc = (state_callback_t*)malloc(sizeof(state_callback_t));
-    sc->func = (void*)TEST_CALLBACK__cb_state_changed;
-    pa_context_state_t a = 0;
-    sc->state = &a;
+    callback_t *sc = (callback_t*)malloc(sizeof(callback_t));
+    sc->state = (void*)TEST_CALLBACK__cb_state_changed;
+
+    SECTION("ready", "PA_CONTEXT_READY") {
+        s_state = PA_CONTEXT_READY;
+        _cb_state_changed(NULL, sc);
+
+        REQUIRE(TEST_RETURN__cb_state_changed == 1);
+    }
 
     SECTION("failed", "PA_CONTEXT_FAILED") {
         s_state = PA_CONTEXT_FAILED;

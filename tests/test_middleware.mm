@@ -27,19 +27,6 @@ TEST_CASE("Middleware", "") {
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
 
-    SECTION("initContext", "Should fire a 'backendAppeared' notification") {
-        s_instance = 1;
-        s_state = PA_CONTEXT_READY;
-        [center addObserver: results
-                   selector: @selector(addObject:)
-                       name: @"backendAppeared"
-                     object: middleware];
-
-        [middleware initContext];
-
-        REQUIRE([results count] == 1);
-    }
-
     SECTION("addBlock", "Should create and return a block for given data") {
         //Using SINK type, it scales to other types as well.
         id block = [middleware addBlockWithId: PA_VALID_INDEX
@@ -157,19 +144,37 @@ TEST_CASE("Block", "") {
     [block release];
 }
 
-TEST_CASE("callback_state_func", "Should fire 'backendGone' notification") {
+TEST_CASE("callback_state_func", "") {
     Middleware *middleware = [[Middleware alloc] init];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
-    [center addObserver: results
-               selector: @selector(addObject:)
-                   name: @"backendGone"
-                 object: middleware];
 
-    callback_state_func((void*)middleware);
+    SECTION("server appeared", "Should fire 'backendAppeared' notification") {
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: @"backendAppeared"
+                     object: middleware];
 
-    REQUIRE([results count] == 1);
+        callback_state_func((void*)middleware, S_CAME);
 
+        REQUIRE([results count] == 1);
+    }
+
+    [center removeObserver: results];
+    [results removeAllObjects];
+
+    SECTION("server gone", "Should fire 'backendGone' notification") {
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: @"backendGone"
+                     object: middleware];
+
+        callback_state_func((void*)middleware, S_GONE);
+
+        REQUIRE([results count] == 1);
+    }
+
+    [center removeObserver: results];
     [middleware release];
 }
 
@@ -256,7 +261,7 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
-                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK] 
+                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK]
                      object: middleware];
 
         callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
@@ -281,7 +286,7 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
-                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK] 
+                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK]
                      object: middleware];
 
         callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
@@ -324,7 +329,6 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
     s_instance = 1;
     s_state = PA_CONTEXT_READY;
     Middleware *middleware = [[Middleware alloc] init];
-    [middleware initContext];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     NSMutableArray *results = [[NSMutableArray alloc] initWithCapacity: 0];
 

@@ -25,6 +25,10 @@
 typedef int pa_context_state_t;
 
 typedef enum {
+    PA_CONTEXT_NOFAIL
+} pa_context_flags_t;
+
+typedef enum {
     PA_SUBSCRIPTION_MASK_ALL,
     PA_SUBSCRIPTION_EVENT_TYPE_MASK,
     PA_SUBSCRIPTION_EVENT_FACILITY_MASK,
@@ -45,10 +49,6 @@ enum {
 
 #define PA_VOLUME_UI_MAX 150
 #define PA_VOLUME_NORM 100
-
-typedef struct S_CALLBACK {
-    pa_context_state_t *state;
-} s_callback_t;
 
 pa_threaded_mainloop *pa_threaded_mainloop_new();
 pa_mainloop_api *pa_threaded_mainloop_get_api(pa_threaded_mainloop*);
