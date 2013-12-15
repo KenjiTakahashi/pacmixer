@@ -22,14 +22,17 @@
 #else
 #include <pulse/pulseaudio.h>
 #endif
-#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
 #ifdef DEBUG
 #include "debug.h"
 #endif
 
+
+typedef enum {
+    S_CAME,
+    S_GONE
+} server_state;
 
 /**
  * Holds information necessary to communicate with PA server.
@@ -51,17 +54,9 @@ typedef struct CALLBACK {
     void *add;
     void *update;
     void *remove;
+    void *state;
     void *self;
 } callback_t;
-
-/**
- * Holds information necessary to fire a state callback.
- */
-typedef struct STATE_CALLBACK {
-    pa_context_state_t *state; /**< PA server state. */
-    void *func; /**< Callback function. */
-    void *self; /**< Middleware object. */
-} state_callback_t;
 
 /**
  * Holds information about channel.
@@ -128,19 +123,20 @@ typedef enum {
 /**
  * Initializes all necessary mechanisms and data.
  *
- * @param state_callback Callback fired when PA server changes it's state.
- *        Meant to be used mainly for dealing with lost/failed connection.
+ * @param callback Struct with higher level (middleware) callbacks.
+ *        Only the 'state' callback is used here for dealing with lost/failed
+ *        connections.
  *
  * @return CONTEXT which contains all necessary information about connection.
  *         It will be passed as first argument to all other API parts.
  */
-context_t *backend_new(state_callback_t*);
+context_t *backend_new(callback_t*);
 
 /**
  * Starts the PA event loop and subscribes appropriate events.
  *
  * @param context CONTEXT as returned by backend_init().
- * @param callback Enum with higher level (middleware) callbacks.
+ * @param callback Struct with higher level (middleware) callbacks.
  */
 void backend_init(context_t*, callback_t*);
 
@@ -225,7 +221,7 @@ void backend_port_set(context_t*, backend_entry_type, uint32_t, const char*);
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_data_t*);
 typedef void (*tcallback_update_func)(void*, backend_entry_type, uint32_t, backend_data_t*);
 typedef void (*tcallback_remove_func)(void*, uint32_t, backend_entry_type);
-typedef void (*tstate_callback_func)(void*);
+typedef void (*tstate_callback_func)(void*, server_state);
 
 typedef struct CLIENT_CALLBACK {
     callback_t *callback;

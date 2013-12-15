@@ -41,7 +41,6 @@
                    name: @"serverDefaultsAppeared"
                  object: nil];
     middleware = [[Middleware alloc] init];
-    [middleware spawn];
     return self;
 }
 

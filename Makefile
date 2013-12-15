@@ -18,7 +18,7 @@ PREFIX=/usr/local
 
 CCC=gcc
 CPP=g++
-CFLAGS=-std=gnu99 -Wall
+CFLAGS=-std=c99 -Wall
 OFLAGS=`gnustep-config --objc-flags`
 CPPFLAGS=-Wall -g -O2 -D TESTS=1 -fobjc-exceptions -D __STDC_LIMIT_MACROS
 LIBS=-lgnustep-base -lobjc -lpanel -lcurses

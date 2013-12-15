@@ -22,7 +22,6 @@
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSAutoreleasePool.h>
-#import <Foundation/NSThread.h>
 #import "types.h"
 #import "backend.h"
 #ifdef DEBUG
@@ -33,7 +32,7 @@
 void callback_add_func(void*, const char*, backend_entry_type, uint32_t, backend_data_t*);
 void callback_update_func(void*, backend_entry_type, uint32_t, const backend_data_t*);
 void callback_remove_func(void*, uint32_t, backend_entry_type);
-void callback_state_func(void*);
+void callback_state_func(void*, server_state);
 
 @interface Block: NSObject {
     @private
@@ -64,13 +63,11 @@ void callback_state_func(void*);
     @private
         context_t *context;
         callback_t *callback;
-        state_callback_t *state_callback;
         NSMutableArray *blocks;
 }
 
 -(Middleware*) init;
--(void) spawn;
--(void) initContext;
+-(void) restart: (NSNotification*) _;
 -(void) dealloc;
 -(Block*) addBlockWithId: (uint32_t) idx
                 andIndex: (int) i

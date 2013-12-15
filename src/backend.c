@@ -37,47 +37,20 @@ _CB_SET_VOLUME(_cb_s_source, pa_source_info, source, _by_index);
 _CB_SET_VOLUME(_cb_s_source_output, pa_source_output_info, source_output, );
 
 
-context_t *backend_new(state_callback_t *state_callback) {
+context_t *backend_new(callback_t *callback) {
     context_t *context = (context_t*)malloc(sizeof(context_t));
     context->loop = pa_threaded_mainloop_new();
     context->state = PA_CONTEXT_UNCONNECTED;
-    pa_mainloop_api *api = pa_threaded_mainloop_get_api(context->loop);
-    context->context = pa_context_new(api, "pacmixer");
-    int r = pa_context_connect(context->context, NULL, 0, NULL);
-    struct timespec t, rt;
-    t.tv_sec = 0;
-    t.tv_nsec = 100000000;
-    while(r == -1) {
-        nanosleep(&t, &rt);
-        pa_context_unref(context->context);
-        context->context = pa_context_new(api, "pacmixer");
-        r = pa_context_connect(context->context, NULL, 0, NULL);
-    }
-    state_callback->state = &context->state;
-    pa_context_set_state_callback(context->context, _cb_state_changed, state_callback);
+    backend_init(context, callback);
+    pa_threaded_mainloop_start(context->loop);
     return context;
 }
 
-void backend_init(context_t *context, callback_t *callback) {
-    pa_threaded_mainloop_start(context->loop);
-    struct timespec t, rt;
-    t.tv_sec = 0;
-    t.tv_nsec = 10000000;
-    while(
-        context->state != PA_CONTEXT_READY ||
-        context->state == PA_CONTEXT_FAILED ||
-        context->state == PA_CONTEXT_TERMINATED
-    ) {
-        nanosleep(&t, &rt);
-    }
-    pa_context_set_subscribe_callback(context->context, _cb_event, callback);
-    pa_context_subscribe(context->context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
-    pa_context_get_sink_input_info_list(context->context, _cb_sink_input, callback);
-    pa_context_get_sink_info_list(context->context, _cb_sink, callback);
-    pa_context_get_source_info_list(context->context, _cb_source, callback);
-    pa_context_get_source_output_info_list(context->context, _cb_source_output, callback);
-    pa_context_get_card_info_list(context->context, _cb_card, callback);
-    pa_context_get_server_info(context->context, _cb_server, callback);
+void backend_init(context_t *context, callback_t* callback) {
+    pa_mainloop_api *api = pa_threaded_mainloop_get_api(context->loop);
+    context->context = pa_context_new(api, "pacmixer");
+    pa_context_set_state_callback(context->context, _cb_state_changed, callback);
+    pa_context_connect(context->context, NULL, PA_CONTEXT_NOFAIL, NULL);
 }
 
 void backend_destroy(context_t *context) {
@@ -183,12 +156,33 @@ void backend_port_set(context_t *c, backend_entry_type type, uint32_t idx, const
     }
 }
 
-void _cb_state_changed(pa_context *c, void *userdata) {
-    state_callback_t *state_callback = (state_callback_t*)userdata;
-    pa_context_state_t nstate = pa_context_get_state(c);
-    *state_callback->state = nstate;
-    if(nstate == PA_CONTEXT_FAILED || nstate == PA_CONTEXT_TERMINATED) {
-        ((tstate_callback_func)(state_callback->func))(state_callback->self);
+void _cb_state_changed(pa_context *context, void *userdata) {
+    callback_t *callback = (callback_t*)userdata;
+    pa_context_state_t state = pa_context_get_state(context);
+
+#ifdef DEBUG
+debug_fprintf(__func__, "b:server state changed to %d", state);
+#endif
+
+    switch(state) {
+        case PA_CONTEXT_READY:
+            pa_context_set_subscribe_callback(context, _cb_event, callback);
+            pa_context_subscribe(context, PA_SUBSCRIPTION_MASK_ALL, NULL, NULL);
+            pa_context_get_sink_input_info_list(context, _cb_sink_input, callback);
+            pa_context_get_sink_info_list(context, _cb_sink, callback);
+            pa_context_get_source_info_list(context, _cb_source, callback);
+            pa_context_get_source_output_info_list(context, _cb_source_output, callback);
+            pa_context_get_card_info_list(context, _cb_card, callback);
+            pa_context_get_server_info(context, _cb_server, callback);
+            ((tstate_callback_func)(callback->state))(callback->self, S_CAME);
+            break;
+        case PA_CONTEXT_FAILED:
+        case PA_CONTEXT_TERMINATED:
+            pa_context_unref(context);
+            ((tstate_callback_func)(callback->state))(callback->self, S_GONE);
+            break;
+        default:
+            break;
     }
 }
 

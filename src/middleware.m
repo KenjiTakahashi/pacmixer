@@ -225,9 +225,10 @@ debug_fprintf(__func__, "m:%d %s notification posted", idx, [nname UTF8String]);
     [pool release];
 }
 
-void callback_state_func(void *self_) {
+void callback_state_func(void *self_, server_state state) {
     Middleware *self = self_;
-    [[NSNotificationCenter defaultCenter] postNotificationName: @"backendGone"
+    NSString *name = state == S_CAME ? @"backendAppeared" : @"backendGone";
+    [[NSNotificationCenter defaultCenter] postNotificationName: name
                                                         object: self
                                                       userInfo: nil];
 }
@@ -314,39 +315,34 @@ void callback_state_func(void *self_) {
 -(Middleware*) init {
     self = [super init];
     blocks = [[NSMutableArray alloc] init];
+
     callback = malloc(sizeof(callback_t));
     callback->add = callback_add_func;
     callback->update = callback_update_func;
     callback->remove = callback_remove_func;
+    callback->state = callback_state_func;
     callback->self = self;
-    state_callback = malloc(sizeof(state_callback_t));
-    state_callback->func = callback_state_func;
-    state_callback->self = self;
-    return self;
-}
 
--(void) spawn {
-    [NSThread detachNewThreadSelector: @selector(initContext)
-                             toTarget: self
-                           withObject: nil];
-}
+    context = backend_new(callback);
 
--(void) initContext {
-    context = backend_new(state_callback);
-    backend_init(context, callback);
-    NSString *name = @"backendAppeared";
-    [[NSNotificationCenter defaultCenter] postNotificationName: name
-                                                        object: self
-                                                      userInfo: nil];
-
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     Block *block = [self addBlockWithId: -1
                                andIndex: -1
                                 andType: CARD]; //It does not matter.
-    NSString *dname = @"serverDefaultsChanged";
-    [[NSNotificationCenter defaultCenter] addObserver: block
-                                             selector: @selector(setDefaults:)
-                                                 name: dname
-                                               object: nil];
+    [center addObserver: block
+               selector: @selector(setDefaults:)
+                   name: @"serverDefaultsChanged"
+                 object: nil];
+
+    [center addObserver: self
+               selector: @selector(restart:)
+                   name: @"backendGone"
+                 object: nil];
+    return self;
+}
+
+-(void) restart: (NSNotification*) _ {
+    backend_init(context, callback);
 }
 
 -(void) dealloc {
@@ -354,7 +350,6 @@ void callback_state_func(void *self_) {
     if(context != NULL) {
         backend_destroy(context);
     }
-    free(state_callback);
     free(callback);
     [super dealloc];
 }

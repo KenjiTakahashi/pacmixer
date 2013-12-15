@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2012
+ Karol "Kenji Takahashi" Woźniak © 2012 - 2013
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 */
 
 
+#define _POSIX_C_SOURCE 199309
 #include <time.h>
 #include <stdio.h>
 #include <stdlib.h>
