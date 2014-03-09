@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+ Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -62,21 +62,21 @@ void backend_destroy(context_t *context) {
 }
 
 void backend_volume_set(context_t *c, backend_entry_type type, uint32_t idx, int i, int v) {
-    volume_callback_t volume;
-    volume.index = i;
-    volume.value = v;
+    volume_callback_t *volume = (volume_callback_t*)malloc(sizeof(volume_callback_t));
+    volume->index = i;
+    volume->value = v;
     switch(type) {
         case SINK:
-            pa_context_get_sink_info_by_index(c->context, idx, _cb_s_sink, &volume);
+            pa_context_get_sink_info_by_index(c->context, idx, _cb_s_sink, volume);
             break;
         case SINK_INPUT:
-            pa_context_get_sink_input_info(c->context, idx, _cb_s_sink_input, &volume);
+            pa_context_get_sink_input_info(c->context, idx, _cb_s_sink_input, volume);
             break;
         case SOURCE:
-            pa_context_get_source_info_by_index(c->context, idx, _cb_s_source, &volume);
+            pa_context_get_source_info_by_index(c->context, idx, _cb_s_source, volume);
             break;
         case SOURCE_OUTPUT:
-            pa_context_get_source_output_info(c->context, idx, _cb_s_source_output, &volume);
+            pa_context_get_source_output_info(c->context, idx, _cb_s_source_output, volume);
             break;
         default:
             break;

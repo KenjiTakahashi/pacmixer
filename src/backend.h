@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+ Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -345,6 +345,7 @@ typedef struct VOLUME_CALLBACK {
                 cvolume.values[volume->index] = volume->value;\
                 pa_context_set_ ## type ## _volume ## by_index(c, info->index, &cvolume, NULL, NULL);\
             }\
+            free(userdata);\
         }\
     }\
 

@@ -38,6 +38,7 @@
 - Fixed screen corruptions happening on terminal resizes.
 - Fixed settings sometimes disappearing after card profile change.
 
-== 0.5:
+== 0.4.1 (09.03.2014):
 - Fixed INPUTS filtered as OUTPUTS and vice versa.
 - Added ability to set SINKs and SOURCEs as default/fallback.
+- Fixed segfault on changing single channel volume.
