@@ -229,6 +229,7 @@ typedef struct CLIENT_CALLBACK {
     backend_volume_t *volumes;
     uint8_t chnum;
     uint32_t index;
+    backend_entry_type type;
 } client_callback_t;
 
 typedef struct VOLUME_CALLBACK {
@@ -295,7 +296,7 @@ typedef struct VOLUME_CALLBACK {
  *
  * @see _cb_u()
  */
-#define _CB_STREAM_(c, info, type, userdata)\
+#define _CB_STREAM_(c, info, type_, userdata)\
     if(info->index != PA_INVALID_INDEX) {\
         /* TODO: We'll need this name once status line is done. */\
         if(info->client != PA_INVALID_INDEX) {\
@@ -309,6 +310,7 @@ typedef struct VOLUME_CALLBACK {
             client_cb->volumes = volumes;\
             client_cb->chnum = chnum;\
             client_cb->index = info->index;\
+            client_cb->type = type_;\
             pa_context_get_client_info(c, info->client, _cb_client, client_cb);\
         }\
     }

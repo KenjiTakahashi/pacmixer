@@ -198,7 +198,7 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
         data.volumes = client_callback->volumes;
         data.channels_num = client_callback->chnum;
         data.option = NULL;
-        ((tcallback_add_func)(callback->add))(callback->self, info->name, SINK_INPUT, client_callback->index, &data);
+        ((tcallback_add_func)(callback->add))(callback->self, info->name, client_callback->type, client_callback->index, &data);
         free(client_callback->channels);
         free(client_callback->volumes);
         free(client_callback);

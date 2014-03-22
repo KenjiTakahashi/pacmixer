@@ -45,3 +45,4 @@
 
 == 0.5:
 - Fixed showing newly appeared card profile.
+- Fixed RECORDING threated as PLAYBACK.
