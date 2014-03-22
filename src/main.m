@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -103,6 +103,11 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             id opt = [w addOptions: [ports options]
                           withName: @"Ports"];
             [opt setCurrentByName: [ports active]];
+        } else if(type == PLAYBACK || type == RECORDING) {
+            View option_type = type == PLAYBACK ? OUTPUTS : INPUTS;
+            NSArray *options = [tui getWidgetsNamesOfType: option_type];
+            [w addOptions: options
+                 withName: type == PLAYBACK ? @"Output" : @"Input"];
         }
     } else {
         option_t *profile = [info objectForKey: @"profile"];

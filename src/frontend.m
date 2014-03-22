@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -329,6 +329,17 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
             [w setDefault: [default_sink isEqualToString: w.internalName]];
         }
     }
+}
+
+-(NSArray*) getWidgetsNamesOfType: (View) type {
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity: 0];
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *widget = [allWidgets objectAtIndex: i];
+        if([widget type] == type) {
+            [results addObject: [widget name]];
+        }
+    }
+    return results;
 }
 
 -(void) showSettings {
