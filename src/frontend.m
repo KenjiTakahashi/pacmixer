@@ -259,6 +259,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     [allWidgets addObject: widget];
     if([top view] == SETTINGS) {
         [widgets addObject: widget];
+        [widget show];
     }
     [widget release];
 }

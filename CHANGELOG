@@ -42,3 +42,6 @@
 - Fixed INPUTS filtered as OUTPUTS and vice versa.
 - Added ability to set SINKs and SOURCEs as default/fallback.
 - Fixed segfault on changing single channel volume.
+
+== 0.5:
+- Fixed showing newly appeared card profile.
