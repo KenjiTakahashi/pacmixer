@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2013
+ Karol "Kenji Takahashi" Woźniak © 2013 - 2014
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -372,24 +372,24 @@ TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
     free(TEST_RETURN__cb_client_data.channels);
 }
 
-backend_option_t TEST_RETURN__cb1__cb_u;
+backend_option_t TEST_RETURN__CB1__CB_U;
 
-void TEST_FUNC__cb1__cb_u(uint32_t idx, backend_entry_type type, pa_cvolume volme, int mute, const char *description, const char *name, backend_option_t *options, void *userdata) {
-    strcpy(TEST_RETURN__cb1__cb_u.names[0], options->names[0]);
-    strcpy(TEST_RETURN__cb1__cb_u.descriptions[0], options->descriptions[0]);
-    strcpy(TEST_RETURN__cb1__cb_u.active, options->active);
-    TEST_RETURN__cb1__cb_u.size = options->size;
+void TEST_FUNC__CB1__CB_U(const pa_sink_info *idx, backend_entry_type type, backend_option_t *options, void *userdata) {
+    strcpy(TEST_RETURN__CB1__CB_U.names[0], options->names[0]);
+    strcpy(TEST_RETURN__CB1__CB_U.descriptions[0], options->descriptions[0]);
+    strcpy(TEST_RETURN__CB1__CB_U.active, options->active);
+    TEST_RETURN__CB1__CB_U.size = options->size;
 }
 
-_CB_DEVICE(_TEST_cb_sink, pa_sink_info, TEST_FUNC__cb1__cb_u, SINK);
+_CB_DEVICE(_TEST_cb_sink, pa_sink_info, TEST_FUNC__CB1__CB_U, SINK);
 TEST_CASE("_CB_DEVICE", "Should generate device adding/updating function") {
     // We'll use pa_sink_info here, but it scales to other pa_source_info
     // structures as well.
-    TEST_RETURN__cb1__cb_u.names = (char**)malloc(sizeof(char*));
-    TEST_RETURN__cb1__cb_u.names[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
-    TEST_RETURN__cb1__cb_u.descriptions = (char**)malloc(sizeof(char*));
-    TEST_RETURN__cb1__cb_u.descriptions[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
-    TEST_RETURN__cb1__cb_u.active = (char*)malloc(sizeof(char) * STRING_SIZE);
+    TEST_RETURN__CB1__CB_U.names = (char**)malloc(sizeof(char*));
+    TEST_RETURN__CB1__CB_U.names[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
+    TEST_RETURN__CB1__CB_U.descriptions = (char**)malloc(sizeof(char*));
+    TEST_RETURN__CB1__CB_U.descriptions[0] = (char*)malloc(sizeof(char) * STRING_SIZE);
+    TEST_RETURN__CB1__CB_U.active = (char*)malloc(sizeof(char) * STRING_SIZE);
 
     pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
     info->index = PA_VALID_INDEX;
@@ -409,18 +409,18 @@ TEST_CASE("_CB_DEVICE", "Should generate device adding/updating function") {
 
     _TEST_cb_sink(NULL, info, 0, NULL);
 
-    REQUIRE(TEST_RETURN__cb1__cb_u.size == 1);
-    REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.names[0], "test_port_name") == 0);
-    REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.descriptions[0], "test_port_desc") == 0);
-    REQUIRE(strcmp(TEST_RETURN__cb1__cb_u.active, "test_active_port_desc") == 0);
+    REQUIRE(TEST_RETURN__CB1__CB_U.size == 1);
+    REQUIRE(strcmp(TEST_RETURN__CB1__CB_U.names[0], "test_port_name") == 0);
+    REQUIRE(strcmp(TEST_RETURN__CB1__CB_U.descriptions[0], "test_port_desc") == 0);
+    REQUIRE(strcmp(TEST_RETURN__CB1__CB_U.active, "test_active_port_desc") == 0);
 
     free(info->active_port);
     free(info->ports[0]);
     free(info->ports);
     free(info);
 
-    free(TEST_RETURN__cb1__cb_u.descriptions[0]);
-    free(TEST_RETURN__cb1__cb_u.descriptions);
+    free(TEST_RETURN__CB1__CB_U.descriptions[0]);
+    free(TEST_RETURN__CB1__CB_U.descriptions);
 }
 
 backend_entry_type TEST_RETURN__CB_STREAM_U_type = CARD;
@@ -870,54 +870,64 @@ TEST_CASE("_do_card", "Should compose backend_option_t for given card data") {
     free(info.profiles);
 }
 
-backend_entry_type TEST_RETURN__cb_u_type = CARD;
-int TEST_RETURN__cb_u_idx = PA_INVALID_INDEX;
+backend_entry_type TEST_RETURN__CB_U_type = CARD;
+int TEST_RETURN__CB_U_idx = PA_INVALID_INDEX;
 
-void TEST_CALLBACK__cb_u(void *s, backend_entry_type type, uint32_t idx, void *data) {
-    TEST_RETURN__cb_u_type = type;
-    TEST_RETURN__cb_u_idx = idx;
+void TEST_CALLBACK__CB_U(void *s, backend_entry_type type, uint32_t idx, void *data) {
+    TEST_RETURN__CB_U_type = type;
+    TEST_RETURN__CB_U_idx = idx;
 }
 
-TEST_CASE("_cb_u", "Should fire 'update' callback for given data") {
+TEST_CASE("_CB_U", "Should fire 'update' callback for given data") {
     //Using SINK, it scales to other types as well.
     //TODO: More thorough tests.
     pa_cvolume cv;
     cv.channels = 0;
     callback_t cb;
-    cb.update = (void*)TEST_CALLBACK__cb_u;
+    cb.update = (void*)TEST_CALLBACK__CB_U;
+    pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
+    info->index = PA_VALID_INDEX;
+    info->volume = cv;
+    info->mute = 0;
 
-    _cb_u(PA_VALID_INDEX, SINK, cv, 1, NULL, NULL, NULL, (void*)&cb);
+    _CB_U(info, SINK, NULL, (void*)&cb);
 
-    REQUIRE(TEST_RETURN__cb_u_type == SINK);
-    REQUIRE(TEST_RETURN__cb_u_idx == PA_VALID_INDEX);
+    REQUIRE(TEST_RETURN__CB_U_type == SINK);
+    REQUIRE(TEST_RETURN__CB_U_idx == PA_VALID_INDEX);
 }
 
-backend_entry_type TEST_RETURN__cb1_type = CARD;
-int TEST_RETURN__cb1_idx = PA_INVALID_INDEX;
-char TEST_RETURN__cb1_desc[STRING_SIZE];
-char TEST_RETURN__cb1_iname[STRING_SIZE];
+backend_entry_type TEST_RETURN__CB1_type = CARD;
+int TEST_RETURN__CB1_idx = PA_INVALID_INDEX;
+char TEST_RETURN__CB1_desc[STRING_SIZE];
+char TEST_RETURN__CB1_iname[STRING_SIZE];
 
-void TEST_CALLBACK__cb1(void *s, const char *desc, backend_entry_type type, uint32_t idx, void *data) {
+void TEST_CALLBACK__CB1(void *s, const char *desc, backend_entry_type type, uint32_t idx, void *data) {
     backend_data_t *d = (backend_data_t*)data;
-    TEST_RETURN__cb1_type = type;
-    TEST_RETURN__cb1_idx = idx;
-    strcpy(TEST_RETURN__cb1_desc, desc);
-    strcpy(TEST_RETURN__cb1_iname, d->internalName);
+    TEST_RETURN__CB1_type = type;
+    TEST_RETURN__CB1_idx = idx;
+    strcpy(TEST_RETURN__CB1_desc, desc);
+    strcpy(TEST_RETURN__CB1_iname, d->internalName);
 }
 
-TEST_CASE("_cb1", "Should fire 'add' callback for given data") {
+TEST_CASE("_CB1", "Should fire 'add' callback for given data") {
     //Using SINK, it scales to other types as well.
     pa_cvolume cv;
     cv.channels = 0;
     callback_t cb;
-    cb.add = (void*)TEST_CALLBACK__cb1;
+    cb.add = (void*)TEST_CALLBACK__CB1;
+    pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
+    info->index = PA_VALID_INDEX;
+    info->volume = cv;
+    info->mute = 1;
+    strcpy(info->name, "test_iname");
+    strcpy(info->description, "test_desc");
 
-    _cb1(PA_VALID_INDEX, SINK, cv, 1, "test_desc", "test_iname", NULL, (void*)&cb);
+    _CB1(info, SINK, NULL, (void*)&cb);
 
-    REQUIRE(TEST_RETURN__cb1_type == SINK);
-    REQUIRE(TEST_RETURN__cb1_idx == PA_VALID_INDEX);
-    REQUIRE(strcmp(TEST_RETURN__cb1_desc, "test_desc") == 0);
-    REQUIRE(strcmp(TEST_RETURN__cb1_iname, "test_iname") == 0);
+    REQUIRE(TEST_RETURN__CB1_type == SINK);
+    REQUIRE(TEST_RETURN__CB1_idx == PA_VALID_INDEX);
+    REQUIRE(strcmp(TEST_RETURN__CB1_desc, "test_desc") == 0);
+    REQUIRE(strcmp(TEST_RETURN__CB1_iname, "test_iname") == 0);
 }
 
 

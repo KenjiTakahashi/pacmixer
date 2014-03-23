@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2013
+ Karol "Kenji Takahashi" Woźniak © 2013 - 2014
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -47,6 +47,8 @@ struct PA_INFO {
     const char *name;
     uint32_t client;
     const char *description;
+    uint32_t sink;
+    uint32_t source;
 };
 typedef struct PA_INFO pa_sink_input_info;
 typedef struct PA_INFO pa_source_output_info;
