@@ -20,10 +20,10 @@
 #include "backend.h"
 
 
-_CB_DEVICE(_cb_sink, pa_sink_info, _cb1, SINK);
-_CB_DEVICE(_cb_u_sink, pa_sink_info, _cb_u, SINK);
-_CB_DEVICE(_cb_source, pa_source_info, _cb1, SOURCE);
-_CB_DEVICE(_cb_u_source, pa_source_info, _cb_u, SOURCE);
+_CB_DEVICE(_cb_sink, pa_sink_info, _CB1, SINK);
+_CB_DEVICE(_cb_u_sink, pa_sink_info, _CB_U, SINK);
+_CB_DEVICE(_cb_source, pa_source_info, _CB1, SOURCE);
+_CB_DEVICE(_cb_u_source, pa_source_info, _CB_U, SOURCE);
 
 
 _CB_STREAM(_cb_sink_input, pa_sink_input_info, _CB_STREAM_, SINK_INPUT);
@@ -197,6 +197,7 @@ debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
         data.channels = client_callback->channels;
         data.volumes = client_callback->volumes;
         data.channels_num = client_callback->chnum;
+        data.device = client_callback->device;
         data.option = NULL;
         ((tcallback_add_func)(callback->add))(callback->self, info->name, client_callback->type, client_callback->index, &data);
         free(client_callback->channels);
@@ -339,37 +340,4 @@ void _do_option_free(backend_option_t *option, int n) {
     free(option->descriptions);
     free(option->names);
     free(option);
-}
-
-void _cb_u(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, const char *internalName, backend_option_t *optdata, void *userdata) {
-    if(index != PA_INVALID_INDEX) {
-        callback_t *callback = (callback_t*)userdata;
-        uint8_t chnum = volume.channels;
-        backend_data_t data;
-        data.volumes = _do_volumes(volume, chnum, mute);
-        data.channels_num = chnum;
-        data.option = optdata;
-        ((tcallback_update_func)(callback->update))(callback->self, type, index, &data);
-        free(data.volumes);
-    }
-}
-
-void _cb1(uint32_t index, backend_entry_type type, pa_cvolume volume, int mute, const char *description, const char *internalName, backend_option_t *options, void *userdata) {
-    if(index != PA_INVALID_INDEX) {
-#ifdef DEBUG
-debug_fprintf(__func__, "%d:%s appeared", index, description);
-#endif
-        callback_t *callback = (callback_t*)userdata;
-        uint8_t chnum = volume.channels;
-        backend_data_t data;
-        data.channels = _do_channels(volume, chnum);
-        data.volumes = _do_volumes(volume, chnum, mute);
-        data.channels_num = chnum;
-        data.option = options;
-        data.internalName = (char*)malloc((strlen(internalName) + 1) * sizeof(char));
-        strcpy(data.internalName, internalName);
-        ((tcallback_add_func)(callback->add))(callback->self, description, type, index, &data);
-        free(data.channels);
-        free(data.volumes);
-    }
 }

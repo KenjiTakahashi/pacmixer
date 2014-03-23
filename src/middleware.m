@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -100,6 +100,10 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
             [NSString stringWithUTF8String: data->internalName],
             @"internalName",
         nil];
+        if(type == SINK_INPUT || type == SOURCE_OUTPUT) {
+            NSNumber *device = [NSNumber numberWithInt: data->device];
+            [s setObject: device forKey: @"deviceIndex"];
+        }
         if(data->option != NULL) {
             char ** const ports = data->option->descriptions;
             const char *active = data->option->active;
@@ -188,6 +192,10 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
             NSMutableDictionary dictionaryWithObjectsAndKeys:
             volumes, @"volumes", nil];
         [volumes release];
+        if(type == SINK_INPUT || type == SOURCE_OUTPUT) {
+            NSNumber *device = [NSNumber numberWithInt: data->device];
+            [s setObject: device forKey: @"deviceIndex"];
+        }
         if(data->option != NULL) {
             char ** const ports = data->option->descriptions;
             const char *active = data->option->active;

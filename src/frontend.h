@@ -36,7 +36,6 @@
 
 @interface TUI: NSObject <Controlling> {
     @private
-        NSMutableArray *allWidgets;
         NSMutableArray *widgets;
         Settings *settings;
         Top *top;
@@ -68,8 +67,9 @@
 -(void) setFirst;
 -(void) setFilter: (View) type;
 -(void) setDefaults: (NSNotification*) notification;
--(NSArray*) getWidgetsOfType: (View) type;
--(NSArray*) getWidgetsNamesOfType: (View) type;
+-(NSArray*) getWidgetsWithType: (View) type;
+-(NSArray*) getWidgetsNamesWithType: (View) type;
++(Widget*) getWidgetWithId: (NSString*) id_;
 -(void) showSettings;
 -(void) switchSetting;
 -(void) previous;

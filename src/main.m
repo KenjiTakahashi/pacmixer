@@ -79,7 +79,7 @@
     }
     NSString *name = [info objectForKey: @"name"];
     NSString *internalId = [NSString stringWithFormat:
-        @"%@_%d", id_, typeb];
+        @"%@_%d", id_, type];
 #ifdef DEBUG
 debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
 #endif
@@ -105,9 +105,13 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             [opt setCurrentByName: [ports active]];
         } else if(type == PLAYBACK || type == RECORDING) {
             View option_type = type == PLAYBACK ? OUTPUTS : INPUTS;
-            NSArray *options = [tui getWidgetsNamesOfType: option_type];
-            [w addOptions: options
-                 withName: type == PLAYBACK ? @"Output" : @"Input"];
+            NSArray *options = [tui getWidgetsNamesWithType: option_type];
+            id opt = [w addOptions: options
+                          withName: type == PLAYBACK ? @"Output" : @"Input"];
+            NSString *current_id = [NSString stringWithFormat:
+                @"%@_%d", [info objectForKey: @"deviceIndex"], option_type];
+            Widget *current_widget = [TUI getWidgetWithId: current_id];
+            [opt setCurrentByName: [current_widget name]];
         }
     } else {
         option_t *profile = [info objectForKey: @"profile"];

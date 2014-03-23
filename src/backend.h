@@ -106,6 +106,7 @@ typedef struct BACKEND_DATA {
     backend_option_t *option;
     backend_default_t *defaults;
     char *internalName;
+    uint32_t device;
 } backend_data_t;
 
 /**
@@ -230,6 +231,7 @@ typedef struct CLIENT_CALLBACK {
     uint8_t chnum;
     uint32_t index;
     backend_entry_type type;
+    uint32_t device;
 } client_callback_t;
 
 typedef struct VOLUME_CALLBACK {
@@ -253,7 +255,7 @@ typedef struct VOLUME_CALLBACK {
  * @see _cb1()
  * @see _cb_u()
  */
-#define _CB_DEVICE(func, info_type, _cb_func, type)\
+#define _CB_DEVICE(func, info_type, _CB, type)\
     void func(pa_context *c, const info_type *info, int eol, void *userdata) {\
         if(!eol) {\
             uint32_t n = info->n_ports;\
@@ -275,7 +277,7 @@ typedef struct VOLUME_CALLBACK {
                 strcpy(optdata->active, active_opt);\
                 optdata->size = n;\
             }\
-            _cb_func(info->index, type, info->volume, info->mute, info->description, info->name, optdata, userdata);\
+            _CB(info, type, optdata, userdata);\
             _do_option_free(optdata, n);\
         }\
     }\
@@ -296,6 +298,8 @@ typedef struct VOLUME_CALLBACK {
  *
  * @see _cb_u()
  */
+#define MAP_STREAM_SINK_INPUT sink
+#define MAP_STREAM_SOURCE_OUTPUT source
 #define _CB_STREAM_(c, info, type_, userdata)\
     if(info->index != PA_INVALID_INDEX) {\
         /* TODO: We'll need this name once status line is done. */\
@@ -310,18 +314,18 @@ typedef struct VOLUME_CALLBACK {
             client_cb->volumes = volumes;\
             client_cb->chnum = chnum;\
             client_cb->index = info->index;\
+            client_cb->device = info->MAP_STREAM_ ## type_;\
             client_cb->type = type_;\
             pa_context_get_client_info(c, info->client, _cb_client, client_cb);\
         }\
     }
-#define _CB_STREAM_U(c, info, type, userdata)\
-    _cb_u(info->index, type, info->volume, info->mute, NULL, NULL, NULL, userdata);
-#define _CB_STREAM(func, info_type, _cb_func, type)\
+#define _CB_STREAM_U(c, info, type, userdata) _CB_U(info, type, NULL, userdata);
+#define _CB_STREAM(func, info_type, _CB, type)\
     void func(pa_context *c, const info_type *info, int eol, void *userdata) {\
         if(!eol) {\
-            _cb_func(c, info, type, userdata);\
+            _CB(c, info, type, userdata);\
         }\
-    }\
+    }
 
 /**
  * Internal macro.
@@ -526,40 +530,61 @@ void _do_option_free(backend_option_t*, int n);
 
 
 /**
- * Internal helper function.
+ * Internal macro.
  * Used to propagate info about control's current volume and mute values.
  * Makes up necessary information using BACKEND_VOLUME type
  * and calls higher level update callback.
  *
- * @param index PA internal control index.
+ * @param info PA info structure.
  * @param type Type of the control.
- * @param volume Volume values.
- * @param mute Mute value.
- * @param description Human readable name of the control (IGNORED).
- * @param internalName Internal name of the control (IGNORED).
  * @param optdata Options data. Can be NULL.
  * @param userdata Additional data of type CALLBACK.
  *
  * @see _do_volumes()
  */
-void _cb_u(uint32_t, backend_entry_type, pa_cvolume, int, const char*, const char*, backend_option_t*, void*);
+#define _CB_U_DEVICE_SINK 0
+#define _CB_U_DEVICE_SOURCE 0
+#define _CB_U_DEVICE_SINK_INPUT info->sink
+#define _CB_U_DEVICE_SOURCE_OUTPUT info->source
+#define _CB_U(info, type, optdata, userdata)\
+    if(info->index != PA_INVALID_INDEX) {\
+        callback_t *callback = (callback_t*)userdata;\
+        uint8_t chnum = info->volume.channels;\
+        backend_data_t data;\
+        data.volumes = _do_volumes(info->volume, chnum, info->mute);\
+        data.channels_num = chnum;\
+        data.option = optdata;\
+        data.device = _CB_U_DEVICE_ ## type;\
+        ((tcallback_update_func)(callback->update))(callback->self, type, info->index, &data);\
+        free(data.volumes);\
+    }
 
 /**
- * Internal helper function.
+ * Internal macro.
  * Used to propagate info about newly appearing SINKs and SOURCEs.
  * Makes up necessary information using BACKEND_CHANNEL type
  * and calls higher level add callback.
  *
- * @param index PA internal control index.
+ * @param info PA info structure.
  * @param type Type of the control.
- * @param volume Volume values.
- * @param mute Mute value.
- * @param description Human readable name of the control.
- * @param internalName Internal name of the control.
  * @param options Options data (BACKEND_OPTION).
  * @param userdata Additional data of type CALLBACK.
  *
  * @see _do_channels()
  * @see _do_volumes()
  */
-void _cb1(uint32_t, backend_entry_type, pa_cvolume, int, const char*, const char*, backend_option_t*, void*);
+#define _CB1(info, type, optdata, userdata)\
+    if(info->index != PA_INVALID_INDEX) {\
+        callback_t *callback = (callback_t*)userdata;\
+        uint8_t chnum = info->volume.channels;\
+        backend_data_t data;\
+        data.channels = _do_channels(info->volume, chnum);\
+        data.volumes = _do_volumes(info->volume, chnum, info->mute);\
+        data.channels_num = chnum;\
+        data.option = optdata;\
+        data.internalName = (char*)malloc((strlen(info->name) + 1) * sizeof(char));\
+        strcpy(data.internalName, info->name);\
+        ((tcallback_add_func)(callback->add))(callback->self, info->description, type, info->index, &data);\
+        free(data.channels);\
+        free(data.volumes);\
+    }

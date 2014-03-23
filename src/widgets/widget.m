@@ -197,6 +197,13 @@ debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UT
     if(ports_ != nil) {
         [ports setCurrentByName: [ports_ active]];
     }
+    View option_type = type == PLAYBACK ? OUTPUTS : INPUTS;
+    NSNumber *device = [info objectForKey: @"deviceIndex"];
+    NSString *current_id = [NSString stringWithFormat:
+        @"%@_%d", [info objectForKey: @"deviceIndex"], option_type];
+    if(device != nil) {
+        [ports setCurrentByName: [[TUI getWidgetWithId: current_id] name]];
+    }
 }
 
 -(void) setDefault: (BOOL) default_ {

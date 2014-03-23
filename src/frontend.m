@@ -23,6 +23,7 @@ static WINDOW *win;
 static PANEL *pan;
 static int xpadding;
 static int ypadding;
+static NSMutableArray *allWidgets;
 
 
 @implementation TUI
@@ -269,8 +270,8 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
         View wtype = [widget type];
         if(wtype == OUTPUTS || wtype == INPUTS) {
             View option_type = wtype == OUTPUTS ? PLAYBACK : RECORDING;
-            NSArray *tc_widgets = [self getWidgetsOfType: option_type];
-            NSArray *values = [self getWidgetsNamesOfType: wtype];
+            NSArray *tc_widgets = [self getWidgetsWithType: option_type];
+            NSArray *values = [self getWidgetsNamesWithType: wtype];
             for(int j = 0; j < [tc_widgets count]; ++j) {
                 Widget *tc_widget = [tc_widgets objectAtIndex: j];
                 [tc_widget replaceOptions: values];
@@ -346,7 +347,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     }
 }
 
--(NSArray*) getWidgetsOfType: (View) type {
+-(NSArray*) getWidgetsWithType: (View) type {
     NSMutableArray *results = [NSMutableArray arrayWithCapacity: 0];
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
@@ -357,7 +358,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     return results;
 }
 
--(NSArray*) getWidgetsNamesOfType: (View) type {
+-(NSArray*) getWidgetsNamesWithType: (View) type {
     NSMutableArray *results = [NSMutableArray arrayWithCapacity: 0];
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
@@ -366,6 +367,16 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
         }
     }
     return results;
+}
+
++(Widget*) getWidgetWithId: (NSString*) id_ {
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *widget = [allWidgets objectAtIndex: i];
+        if([[widget internalId] isEqualToString: id_]) {
+            return widget;
+        }
+    }
+    return nil;
 }
 
 -(void) showSettings {
