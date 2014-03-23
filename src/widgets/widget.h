@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -58,6 +58,7 @@
 -(Channels*) addChannels: (NSArray*) channels_;
 -(id) addOptions: (NSArray*) options_
         withName: (NSString*) optname;
+-(void) replaceOptions: (NSArray*) values;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(void) setValuesByNotification: (NSNotification*) notification;

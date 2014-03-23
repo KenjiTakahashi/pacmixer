@@ -44,5 +44,5 @@
 - Fixed segfault on changing single channel volume.
 
 == 0.5:
-- Fixed showing newly appeared card profile.
+- Fixed showing newly appeared card profile when SETTINGS panel is active.
 - Fixed RECORDING threated as PLAYBACK.

@@ -63,10 +63,12 @@
          withActive: (NSString*) active
             andName: (NSString*) name
               andId: (NSString*) id_;
+-(void) adjustOptions;
 -(void) setCurrent: (int) i;
 -(void) setFirst;
 -(void) setFilter: (View) type;
 -(void) setDefaults: (NSNotification*) notification;
+-(NSArray*) getWidgetsOfType: (View) type;
 -(NSArray*) getWidgetsNamesOfType: (View) type;
 -(void) showSettings;
 -(void) switchSetting;

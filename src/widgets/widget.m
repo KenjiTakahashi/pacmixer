@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -163,6 +163,12 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
 debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UTF8String]);
 #endif
     return ports;
+}
+
+-(void) replaceOptions: (NSArray*) values {
+    [channels reprint: height - [values count] - 2];
+    [ports replaceValues: values];
+    [ports reprint: height];
 }
 
 -(void) setHighlighted: (BOOL) active {

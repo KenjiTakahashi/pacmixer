@@ -232,7 +232,6 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     if([widgets count]) {
         [[widgets objectAtIndex: highlight] setHighlighted: YES];
     }
-    [[self class] refresh];
 }
 
 -(void) addProfiles: (NSArray*) profiles
@@ -262,6 +261,22 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
         [widget show];
     }
     [widget release];
+}
+
+-(void) adjustOptions {
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *widget = [allWidgets objectAtIndex: i];
+        View wtype = [widget type];
+        if(wtype == OUTPUTS || wtype == INPUTS) {
+            View option_type = wtype == OUTPUTS ? PLAYBACK : RECORDING;
+            NSArray *tc_widgets = [self getWidgetsOfType: option_type];
+            NSArray *values = [self getWidgetsNamesOfType: wtype];
+            for(int j = 0; j < [tc_widgets count]; ++j) {
+                Widget *tc_widget = [tc_widgets objectAtIndex: j];
+                [tc_widget replaceOptions: values];
+            }
+        }
+    }
 }
 
 -(void) setCurrent: (int) i {
@@ -329,6 +344,17 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
             [w setDefault: [default_sink isEqualToString: w.internalName]];
         }
     }
+}
+
+-(NSArray*) getWidgetsOfType: (View) type {
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity: 0];
+    for(int i = 0; i < [allWidgets count]; ++i) {
+        Widget *widget = [allWidgets objectAtIndex: i];
+        if([widget type] == type) {
+            [results addObject: widget];
+        }
+    }
+    return results;
 }
 
 -(NSArray*) getWidgetsNamesOfType: (View) type {

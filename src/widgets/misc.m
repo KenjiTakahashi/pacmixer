@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2013
+// Karol "Kenji Takahashi" Woźniak © 2013 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -36,21 +36,21 @@
 -(void) reprint: (int) height_ {
     [window reprint: height_];
     if(pan != NULL) {
-        wresize(window.win, [window height], getmaxx(stdscr));
+        wresize(window.win, window.height, getmaxx(stdscr));
         replace_panel(pan, window.win);
-        move_panel(pan, 2, 0);
+        move_panel(pan, window.position + 2, 0);
     }
 }
 
 -(void) setHighlighted: (BOOL) active {
     if(active) {
-        owidth = [window width];
-        int by = getbegy(window.win);
+        owidth = window.width;
         window.width = getmaxx(stdscr);
         delwin(window.win);
-        window.win = newwin([window height], window.width, by + 2, 0);
+        window.win = newwin(
+            window.height, window.width, window.position + 2, 0
+        );
         pan = new_panel(window.win);
-        [window setHighlighted: active];
     } else {
         window.width = owidth;
         if(pan != NULL) {
@@ -59,10 +59,10 @@
         }
         delwin(window.win);
         window.win = derwin(
-            window.parent, [window height], window.width, window.position, 0
+            window.parent, window.height, window.width, window.position, 0
         );
-        [window setHighlighted: active];
     }
+    [window setHighlighted: active];
 }
 
 -(void) adjust {

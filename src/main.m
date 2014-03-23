@@ -118,12 +118,15 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
                        andId: internalId];
         }
     }
+    [tui adjustOptions];
     [TUI refresh];
 }
 
 -(void) removeWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
     [tui removeWidget: [info objectForKey: @"id"]];
+    [tui adjustOptions];
+    [TUI refresh];
 }
 
 -(void) run {

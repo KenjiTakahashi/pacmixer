@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -67,13 +67,15 @@
 -(void) dealloc;
 -(void) print;
 -(void) reprint: (int) height_;
+-(void) calculateDimensions;
 -(void) setCurrent: (int) i;
 -(void) setCurrentByName: (NSString*) name;
 -(void) setCurrentByNotification: (NSNotification*) notification;
--(void) up;
--(void) down;
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
+-(void) replaceValues: (NSArray*) values;
+-(void) up;
+-(void) down;
 -(void) switchValue;
 -(int) height;
 -(int) endPosition;

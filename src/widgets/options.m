@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -65,27 +65,12 @@
     self = [super init];
     _parent = parent_;
     label = [label_ copy];
-    options = [options_ retain];
     internalId = [id_ copy];
     highlighted = NO;
     highlight = 0;
-    _height = [options count] + 2;
-    int my;
-    int mx;
-    getmaxyx(_parent, my, mx);
+    options = [options_ retain];
     _width += 2;
-    BOOL resizeParent = NO;
-    if(_width > mx) {
-        mx = _width;
-        resizeParent = YES;
-    }
-    if(_position + _height > my) {
-        my = _position + _height;
-        resizeParent = YES;
-    }
-    if(resizeParent) {
-        wresize(_parent, my, mx);
-    }
+    [self calculateDimensions];
     _win = derwin(_parent, _height, _width, _position, 0);
     hidden = YES;
     [self print];
@@ -103,6 +88,7 @@
 
 -(void) print {
     if(!hidden) {
+        werase(self.win);
         box(self.win, 0, 0);
         if([label length] > self.width - 2) {
             mvwprintw(self.win, 0, 1, "%@", [label substringToIndex: self.width - 2]);
@@ -135,8 +121,27 @@
 
 -(void) reprint: (int) height_ {
     [self setPosition: height_ - [options count] - 3];
-    wresize(self.win, [self height], self.width);
+    wresize(self.win, self.height, self.width);
     [self print];
+}
+
+-(void) calculateDimensions {
+    _height = [options count] + 2;
+    int my;
+    int mx;
+    getmaxyx(_parent, my, mx);
+    BOOL resizeParent = NO;
+    if(_width > mx) {
+        mx = _width;
+        resizeParent = YES;
+    }
+    if(_position + _height > my) {
+        my = _position + _height;
+        resizeParent = YES;
+    }
+    if(resizeParent) {
+        wresize(_parent, my, mx);
+    }
 }
 
 -(void) setCurrent: (int) i {
@@ -155,6 +160,22 @@
     [self setCurrentByName: [info active]];
 }
 
+-(void) setHighlighted: (BOOL) active {
+    highlighted = active;
+    [self print];
+}
+
+-(void) setPosition: (int) position_ {
+    _position = position_;
+    mvderwin(self.win, self.position, 0);
+}
+
+-(void) replaceValues: (NSArray*) values {
+    [options release];
+    options = [values retain];
+    [self calculateDimensions];
+}
+
 -(void) up {
     if(highlight > 0) {
         [self setCurrent: highlight - 1];
@@ -165,16 +186,6 @@
     if(highlight < [options count] - 1) {
         [self setCurrent: highlight + 1];
     }
-}
-
--(void) setHighlighted: (BOOL) active {
-    highlighted = active;
-    [self print];
-}
-
--(void) setPosition: (int) position_ {
-    _position = position_;
-    mvderwin(self.win, self.position, 0);
 }
 
 -(void) switchValue {
@@ -194,7 +205,7 @@
 }
 
 -(int) endPosition {
-    return self.position + [self height];
+    return self.position + self.height;
 }
 
 -(View) type {
