@@ -82,6 +82,7 @@
     delwin(_win);
     [internalId release];
     [options release];
+    [mapping release];
     [label release];
     [super dealloc];
 }
@@ -176,6 +177,11 @@
     [self calculateDimensions];
 }
 
+-(void) replaceMapping: (NSArray*) values {
+    [mapping release];
+    mapping = [values retain];
+}
+
 -(void) up {
     if(highlight > 0) {
         [self setCurrent: highlight - 1];
@@ -192,8 +198,9 @@
     current = highlight;
     NSString *sname = [NSString stringWithFormat:
         @"%@%@", @"activeOptionChanged", internalId];
+    NSArray *source = mapping != nil ? mapping : options;
     NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-        [options objectAtIndex: highlight], @"option", nil];
+        [source objectAtIndex: highlight], @"option", nil];
     [[NSNotificationCenter defaultCenter] postNotificationName: sname
                                                         object: self
                                                       userInfo: s];

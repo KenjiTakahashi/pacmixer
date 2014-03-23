@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ void callback_state_func(void*, server_state);
 -(void) setMute: (NSNotification*) notification;
 -(void) setCardActiveProfile: (NSNotification*) notification;
 -(void) setActivePort: (NSNotification*) notification;
+-(void) setActiveDevice: (NSNotification*) notification;
 -(void) setDefaults: (NSNotification*) notification;
 @end
 

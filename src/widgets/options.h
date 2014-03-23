@@ -37,6 +37,7 @@
         NSString *label;
         NSString *internalId;
         NSArray *options;
+        NSArray *mapping;
         BOOL highlighted;
         int current;
         int highlight;
@@ -74,6 +75,7 @@
 -(void) setHighlighted: (BOOL) active;
 -(void) setPosition: (int) position_;
 -(void) replaceValues: (NSArray*) values;
+-(void) replaceMapping: (NSArray*) values;
 -(void) up;
 -(void) down;
 -(void) switchValue;

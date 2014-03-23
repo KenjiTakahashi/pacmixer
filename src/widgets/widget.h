@@ -80,6 +80,7 @@
 -(View) type;
 -(NSString*) name;
 -(NSString*) internalId;
+-(id) options;
 -(void) show;
 -(void) hide;
 @end

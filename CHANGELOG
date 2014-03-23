@@ -46,3 +46,4 @@
 == 0.5:
 - Fixed showing newly appeared card profile when SETTINGS panel is active.
 - Fixed RECORDING threated as PLAYBACK.
+- Added ability to set current device for PLAYBACK/RECORDING.

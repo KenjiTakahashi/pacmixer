@@ -113,10 +113,10 @@ typedef struct BACKEND_DATA {
  * Controls types.
  */
 typedef enum {
-    SINK,
-    SINK_INPUT,
-    SOURCE,
-    SOURCE_OUTPUT,
+    SINK = 0,
+    SINK_INPUT = 1,
+    SOURCE = 2,
+    SOURCE_OUTPUT = 3,
     CARD, /**< Virtual type representing whole sound card. */
     SERVER /**< Virtual type representing whole PA server. */
 } backend_entry_type;
@@ -213,11 +213,20 @@ void backend_default_set(context_t*, backend_entry_type, const char*);
  * Sets active port value for a control.
  *
  * @param c CONTEXT as returned by backend_init().
- * @param type Type of the control. It should be SINK or SOURCE.
+ * @param type Type of the control. Should be SINK or SOURCE.
  * @param idx PA internal control index.
  * @param active Active port's name.
  */
 void backend_port_set(context_t*, backend_entry_type, uint32_t, const char*);
+
+/**
+ * Sets active device value for a control.
+ * @param c CONTEXT as returned by backend_init().
+ * @param type Type of the control. Should be SINK_INPUT or SOURCE_OUTPUT.
+ * @param idx PA internal control index.
+ * @param active Active device's name.
+ */
+void backend_device_set(context_t*, backend_entry_type, uint32_t, const char*);
 
 typedef void (*tcallback_add_func)(void*, const char*, backend_entry_type, uint32_t, const backend_data_t*);
 typedef void (*tcallback_update_func)(void*, backend_entry_type, uint32_t, backend_data_t*);

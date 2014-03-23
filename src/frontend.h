@@ -68,7 +68,8 @@
 -(void) setFilter: (View) type;
 -(void) setDefaults: (NSNotification*) notification;
 -(NSArray*) getWidgetsWithType: (View) type;
--(NSArray*) getWidgetsNamesWithType: (View) type;
+-(NSArray*) getWidgetsAttr: (SEL) selector
+                  withType: (View) type;
 +(Widget*) getWidgetWithId: (NSString*) id_;
 -(void) showSettings;
 -(void) switchSetting;

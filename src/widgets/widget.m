@@ -200,7 +200,7 @@ debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UT
     View option_type = type == PLAYBACK ? OUTPUTS : INPUTS;
     NSNumber *device = [info objectForKey: @"deviceIndex"];
     NSString *current_id = [NSString stringWithFormat:
-        @"%@_%d", [info objectForKey: @"deviceIndex"], option_type];
+        @"%@_%d", device, option_type];
     if(device != nil) {
         [ports setCurrentByName: [[TUI getWidgetWithId: current_id] name]];
     }
@@ -321,6 +321,10 @@ debug_fprintf(__func__, "f:%d:%s set as default", [internalId intValue], [name U
 
 -(NSString*) internalId {
     return internalId;
+}
+
+-(id) options {
+    return ports;
 }
 
 -(void) show {

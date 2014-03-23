@@ -156,6 +156,19 @@ void backend_port_set(context_t *c, backend_entry_type type, uint32_t idx, const
     }
 }
 
+void backend_device_set(context_t *c, backend_entry_type type, uint32_t idx, const char *active) {
+    switch(type) {
+        case SINK_INPUT:
+            pa_context_move_sink_input_by_name(c->context, idx, active, NULL, NULL);
+            break;
+        case SOURCE_OUTPUT:
+            pa_context_move_source_output_by_name(c->context, idx, active, NULL, NULL);
+            break;
+        default:
+            break;
+    }
+}
+
 void _cb_state_changed(pa_context *context, void *userdata) {
     callback_t *callback = (callback_t*)userdata;
     pa_context_state_t state = pa_context_get_state(context);

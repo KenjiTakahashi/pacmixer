@@ -103,6 +103,12 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
         if(type == SINK_INPUT || type == SOURCE_OUTPUT) {
             NSNumber *device = [NSNumber numberWithInt: data->device];
             [s setObject: device forKey: @"deviceIndex"];
+            NSString *psname = [NSString stringWithFormat:
+                @"activeOptionChanged%d_%d", idx, type];
+            [center addObserver: block
+                       selector: @selector(setActiveDevice:)
+                           name: psname
+                         object: nil];
         }
         if(data->option != NULL) {
             char ** const ports = data->option->descriptions;
@@ -302,6 +308,11 @@ void callback_state_func(void *self_, server_state state) {
     NSString *key = [[notification userInfo] objectForKey: @"option"];
     const char *name = [[data objectForKey: key] UTF8String];
     backend_port_set(context, type, idx, name);
+}
+
+-(void) setActiveDevice: (NSNotification*) notification {
+    NSString *active = [[notification userInfo] objectForKey: @"option"];
+    backend_device_set(context, type, idx, [active UTF8String]);
 }
 
 -(void) setDefaults: (NSNotification*) notification {
