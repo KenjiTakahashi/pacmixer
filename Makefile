@@ -60,7 +60,7 @@ clean:
 %.o: %.c
 	$(CCC) $(CFLAGS) -c -o $@ $^
 
-install:
+install: all
 	@echo "installing executable file into $(DESTDIR)$(PREFIX)/bin"
 	@mkdir -p $(DESTDIR)$(PREFIX)/bin
 	@cp -f pacmixer $(DESTDIR)$(PREFIX)/bin/
