@@ -94,24 +94,9 @@ TEST_CASE("Block", "") {
         REQUIRE(output_sink_mute[1] == 1);
     }
 
-    char **keys = (char**)malloc(2 * sizeof(char*));
-    keys[0] = (char*)malloc(STRING_SIZE * sizeof(char));
-    keys[1] = (char*)malloc(STRING_SIZE * sizeof(char));
-    strcpy(keys[0], "test_desc1");
-    strcpy(keys[1], "test_desc2");
-    char **values = (char**)malloc(2 * sizeof(char*));
-    values[0] = (char*)malloc(STRING_SIZE * sizeof(char));
-    values[1] = (char*)malloc(STRING_SIZE * sizeof(char));
-    strcpy(values[0], "test_name1");
-    strcpy(values[1], "test_name2");
-
-    [block addDataByCArray: 2
-                withValues: values
-                   andKeys: keys];
-
     SECTION("setCardActiveProfile", "Should set active profile for a card") {
         NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-            @"test_desc2", @"option", nil];
+            @"test_name2", @"option", nil];
         NSNotification *n = [NSNotification notificationWithName: @"N"
                                                           object: nil
                                                         userInfo: info];
@@ -135,12 +120,24 @@ TEST_CASE("Block", "") {
         REQUIRE(strcmp(output_sink_port.active, "test_name1") == 0);
     }
 
-    free(values[1]);
-    free(values[0]);
-    free(values);
-    free(keys[1]);
-    free(keys[0]);
-    free(keys);
+    SECTION("setActiveDevice", "Should set active device for given control") {
+        Block *block = [[Block alloc] initWithContext: &c
+                                                andId: PA_VALID_INDEX
+                                             andIndex: 2
+                                              andType: SINK_INPUT];
+
+        NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+            @"test_name1", @"option", nil];
+        NSNotification *n = [NSNotification notificationWithName: @"N"
+                                                          object: nil
+                                                        userInfo: info];
+
+        [block setActiveDevice: n];
+
+        REQUIRE(output_sink_input_device.index == PA_VALID_INDEX);
+        REQUIRE(strcmp(output_sink_input_device.active, "test_name1") == 0);
+    }
+
     [block release];
 }
 
@@ -331,10 +328,15 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         callback_update_func(middleware, CARD, PA_VALID_INDEX, &data);
 
         REQUIRE([results count] == 1);
-        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"profile"];
-        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
-        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
-        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+        NSDictionary *info = [[results objectAtIndex: 0] userInfo];
+        NSArray *profile_names = [info objectForKey: @"profileNames"];
+        NSArray *profile_descs = [info objectForKey: @"profileDescriptions"];
+        NSString *active_profile = [info objectForKey: @"activeProfile"];
+        REQUIRE([[profile_names objectAtIndex: 0] isEqualToString: @"test_name1"]);
+        REQUIRE([[profile_names objectAtIndex: 1] isEqualToString: @"test_name2"]);
+        REQUIRE([[profile_descs objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[profile_descs objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([active_profile isEqualToString: @"test_desc2"]);
     }
 
     [center removeObserver: results];
@@ -472,6 +474,7 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
         }
 
         SECTION("device", "activeOptionChanged") {
+            callback_add_func(middleware, "test_c1", SINK_INPUT, PA_VALID_INDEX, &data);
             NSString *name = [NSString stringWithFormat:
                 @"activeOptionChanged%d_%d", PA_VALID_INDEX, SINK_INPUT];
             NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
@@ -480,8 +483,8 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
                                   object: nil
                                 userInfo: info];
 
-            REQUIRE(output_sink_port.index == PA_VALID_INDEX);
-            REQUIRE(strcmp(output_sink_port.active, "test_device2") == 0);
+            REQUIRE(output_sink_input_device.index == PA_VALID_INDEX);
+            REQUIRE(strcmp(output_sink_input_device.active, "test_device2") == 0);
         }
     }
 
@@ -497,16 +500,21 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
         callback_add_func(middleware, "test_c1", CARD, PA_VALID_INDEX, &data);
 
         REQUIRE([results count] == 1);
-        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"profile"];
-        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
-        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
-        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+        NSDictionary *info = [[results objectAtIndex: 0] userInfo];
+        NSArray *profile_names = [info objectForKey: @"profileNames"];
+        NSArray *profile_descs = [info objectForKey: @"profileDescriptions"];
+        NSString *active_profile = [info objectForKey: @"activeProfile"];
+        REQUIRE([[profile_names objectAtIndex: 0] isEqualToString: @"test_name1"]);
+        REQUIRE([[profile_names objectAtIndex: 1] isEqualToString: @"test_name2"]);
+        REQUIRE([[profile_descs objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[profile_descs objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([active_profile isEqualToString: @"test_desc2"]);
 
         SECTION("activeOptionChanged", "") {
             NSString *name = [NSString stringWithFormat:
                 @"activeOptionChanged%d_%d", PA_VALID_INDEX, CARD];
             NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-                @"test_desc1", @"option", nil];
+                @"test_name1", @"option", nil];
             [center postNotificationName: name
                                   object: nil
                                 userInfo: info];

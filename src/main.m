@@ -117,12 +117,15 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             [opt setCurrentByName: [current_widget name]];
         }
     } else {
-        option_t *profile = [info objectForKey: @"profile"];
-        if(profile != nil) {
-            [tui addProfiles: [profile options]
-                  withActive: [profile active]
-                     andName: name
-                       andId: internalId];
+        NSArray *profile_names = [info objectForKey: @"profileNames"];
+        NSArray *profile_descs = [info objectForKey: @"profileDescriptions"];
+        NSString *active_profile = [info objectForKey: @"activeProfile"];
+        if(profile_names != nil && profile_descs != nil && active_profile != nil) {
+            id opt = [tui addProfiles: profile_descs
+                           withActive: active_profile
+                              andName: name
+                                andId: internalId];
+            [opt replaceMapping: profile_names];
         }
     }
     [tui adjustOptions];

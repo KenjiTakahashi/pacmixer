@@ -18,21 +18,23 @@
 #import "middleware.h"
 
 
-#define _CALLBACK_DO_OPTION()\
-    char ** const port_names = data->option->names;\
-    char ** const port_descs = data->option->descriptions;\
+#define CAPITALIZE_port @"Port"
+#define CAPITALIZE_profile @"Profile"
+#define _CALLBACK_DO_OPTION(__option__)\
+    char ** const names = data->option->names;\
+    char ** const descs = data->option->descriptions;\
     const char *active = data->option->active;\
     uint8_t pnum = data->option->size;\
     NSMutableArray *pd = [NSMutableArray arrayWithCapacity: pnum];\
     NSMutableArray *pn = [NSMutableArray arrayWithCapacity: pnum];\
     for(int i = 0; i < pnum; ++i) {\
-        [pn addObject: [NSString stringWithUTF8String: port_names[i]]];\
-        [pd addObject: [NSString stringWithUTF8String: port_descs[i]]];\
+        [pn addObject: [NSString stringWithUTF8String: names[i]]];\
+        [pd addObject: [NSString stringWithUTF8String: descs[i]]];\
     }\
     NSString *a = [NSString stringWithUTF8String: active];\
-    [s setObject: pn forKey: @"portNames"];\
-    [s setObject: pd forKey: @"portDescriptions"];\
-    [s setObject: a forKey: @"activePort"];
+    [s setObject: pn forKey: @#__option__"Names"];\
+    [s setObject: pd forKey: @#__option__"Descriptions"];\
+    [s setObject: a forKey: @"active"CAPITALIZE_ ## __option__];
 
 void callback_add_func(
     void *self_, const char *name, backend_entry_type type,
@@ -53,19 +55,13 @@ void callback_add_func(
         sname = [NSString stringWithFormat:
             @"activeOptionChanged%d_%d", idx, type];
         ssel = @selector(setCardActiveProfile:);
-        char ** const profiles = data->option->descriptions;
-        const char *active = data->option->active;
-        uint8_t chnum = data->option->size;
-        [block addDataByCArray: chnum
-                    withValues: data->option->names
-                       andKeys: profiles];
-        option_t *p = [[option_t alloc] initWithOptions: profiles
-                                            andNOptions: chnum
-                                              andActive: active];
-        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
+
+        NSMutableDictionary *s = [NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: name], @"name",
             [NSNumber numberWithInt: idx], @"id",
-            p, @"profile", [NSNumber numberWithInt: type], @"type", nil];
+            [NSNumber numberWithInt: type], @"type", nil];
+        _CALLBACK_DO_OPTION(profile);
+
         [center postNotificationName: @"cardAppeared"
                               object: self
                             userInfo: s];
@@ -127,7 +123,7 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
                          object: nil];
         }
         if(data->option != NULL) {
-            _CALLBACK_DO_OPTION();
+            _CALLBACK_DO_OPTION(port);
 
             NSString *psname = [NSString stringWithFormat:
                 @"activeOptionChanged%d_%d", idx, type];
@@ -175,15 +171,9 @@ void callback_update_func(
                               object: self
                             userInfo: s];
     } else if(type == CARD && data->option != NULL) {
-        char ** const profiles = data->option->descriptions;
-        const char *active = data->option->active;
-        uint8_t chnum = data->option->size;
-        option_t *p = [[option_t alloc] initWithOptions: profiles
-                                            andNOptions: chnum
-                                              andActive: active];
-        NSDictionary *s = [NSDictionary dictionaryWithObjectsAndKeys:
-            p, @"profile", nil];
-        [p release];
+        NSMutableDictionary *s = [NSMutableDictionary dictionary];
+        _CALLBACK_DO_OPTION(profile);
+
         NSString *nname = [NSString stringWithFormat:
             @"cardProfileChanged%d_%d", idx, type];
         [center postNotificationName: nname
@@ -211,7 +201,7 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
             [s setObject: device forKey: @"deviceIndex"];
         }
         if(data->option != NULL) {
-            _CALLBACK_DO_OPTION();
+            _CALLBACK_DO_OPTION(port);
         }
         NSString *nname = [NSString stringWithFormat:
         @"controlChanged%d_%d", idx, type];
@@ -300,9 +290,8 @@ void callback_state_func(void *self_, server_state state) {
 }
 
 -(void) setCardActiveProfile: (NSNotification*) notification {
-    NSString *key = [[notification userInfo] objectForKey: @"option"];
-    const char *name = [[data objectForKey: key] UTF8String];
-    backend_card_profile_set(context, type, idx, name);
+    NSString *active = [[notification userInfo] objectForKey: @"option"];
+    backend_card_profile_set(context, type, idx, [active UTF8String]);
 }
 
 -(void) setActivePort: (NSNotification*) notification {

@@ -58,10 +58,10 @@
                      andType: (View) type
                        andId: (NSString*) id_;
 -(void) removeWidget: (NSString*) id_;
--(void) addProfiles: (NSArray*) profiles
-         withActive: (NSString*) active
-            andName: (NSString*) name
-              andId: (NSString*) id_;
+-(id) addProfiles: (NSArray*) profiles
+       withActive: (NSString*) active
+          andName: (NSString*) name
+            andId: (NSString*) id_;
 -(void) adjustOptions;
 -(void) setCurrent: (int) i;
 -(void) setFirst;

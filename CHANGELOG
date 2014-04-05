@@ -47,3 +47,4 @@
 - Fixed showing newly appeared card profile when SETTINGS panel is active.
 - Fixed RECORDING threated as PLAYBACK.
 - Added ability to set current device for PLAYBACK/RECORDING.
+- Deal with options (e.g. ports, profiles) changing dynamically.

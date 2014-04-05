@@ -157,8 +157,8 @@
 }
 
 -(void) setCurrentByNotification: (NSNotification*) notification {
-    option_t *info = [[notification userInfo] objectForKey: @"profile"];
-    [self setCurrentByName: [info active]];
+    NSDictionary *info = [notification userInfo];
+    [self setCurrentByName: [info objectForKey: @"activeProfile"]];
 }
 
 -(void) setHighlighted: (BOOL) active {

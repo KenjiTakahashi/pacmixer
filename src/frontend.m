@@ -235,10 +235,10 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     }
 }
 
--(void) addProfiles: (NSArray*) profiles
-         withActive: (NSString*) active
-            andName: (NSString*) name
-              andId: (NSString*) id_ {
+-(id) addProfiles: (NSArray*) profiles
+       withActive: (NSString*) active
+          andName: (NSString*) name
+            andId: (NSString*) id_ {
     int ypos = 0;
     if([top view] == SETTINGS) {
         ypos = [[widgets lastObject] endPosition];
@@ -262,6 +262,8 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
         [widget show];
     }
     [widget release];
+
+    return widget;
 }
 
 -(void) adjustOptions {
