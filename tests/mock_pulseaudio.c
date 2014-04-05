@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2013
+ Karol "Kenji Takahashi" Woźniak © 2013 - 2014
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -135,16 +135,16 @@ void pa_context_set_card_profile_by_index(pa_context *context, uint32_t idx, con
     strcpy(output_card_profile.active, name);
 }
 
-#define PA_CONTEXT_SET_PORT(output)\
+#define PA_CONTEXT_SET_OPTION(output)\
     output.index = idx;\
     strcpy(output.active, name);\
 
 void pa_context_set_sink_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {
-    PA_CONTEXT_SET_PORT(output_sink_port);
+    PA_CONTEXT_SET_OPTION(output_sink_port);
 }
 
 void pa_context_set_source_port_by_index(pa_context *context, uint32_t idx, const char *name, void *s, void *m) {
-    PA_CONTEXT_SET_PORT(output_source_port);
+    PA_CONTEXT_SET_OPTION(output_source_port);
 }
 
 void pa_context_set_default_sink(pa_context *context, const char *name, void *s, void *m) {
@@ -179,4 +179,12 @@ void pa_context_get_client_info(pa_context *context, uint32_t idx, void(*s)(pa_c
 }
 
 void pa_context_get_server_info(pa_context *context, void(*s)(pa_context*, const pa_server_info*, void*), void *m) {
+}
+
+void pa_context_move_sink_input_by_name(pa_context *context, uint32_t idx, const char *name, void(*s)(pa_context*, int, void*), void *m) {
+    PA_CONTEXT_SET_OPTION(output_sink_input_device);
+}
+
+void pa_context_move_source_output_by_name(pa_context *context, uint32_t idx, const char *name, void(*s)(pa_context*, int, void*), void *m) {
+    PA_CONTEXT_SET_OPTION(output_source_output_device);
 }

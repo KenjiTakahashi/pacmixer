@@ -118,6 +118,9 @@ extern output_index_active_t output_card_profile;
 extern output_index_active_t output_sink_port;
 extern output_index_active_t output_source_port;
 
+extern output_index_active_t output_sink_input_device;
+extern output_index_active_t output_source_output_device;
+
 extern int output_card_info;
 
 extern int output_client_info;

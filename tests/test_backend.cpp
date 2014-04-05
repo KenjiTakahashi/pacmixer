@@ -284,6 +284,40 @@ TEST_CASE("backend_port_set", "Should set active port") {
     free(c);
 }
 
+TEST_CASE("backend_device_set", "Should set active device") {
+    context_t *c = (context_t*)malloc(sizeof(context_t));
+
+    SECTION("sink_input", "") {
+        backend_device_set(c, SINK_INPUT, PA_VALID_INDEX, "active_device");
+
+        REQUIRE(output_sink_input_device.index == PA_VALID_INDEX);
+        REQUIRE(strcmp(output_sink_input_device.active, "active_device") == 0);
+    }
+
+    SECTION("source_output", "") {
+        backend_device_set(c, SOURCE_OUTPUT, PA_VALID_INDEX, "active_device");
+
+        REQUIRE(output_source_output_device.index == PA_VALID_INDEX);
+        REQUIRE(strcmp(output_source_output_device.active, "active_device") == 0);
+    }
+
+    reset_mock_variables();
+
+    SECTION("other", "Should not do anything") {
+        backend_entry_type types[3] = {SINK, SOURCE, CARD};
+        for(int i = 0; i < 3; ++i) {
+            backend_device_set(c, types[i], PA_VALID_INDEX, "active_device");
+
+            REQUIRE(output_sink_input_device.index == PA_INVALID_INDEX);
+            REQUIRE(strcmp(output_sink_input_device.active, "") == 0);
+            REQUIRE(output_source_output_device.index == PA_INVALID_INDEX);
+            REQUIRE(strcmp(output_source_output_device.active, "") == 0);
+        }
+    }
+
+    free(c);
+}
+
 int TEST_RETURN__cb_state_changed = 0;
 
 void TEST_CALLBACK__cb_state_changed(void *s) {

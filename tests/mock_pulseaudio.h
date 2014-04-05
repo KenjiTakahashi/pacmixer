@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2013
+ Karol "Kenji Takahashi" Woźniak © 2013 - 2014
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -89,3 +89,5 @@ const char *pa_proplist_gets(const pa_proplist, int);
 void pa_context_get_card_info_by_index(pa_context*, uint32_t, void(*)(pa_context*, const pa_card_info*, int, void*), void*);
 void pa_context_get_client_info(pa_context*, uint32_t, void(*)(pa_context*, const pa_client_info*, int, void*), void*);
 void pa_context_get_server_info(pa_context*, void(*)(pa_context*, const pa_server_info*, void*), void*);
+void pa_context_move_sink_input_by_name(pa_context*, uint32_t, const char*, void(*)(pa_context*, int, void*), void*);
+void pa_context_move_source_output_by_name(pa_context*, uint32_t, const char*, void(*)(pa_context*, int, void*), void*);
