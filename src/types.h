@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -48,19 +48,4 @@
 -(void) dealloc;
 -(NSNumber*) level;
 -(BOOL) mute;
-@end
-
-
-@interface option_t: NSObject {
-    @private
-        NSMutableArray *options;
-        NSString *active;
-}
-
--(option_t*) initWithOptions: (char**const) options_
-                 andNOptions: (int) n_options
-                   andActive: (const char*) active_;
--(void) dealloc;
--(NSArray*) options;
--(NSString*) active;
 @end

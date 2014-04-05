@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -69,34 +69,5 @@
 
 -(BOOL) mute {
     return mute;
-}
-@end
-
-
-@implementation option_t
--(option_t*) initWithOptions: (char**const) options_
-                 andNOptions: (int) n_options
-                   andActive: (const char*) active_ {
-    self = [super init];
-    options = [[NSMutableArray alloc] init];
-    for(int i = 0; i < n_options; ++i) {
-        [options addObject: [NSString stringWithUTF8String: options_[i]]];
-    }
-    active = [[NSString alloc] initWithUTF8String: active_];
-    return self;
-}
-
--(void) dealloc {
-    [active release];
-    [options release];
-    [super dealloc];
-}
-
--(NSArray*) options {
-    return options;
-}
-
--(NSString*) active {
-    return active;
 }
 @end
