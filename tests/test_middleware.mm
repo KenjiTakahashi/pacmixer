@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2013
+// Karol "Kenji Takahashi" Woźniak © 2013 - 2014
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -97,13 +97,13 @@ TEST_CASE("Block", "") {
     char **keys = (char**)malloc(2 * sizeof(char*));
     keys[0] = (char*)malloc(STRING_SIZE * sizeof(char));
     keys[1] = (char*)malloc(STRING_SIZE * sizeof(char));
-    strcpy(keys[0], "test_name1");
-    strcpy(keys[1], "test_name2");
+    strcpy(keys[0], "test_desc1");
+    strcpy(keys[1], "test_desc2");
     char **values = (char**)malloc(2 * sizeof(char*));
     values[0] = (char*)malloc(STRING_SIZE * sizeof(char));
     values[1] = (char*)malloc(STRING_SIZE * sizeof(char));
-    strcpy(values[0], "test_desc1");
-    strcpy(values[1], "test_desc2");
+    strcpy(values[0], "test_name1");
+    strcpy(values[1], "test_name2");
 
     [block addDataByCArray: 2
                 withValues: values
@@ -111,7 +111,7 @@ TEST_CASE("Block", "") {
 
     SECTION("setCardActiveProfile", "Should set active profile for a card") {
         NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-            @"test_name2", @"option", nil];
+            @"test_desc2", @"option", nil];
         NSNotification *n = [NSNotification notificationWithName: @"N"
                                                           object: nil
                                                         userInfo: info];
@@ -119,7 +119,7 @@ TEST_CASE("Block", "") {
         [block setCardActiveProfile: n];
 
         REQUIRE(output_card_profile.index == PA_VALID_INDEX);
-        REQUIRE(strcmp(output_card_profile.active, "test_desc2") == 0);
+        REQUIRE(strcmp(output_card_profile.active, "test_name2") == 0);
     }
 
     SECTION("setActivePort", "Should set active port for given control") {
@@ -132,7 +132,7 @@ TEST_CASE("Block", "") {
         [block setActivePort: n];
 
         REQUIRE(output_sink_port.index == PA_VALID_INDEX);
-        REQUIRE(strcmp(output_sink_port.active, "test_desc1") == 0);
+        REQUIRE(strcmp(output_sink_port.active, "test_name1") == 0);
     }
 
     free(values[1]);
@@ -200,7 +200,7 @@ TEST_CASE("callback_remove_func", "Should fire 'controlDisappeared' notification
 
 backend_data_t TEST_PREPARE_backend_data_t_part1() {
     backend_data_t data;
-    //Those values are not really realistic, but work for testing purposes.
+    //Those values are not realistic, but work for testing purposes.
     data.channels = (backend_channel_t*)malloc(2 * sizeof(backend_channel_t));
     data.channels[0].maxLevel = 150;
     data.channels[0].normLevel = 120;
@@ -220,7 +220,6 @@ backend_data_t TEST_PREPARE_backend_data_t_part1() {
 }
 
 void TEST_PREPARE_backend_data_t_part2(backend_data_t *data) {
-    //Crapload of data to prepare :C.
     data->option = (backend_option_t*)malloc(sizeof(backend_option_t));
     data->option->names = (char**)malloc(2 * sizeof(char*));
     data->option->names[0] = (char*)malloc(STRING_SIZE * sizeof(char));
@@ -235,6 +234,7 @@ void TEST_PREPARE_backend_data_t_part2(backend_data_t *data) {
     strcpy(data->option->descriptions[1], "test_desc2");
     strcpy(data->option->active, "test_desc2");
     data->option->size = 2;
+    data->device = PA_VALID_INDEX;
 }
 
 void TEST_PREPARE_backend_data_t_free(backend_data_t data) {
@@ -257,7 +257,7 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
 
     backend_data_t data = TEST_PREPARE_backend_data_t_part1();
 
-    SECTION("control without options", "controlChanged{idx}_{type}, !ports") {
+    SECTION("control values", "controlChanged{idx}_{type}, values") {
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
@@ -281,8 +281,7 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
 
     [results removeAllObjects];
 
-    SECTION("control with options", "controlChanged{idx}_{type}, ports") {
-        //We'll check only options here.
+    SECTION("control ports", "controlChanged{idx}_{type}, ports") {
         [center addObserver: results
                    selector: @selector(addObject:)
                        name: [NSString stringWithFormat:
@@ -292,10 +291,31 @@ TEST_CASE("callback_update_func", "Should fire appropriate update notification")
         callback_update_func(middleware, SINK, PA_VALID_INDEX, &data);
 
         REQUIRE([results count] == 1);
-        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"ports"];
-        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
-        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
-        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+        NSDictionary *info = [[results objectAtIndex: 0] userInfo];
+        NSArray *port_names = [info objectForKey: @"portNames"];
+        NSArray *port_descs = [info objectForKey: @"portDescriptions"];
+        NSString *active_port = [info objectForKey: @"activePort"];
+        REQUIRE([[port_names objectAtIndex: 0] isEqualToString: @"test_name1"]);
+        REQUIRE([[port_names objectAtIndex: 1] isEqualToString: @"test_name2"]);
+        REQUIRE([[port_descs objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[port_descs objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([active_port isEqualToString: @"test_desc2"]);
+    }
+
+    [results removeAllObjects];
+
+    SECTION("device", "controlChanged{idx}_{type}, device") {
+        [center addObserver: results
+                   selector: @selector(addObject:)
+                       name: [NSString stringWithFormat:
+                              @"controlChanged%d_%d", PA_VALID_INDEX, SINK_INPUT]
+                     object: middleware];
+
+        callback_update_func(middleware, SINK_INPUT, PA_VALID_INDEX, &data);
+
+        REQUIRE([results count] == 1);
+        NSNumber *device = [[[results objectAtIndex: 0] userInfo] objectForKey: @"deviceIndex"];
+        REQUIRE([device intValue] == PA_VALID_INDEX);
     }
 
     [results removeAllObjects];
@@ -336,7 +356,7 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
 
     reset_mock_variables();
 
-    SECTION("control without options", "controlAppeared, !ports") {
+    SECTION("control values", "controlAppeared, values") {
         //Also connects "volumeChanged{idx}_{type}_{index}" and
         //volumeChanged{idx}_{type}" and "muteChanged{idx}_{type}" signals.
         [center addObserver: results
@@ -418,7 +438,7 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
 
     [results removeAllObjects];
 
-    SECTION("control with options", "controlAppeared, ports") {
+    SECTION("control ports", "controlAppeared, ports") {
         //Also connects "activeOptionChanged{idx}_{type}" signal.
         [center addObserver: results
                    selector: @selector(addObject:)
@@ -428,22 +448,40 @@ TEST_CASE("callback_add_func", "Should fire appropriate add notification") {
         callback_add_func(middleware, "test_c1", SINK, PA_VALID_INDEX, &data);
 
         REQUIRE([results count] == 1);
-        option_t *p = [[[results objectAtIndex: 0] userInfo] objectForKey: @"ports"];
-        REQUIRE([[[p options] objectAtIndex: 0] isEqualToString: @"test_desc1"]);
-        REQUIRE([[[p options] objectAtIndex: 1] isEqualToString: @"test_desc2"]);
-        REQUIRE([[p active] isEqualToString: @"test_desc2"]);
+        NSDictionary *info = [[results objectAtIndex: 0] userInfo];
+        NSArray *port_names = [info objectForKey: @"portNames"];
+        NSArray *port_descs = [info objectForKey: @"portDescriptions"];
+        NSString *active_port = [info objectForKey: @"activePort"];
+        REQUIRE([[port_names objectAtIndex: 0] isEqualToString: @"test_name1"]);
+        REQUIRE([[port_names objectAtIndex: 1] isEqualToString: @"test_name2"]);
+        REQUIRE([[port_descs objectAtIndex: 0] isEqualToString: @"test_desc1"]);
+        REQUIRE([[port_descs objectAtIndex: 1] isEqualToString: @"test_desc2"]);
+        REQUIRE([active_port isEqualToString: @"test_desc2"]);
 
-        SECTION("activeOptionChanged", "") {
+        SECTION("port", "activeOptionChanged") {
             NSString *name = [NSString stringWithFormat:
                 @"activeOptionChanged%d_%d", PA_VALID_INDEX, SINK];
             NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
-                @"test_desc2", @"option", nil];
+                @"test_name2", @"option", nil];
             [center postNotificationName: name
                                   object: nil
                                 userInfo: info];
 
             REQUIRE(output_sink_port.index == PA_VALID_INDEX);
             REQUIRE(strcmp(output_sink_port.active, "test_name2") == 0);
+        }
+
+        SECTION("device", "activeOptionChanged") {
+            NSString *name = [NSString stringWithFormat:
+                @"activeOptionChanged%d_%d", PA_VALID_INDEX, SINK_INPUT];
+            NSDictionary *info = [NSDictionary dictionaryWithObjectsAndKeys:
+                @"test_device2", @"option", nil];
+            [center postNotificationName: name
+                                  object: nil
+                                userInfo: info];
+
+            REQUIRE(output_sink_port.index == PA_VALID_INDEX);
+            REQUIRE(strcmp(output_sink_port.active, "test_device2") == 0);
         }
     }
 

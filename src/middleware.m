@@ -18,6 +18,22 @@
 #import "middleware.h"
 
 
+#define _CALLBACK_DO_OPTION()\
+    char ** const port_names = data->option->names;\
+    char ** const port_descs = data->option->descriptions;\
+    const char *active = data->option->active;\
+    uint8_t pnum = data->option->size;\
+    NSMutableArray *pd = [NSMutableArray arrayWithCapacity: pnum];\
+    NSMutableArray *pn = [NSMutableArray arrayWithCapacity: pnum];\
+    for(int i = 0; i < pnum; ++i) {\
+        [pn addObject: [NSString stringWithUTF8String: port_names[i]]];\
+        [pd addObject: [NSString stringWithUTF8String: port_descs[i]]];\
+    }\
+    NSString *a = [NSString stringWithUTF8String: active];\
+    [s setObject: pn forKey: @"portNames"];\
+    [s setObject: pd forKey: @"portDescriptions"];\
+    [s setObject: a forKey: @"activePort"];
+
 void callback_add_func(
     void *self_, const char *name, backend_entry_type type,
     uint32_t idx, backend_data_t *data
@@ -111,18 +127,10 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
                          object: nil];
         }
         if(data->option != NULL) {
-            char ** const ports = data->option->descriptions;
-            const char *active = data->option->active;
-            uint8_t pnum = data->option->size;
-            option_t *p = [[option_t alloc] initWithOptions: ports
-                                                andNOptions: pnum
-                                                  andActive: active];
-            [s setObject: p forKey: @"ports"];
+            _CALLBACK_DO_OPTION();
+
             NSString *psname = [NSString stringWithFormat:
                 @"activeOptionChanged%d_%d", idx, type];
-            [block addDataByCArray: pnum
-                        withValues: data->option->names
-                           andKeys: ports];
             [center addObserver: block
                        selector: @selector(setActivePort:)
                            name: psname
@@ -203,14 +211,7 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
             [s setObject: device forKey: @"deviceIndex"];
         }
         if(data->option != NULL) {
-            char ** const ports = data->option->descriptions;
-            const char *active = data->option->active;
-            uint8_t pnum = data->option->size;
-            option_t *p = [[option_t alloc] initWithOptions: ports
-                                                andNOptions: pnum
-                                                  andActive: active];
-            [s setObject: p forKey: @"ports"];
-            [p release];
+            _CALLBACK_DO_OPTION();
         }
         NSString *nname = [NSString stringWithFormat:
         @"controlChanged%d_%d", idx, type];
@@ -305,9 +306,8 @@ void callback_state_func(void *self_, server_state state) {
 }
 
 -(void) setActivePort: (NSNotification*) notification {
-    NSString *key = [[notification userInfo] objectForKey: @"option"];
-    const char *name = [[data objectForKey: key] UTF8String];
-    backend_port_set(context, type, idx, name);
+    NSString *active = [[notification userInfo] objectForKey: @"option"];
+    backend_port_set(context, type, idx, [active UTF8String]);
 }
 
 -(void) setActiveDevice: (NSNotification*) notification {

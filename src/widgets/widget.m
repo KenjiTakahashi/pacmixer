@@ -166,7 +166,8 @@ debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UT
 }
 
 -(void) replaceOptions: (NSArray*) values {
-    [channels reprint: height - [values count] - 2];
+    int dy = hasDefault ? 5 : 2;
+    [channels reprint: height - [values count] - dy];
     [ports replaceValues: values];
     [ports reprint: height];
 }
@@ -193,15 +194,21 @@ debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UT
             [channels setMute: [vol mute] forChannel: i];
         }
     }
-    option_t *ports_ = [info objectForKey: @"ports"];
-    if(ports_ != nil) {
-        [ports setCurrentByName: [ports_ active]];
+
+    NSArray *port_names = [info objectForKey: @"portNames"];
+    NSArray *port_descs = [info objectForKey: @"portDescriptions"];
+    NSString *active_port = [info objectForKey: @"activePort"];
+    if(port_names != nil && port_descs != nil && active_port != nil) {
+        [self replaceOptions: port_descs];
+        [ports replaceMapping: port_names];
+        [ports setCurrentByName: active_port];
     }
+
     View option_type = type == PLAYBACK ? OUTPUTS : INPUTS;
     NSNumber *device = [info objectForKey: @"deviceIndex"];
-    NSString *current_id = [NSString stringWithFormat:
-        @"%@_%d", device, option_type];
     if(device != nil) {
+        NSString *current_id = [NSString stringWithFormat:
+            @"%@_%d", device, option_type];
         [ports setCurrentByName: [[TUI getWidgetWithId: current_id] name]];
     }
 }

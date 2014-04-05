@@ -98,11 +98,13 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
             [channelsWidgets setMute: [volume mute]
                           forChannel: i];
         }
-        option_t *ports = [info objectForKey: @"ports"];
-        if(ports != nil) {
-            id opt = [w addOptions: [ports options]
-                          withName: @"Ports"];
-            [opt setCurrentByName: [ports active]];
+        NSArray *port_names = [info objectForKey: @"portNames"];
+        NSArray *port_descs = [info objectForKey: @"portDescriptions"];
+        NSString *active_port = [info objectForKey: @"activePort"];
+        if(port_names != nil && port_descs != nil && active_port != nil) {
+            id opt = [w addOptions: port_descs withName: @"Ports"];
+            [opt replaceMapping: port_names];
+            [opt setCurrentByName: active_port];
         } else if(type == PLAYBACK || type == RECORDING) {
             View option_type = type == PLAYBACK ? OUTPUTS : INPUTS;
             NSArray *options = [tui getWidgetsAttr: @selector(name)
