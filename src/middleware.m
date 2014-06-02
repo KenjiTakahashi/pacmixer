@@ -231,6 +231,9 @@ debug_fprintf(__func__, "m:%d %s notification posted", idx, [nname UTF8String]);
 }
 
 void callback_state_func(void *self_, server_state state) {
+#if GNUSTEP_BASE_MINOR_VERSION < 24
+    [NSThread _createThreadForCurrentPthread];
+#endif
     Middleware *self = self_;
     NSString *name = state == S_CAME ? @"backendAppeared" : @"backendGone";
     [[NSNotificationCenter defaultCenter] postNotificationName: name

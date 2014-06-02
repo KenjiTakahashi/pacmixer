@@ -22,6 +22,9 @@
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSNotification.h>
 #import <Foundation/NSAutoreleasePool.h>
+#if GNUSTEP_BASE_MINOR_VERSION < 24
+#import <Foundation/NSThread.h>
+#endif
 #import "types.h"
 #import "backend.h"
 #ifdef DEBUG
