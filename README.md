@@ -1,5 +1,4 @@
 [![Build Status](https://travis-ci.org/KenjiTakahashi/pacmixer.png?branch=master)](https://travis-ci.org/KenjiTakahashi/pacmixer)
-[![Flattr This](https://api.flattr.com/button/flattr-badge-large.png)](https://flattr.com/submit/auto?user_id=KenjiTakahashi&url=https://github.com/KenjiTakahashi/pacmixer&title=pacmixer&language=en_GB&tags=github&category=software)
 
 **pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
 
@@ -10,7 +9,7 @@ It was also a good starting point to finally learn myself some ObjC :).
 Back in the old days, there were a good mixer for ALSA (alsamixer), so I thought about taking some of their ideas, mix it with mine, and see what happens.
 
 ## screenshot
-![screenshot](http://dl.dropbox.com/u/20714377/pacmixer2.png)
+![screenshot](https://copy.com/VWeHEkhBtCsr)
 
 ## requirements
 * libpulse
