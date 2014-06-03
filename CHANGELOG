@@ -43,8 +43,9 @@
 - Added ability to set SINKs and SOURCEs as default/fallback.
 - Fixed segfault on changing single channel volume.
 
-== 0.5:
+== 0.5 (04.06.2014):
 - Fixed showing newly appeared card profile when SETTINGS panel is active.
 - Fixed RECORDING threated as PLAYBACK.
 - Added ability to set current device for PLAYBACK/RECORDING.
 - Deal with options (e.g. ports, profiles) changing dynamically.
+- Fixed segfault on gnustep-base < 1.24 [mainly Debian].
