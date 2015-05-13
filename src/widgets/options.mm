@@ -32,8 +32,8 @@
                  andId: (NSString*) id_
              andParent: (WINDOW*) parent_ {
     _width = 0;
-    for(int i = 0; i < [options_ count]; ++i) {
-        int length = [[options_ objectAtIndex: i] length];
+    for(unsigned int i = 0; i < [options_ count]; ++i) {
+        unsigned int length = [[options_ objectAtIndex: i] length];
         if(length > _width) {
             _width = length;
         }
@@ -96,7 +96,7 @@
         } else {
             mvwprintw(self.win, 0, 1, "%@", label);
         }
-        for(int i = 0; i < [options count]; ++i) {
+        for(unsigned int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
             if(i == current) {
                 wattron(self.win, COLOR_PAIR(6));
@@ -129,7 +129,7 @@
 -(void) calculateDimensions {
     _height = [options count] + 2;
     int my;
-    int mx;
+    unsigned int mx;
     getmaxyx(_parent, my, mx);
     BOOL resizeParent = NO;
     if(_width > mx) {

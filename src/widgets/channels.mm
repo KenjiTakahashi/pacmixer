@@ -188,7 +188,7 @@
     hasPeak = NO;
     hasMute = NO;
     hidden = YES;
-    for(int i = 0; i < [channels_ count]; ++i) {
+    for(unsigned int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
         if([obj maxLevel] != nil) {
             hasPeak = YES;
@@ -212,7 +212,7 @@
     [self print];
     internalId = [id_ copy];
     channels = [[NSMutableArray alloc] init];
-    for(int i = 0; i < [channels_ count]; ++i) {
+    for(unsigned int i = 0; i < [channels_ count]; ++i) {
         channel_t *obj = [channels_ objectAtIndex: i];
         NSNumber *mute;
         if([obj mutable]) {
@@ -236,7 +236,7 @@
 }
 
 -(void) dealloc {
-    for(int i = 0; i < [channels count]; ++i) {
+    for(unsigned int i = 0; i < [channels count]; ++i) {
         Channel *channel = [channels objectAtIndex: i];
         [[NSNotificationCenter defaultCenter] removeObserver: channel];
     }
@@ -269,7 +269,7 @@
     } else {
         mvderwin(win, height - 4, position);
     }
-    for(int i = 0; i < [channels count]; ++i) {
+    for(unsigned int i = 0; i < [channels count]; ++i) {
         [(Channel*)[channels objectAtIndex: i] reprint: height];
     }
     [self print];
@@ -288,7 +288,7 @@
 
 -(void) adjust {
     mvderwin(win, y, position);
-    for(int i = 0; i < [channels count]; ++i) {
+    for(unsigned int i = 0; i < [channels count]; ++i) {
         [[channels objectAtIndex: i] adjust: i];
     }
 }
@@ -364,7 +364,7 @@
 }
 
 -(void) mute {
-    for(int i = 0; i < [channels count]; ++i) {
+    for(unsigned int i = 0; i < [channels count]; ++i) {
         [(Channel*)[channels objectAtIndex: i] mute];
     }
     NSString *nname = [NSString stringWithFormat:
@@ -380,7 +380,7 @@
 -(void) show {
     hidden = NO;
     [self print];
-    for(int i = 0; i < [channels count]; ++i) {
+    for(unsigned int i = 0; i < [channels count]; ++i) {
         Channel *channel = [channels objectAtIndex: i];
         [channel print];
         [channel show];
@@ -389,7 +389,7 @@
 
 -(void) hide {
     hidden = YES;
-    for(int i = 0; i < [channels count]; ++i) {
+    for(unsigned int i = 0; i < [channels count]; ++i) {
         [(Channel*)[channels objectAtIndex: i] hide];
     }
 }

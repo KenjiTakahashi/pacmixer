@@ -34,7 +34,7 @@
     highlight = 0;
     int width = 0;
     int height = [names count] + 2;
-    for(int i = 0; i < [names count]; ++i) {
+    for(unsigned int i = 0; i < [names count]; ++i) {
         int length = [[names objectAtIndex: i] length];
         if(length > width) {
             width = length;
@@ -77,7 +77,7 @@
     if(!hidden) {
         box(win, 0, 0);
         mvwprintw(win, 0, 1, "%@", label);
-        for(int i = 0; i < [values count]; ++i) {
+        for(unsigned int i = 0; i < [values count]; ++i) {
             mvwprintw(
                 win, i + 1, 1, "[%c]%@",
                 [[values objectAtIndex: i] boolValue] ? 'X' : ' ',

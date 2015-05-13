@@ -86,7 +86,7 @@
         int y;
         int my;
         int mx;
-        int highlight;
+        unsigned int highlight;
         NSString *internalId;
 }
 

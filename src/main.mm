@@ -91,7 +91,7 @@ debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
                                      andId: internalId];
         w.internalName = [info objectForKey: @"internalName"];
         Channels *channelsWidgets = [w addChannels: channels];
-        for(int i = 0; i < [channels count]; ++i) {
+        for(unsigned int i = 0; i < [channels count]; ++i) {
             volume_t *volume = [volumes objectAtIndex: i];
             [channelsWidgets setLevel: [[volume level] intValue]
                            forChannel: i];

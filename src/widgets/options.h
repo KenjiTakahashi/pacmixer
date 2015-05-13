@@ -32,22 +32,22 @@
     @protected
         WINDOW *_win;
         WINDOW *_parent;
-        int _width;
+        unsigned int _width;
         int _height;
         NSString *label;
         NSString *internalId;
         NSArray *options;
         NSArray *mapping;
         BOOL highlighted;
-        int current;
-        int highlight;
+        unsigned int current;
+        unsigned int highlight;
         int _position;
         BOOL hidden;
 }
 
 @property WINDOW *win;
 @property WINDOW *parent;
-@property int width;
+@property unsigned int width;
 @property(readonly) int height;
 @property int position;
 

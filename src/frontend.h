@@ -42,7 +42,7 @@
         Bottom *bottom;
         NSMutableArray *xpaddingStates;
         NSMutableArray *ypaddingStates;
-        int highlight;
+        unsigned int highlight;
         Notice *notice;
 }
 

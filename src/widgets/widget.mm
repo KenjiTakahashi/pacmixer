@@ -188,7 +188,7 @@ debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UT
     NSDictionary* info = [notification userInfo];
     NSArray *volumes = [info objectForKey: @"volumes"];
     if(volumes != nil) {
-        for(int i = 0; i < [volumes count]; ++i) {
+        for(unsigned int i = 0; i < [volumes count]; ++i) {
             volume_t *vol = [volumes objectAtIndex: i];
             [channels setLevel: [[vol level] intValue] forChannel: i];
             [channels setMute: [vol mute] forChannel: i];

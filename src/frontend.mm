@@ -114,7 +114,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 #endif
     wresize(win, my - 4, mx - 2);
     wresize(pad, my - 4, pmx);
-    for(int i = 0; i < [widgets count]; ++i) {
+    for(unsigned int i = 0; i < [widgets count]; ++i) {
         [(Widget*)[widgets objectAtIndex: i] reprint: my - 4];
     }
     [top reprint];
@@ -191,7 +191,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 -(void) removeWidget: (NSString*) id_ {
     NSMutableIndexSet *indexes = [NSMutableIndexSet indexSet];
     wclear(pad);
-    for(int i = 0; i < [widgets count]; ++i) {
+    for(unsigned int i = 0; i < [widgets count]; ++i) {
         id widget = [widgets objectAtIndex: i];
         if([[widget internalId] isEqualToString: id_]) {
 #ifdef DEBUG
@@ -209,7 +209,7 @@ debug_fprintf(__func__, "f(v):%s removed at index %d", [id_ UTF8String], i);
     }
     [widgets removeObjectsAtIndexes: indexes];
     [indexes removeAllIndexes];
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
         if([[widget internalId] isEqualToString: id_]) {
             [indexes addIndex: i];
@@ -220,7 +220,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     }
     [allWidgets removeObjectsAtIndexes: indexes];
     int x = 0;
-    for(int i = 0; i < [widgets count]; ++i) {
+    for(unsigned int i = 0; i < [widgets count]; ++i) {
         Widget *w = [widgets objectAtIndex: i];
         [w setPosition: x];
         [w show];
@@ -263,7 +263,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
 }
 
 -(void) adjustOptions {
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
         View wtype = [widget type];
         if(wtype == OUTPUTS || wtype == INPUTS) {
@@ -273,7 +273,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
                                           withType: wtype];
             NSArray *mapvalues = [self getWidgetsAttr: @selector(internalName)
                                              withType: wtype];
-            for(int j = 0; j < [tc_widgets count]; ++j) {
+            for(unsigned int j = 0; j < [tc_widgets count]; ++j) {
                 Widget *tc_widget = [tc_widgets objectAtIndex: j];
                 [tc_widget replaceOptions: values];
                 [[tc_widget options] replaceMapping: mapvalues];
@@ -315,7 +315,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
         [notice print];
         [[self class] refresh];
     } else {
-        for(int i = 0; i < [allWidgets count]; ++i) {
+        for(unsigned int i = 0; i < [allWidgets count]; ++i) {
             Widget *w = [allWidgets objectAtIndex: i];
             BOOL cond = [top view] == ALL && [w type] != SETTINGS;
             cond = cond || [w type] == [top view];
@@ -339,7 +339,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     NSString *default_sink = [defaults objectForKey: @"sink"];
     NSString *default_source = [defaults objectForKey: @"source"];
 
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
         if([w type] == INPUTS) {
             [w setDefault: [default_source isEqualToString: w.internalName]];
@@ -351,7 +351,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
 
 -(NSArray*) getWidgetsWithType: (View) type {
     NSMutableArray *results = [NSMutableArray arrayWithCapacity: 0];
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
         if([widget type] == type) {
             [results addObject: widget];
@@ -363,7 +363,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
 -(NSArray*) getWidgetsAttr: (SEL) selector
                   withType: (View) type {
     NSMutableArray *results = [NSMutableArray arrayWithCapacity: 0];
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
         if([widget type] == type) {
             [results addObject: [widget performSelector: selector]];
@@ -373,7 +373,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
 }
 
 +(Widget*) getWidgetWithId: (NSString*) id_ {
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *widget = [allWidgets objectAtIndex: i];
         if([[widget internalId] isEqualToString: id_]) {
             return widget;
@@ -391,7 +391,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     [bottom setView: SETTINGS];
     [self clear];
     int y = 0;
-    for(int i = 0; i < [allWidgets count]; ++i) {
+    for(unsigned int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
         if([w type] == SETTINGS) {
             [w setPosition: y];
@@ -457,7 +457,7 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
 -(void) next {
     if([bottom mode] == MODE_INSIDE) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] next];
-    } else if(highlight < (int)[widgets count] - 1) {
+    } else if(highlight < [widgets count] - 1) {
         int start = [[widgets objectAtIndex: highlight] endPosition];
         if([bottom mode] == MODE_SETTINGS) {
             BOOL flag = NO;

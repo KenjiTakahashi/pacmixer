@@ -36,7 +36,7 @@
         NSMutableArray *values;
         BOOL highlighted;
         BOOL hidden;
-        int highlight;
+        unsigned int highlight;
         int position;
 }
 
