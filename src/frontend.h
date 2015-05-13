@@ -37,7 +37,7 @@
 @interface TUI: NSObject <Controlling> {
     @private
         NSMutableArray *widgets;
-        Settings *settings;
+        pacmixer::Settings settings;
         Top *top;
         Bottom *bottom;
         NSMutableArray *xpaddingStates;

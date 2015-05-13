@@ -20,13 +20,17 @@ CCC=gcc
 CPP=g++
 CFLAGS=-std=c99 -Wall
 OFLAGS=`gnustep-config --objc-flags`
-CPPFLAGS=-Wall -g -O2 -D TESTS=1 -fobjc-exceptions -D __STDC_LIMIT_MACROS
-LIBS=-lgnustep-base -lobjc -lpanel -lcurses
+CPPFLAGS=-std=c++11 -Wall -g -O2 -D TESTS=1 -fobjc-exceptions -fobjc-call-cxx-cdtors -D __STDC_LIMIT_MACROS
+LIBS=-lgnustep-base -lobjc -lpanel -lcurses -lstdc++
 PLIBS=-lpulse
 SOURCES=$(wildcard src/*.m) $(wildcard src/widgets/*.m)
 OBJECTS=$(SOURCES:.m=.o)
 CSOURCES=src/backend.c
 COBJECTS=$(CSOURCES:.c=.o)
+MMSOURCES=$(wildcard src/*.mm) $(wildcard src/widgets/*.mm)
+MMOBJECTS=$(MMSOURCES:.mm=.o)
+CPPSOURCES=$(wildcard src/*.cpp)
+CPPOBJECTS=$(CPPSOURCES:.cpp=.o)
 
 TSOURCES=$(wildcard tests/*.mm)
 TOBJECTS=$(TSOURCES:.mm=.o)
@@ -42,17 +46,17 @@ EXEC=pacmixer
 TEXEC=pacmixer_run_tests
 
 all: CFLAGS += -O2
-all: $(CSOURCES) $(SOURCES) $(EXEC)
+all: $(CSOURCES) $(CPPSOURCES) $(SOURCES) $(MMSOURCES) $(EXEC)
 debug: CFLAGS += -g -O0 -D DEBUG=1
 debug: LIBS += -lrt
 debug: $(OBJECTS) $(COBJECTS) $(DEBUGOBJ)
 	$(CCC) -o $(EXEC) $(OBJECTS) $(COBJECTS) $(DEBUGOBJ) $(LIBS) $(PLIBS)
 
-$(EXEC): $(OBJECTS) $(COBJECTS)
-	$(CCC) -o $@ $(OBJECTS) $(COBJECTS) $(LIBS) $(PLIBS)
+$(EXEC): $(OBJECTS) $(MMOBJECTS) $(COBJECTS) $(CPPOBJECTS)
+	$(CPP) -o $@ $(OBJECTS) $(MMOBJECTS) $(COBJECTS) $(CPPOBJECTS) $(LIBS) $(PLIBS)
 
 clean:
-	rm -rf $(OBJECTS) $(COBJECTS) $(DEBUGOBJ) $(EXEC)
+	rm -rf $(OBJECTS) $(MMOBJECTS) $(COBJECTS) $(CPPOBJECTS) $(DEBUGOBJ) $(EXEC)
 
 %.o: %.m
 	$(CCC) $(CFLAGS) $(OFLAGS) -c -o $@ $^

@@ -1,9 +1,6 @@
-*~
-*swp
 *.o
 *.d
-.td
 pacmixer
 pacmixer_run_tests
 dist/
-tags
+a.out

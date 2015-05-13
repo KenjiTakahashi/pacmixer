@@ -31,7 +31,6 @@ static NSMutableArray *allWidgets;
     self = [super init];
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
-    settings = [[Settings alloc] init];
     initscr();
     cbreak();
     noecho();
@@ -81,7 +80,6 @@ static NSMutableArray *allWidgets;
     [bottom release];
     [top release];
     [widgets release];
-    [settings release];
     [allWidgets release];
     [ypaddingStates release];
     [xpaddingStates release];
@@ -153,10 +151,8 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
 }
 
 -(BOOL) applySettings: (NSString*) name {
-    NSString *key = @"Filter/PulseAudio internals";
-    BOOL filter1 = [[settings getValue: key] boolValue];
-    key = @"Filter/Monitors";
-    BOOL filter2 = [[settings getValue: key] boolValue];
+    bool filter1 = settings.value<bool>("Filter.Internals");
+    bool filter2 = settings.value<bool>("Filter.Monitors");
     filter1 = filter1 && [name hasPrefix: @"PulseAudio"];
     filter2 = filter2 && [name hasPrefix: @"Monitor of"];
     return !filter1 && !filter2;
@@ -395,26 +391,6 @@ debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
     [bottom setView: SETTINGS];
     [self clear];
     int y = 0;
-    NSArray *keys = [settings allKeys];
-    for(int i = 0; i < [keys count]; ++i) {
-        NSString *key = [keys objectAtIndex: i];
-        Values *value = [settings objectForKey: key];
-        id widget = [[[value type] alloc] initWithPosition: y
-                                                   andName: key
-                                                 andValues: [value values]
-                                                     andId: nil
-                                                 andParent: pad];
-        [widget show];
-        for(int i = 0; i < [value count]; ++i) {
-            NSString *fullkey = [NSString stringWithFormat:
-                @"%@/%@", key, [value objectAtIndex: i]];
-            [widget setValue: [[settings getValue: fullkey] boolValue]
-                     atIndex: i];
-        }
-        [widgets addObject: widget];
-        y = [widget endPosition];
-        [widget release];
-    }
     for(int i = 0; i < [allWidgets count]; ++i) {
         Widget *w = [allWidgets objectAtIndex: i];
         if([w type] == SETTINGS) {

@@ -55,7 +55,7 @@
 -(void) addWidget: (NSNotification*) notification {
     NSDictionary *info = [notification userInfo];
     NSNumber *id_ = [info objectForKey: @"id"];
-    backend_entry_type typeb = [[info objectForKey: @"type"] intValue];
+    backend_entry_type typeb = (backend_entry_type)[[info objectForKey: @"type"] intValue];
     View type;
     switch(typeb) {
         case SINK:
