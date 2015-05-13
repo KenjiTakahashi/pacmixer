@@ -1,3 +1,3 @@
 #define CATCH_CONFIG_MAIN
 
-#import "catch.hpp"
+#import "../vendor/catch.hpp"

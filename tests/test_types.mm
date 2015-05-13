@@ -15,7 +15,7 @@
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-#import "catch.hpp"
+#import "../vendor/catch.hpp"
 #import "../src/types.h"
 
 
