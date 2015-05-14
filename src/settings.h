@@ -47,7 +47,6 @@ namespace pacmixer {
     public:
         Settings();
 
-        bool val();
         template<typename T> T value(std::string key) const;
     };
 }

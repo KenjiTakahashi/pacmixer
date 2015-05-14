@@ -49,10 +49,6 @@ pacmixer::Settings::Settings() {
     }
 }
 
-bool pacmixer::Settings::val() {
-    return true;
-}
-
 template<typename T> T pacmixer::Settings::value(std::string key) const {
     return this->g->get_qualified(key)->as<T>()->get();
 }
