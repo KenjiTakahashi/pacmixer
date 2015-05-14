@@ -1,6 +1,5 @@
-*.o
-*.d
 pacmixer
 pacmixer_run_tests
-dist/
 a.out
+.ninja*
+build/

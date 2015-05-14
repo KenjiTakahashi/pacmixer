@@ -1,0 +1,68 @@
+# pacmixer
+# Copyright (C) 2015 Karol 'Kenji Takahashi' Woźniak
+#
+# Permission is hereby granted, free of charge, to any person obtaining
+# a copy of this software and associated documentation files (the "Software"),
+# to deal in the Software without restriction, including without limitation
+# the rights to use, copy, modify, merge, publish, distribute, sublicense,
+# and/or sell copies of the Software, and to permit persons to whom the
+# Software is furnished to do so, subject to the following conditions:
+#
+# The above copyright notice and this permission notice shall be included
+# in all copies or substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+# EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+# OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.
+# IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+# DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT,
+# TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
+# OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+flags = -Wall -O2
+cflags = -std=c99
+cxxflags = -std=c++11
+objcflags = `gnustep-config --objc-flags`
+objcxxflags = -fobjc-exceptions -fobjc-call-cxx-cdtors -D __STDC_LIMIT_MACROS
+
+rule cc
+    depfile = $out.d
+    command = gcc -MMD -MF $out.d $flags $cflags -c $in -o $out
+
+rule cxx
+    depfile = $out.d
+    command = g++ -MMD -MF $out.d $flags $cxxflags -c $in -o $out
+
+rule objcc
+    depfile = $out.d
+    command = gcc -MMD -MF $out.d $flags $cflags $objcflags -c $in -o $out
+
+rule objcxx
+    depfile = $out.d
+    command = gcc -MMD -MF $out.d $flags $cxxflags $objcflags $objcxxflags -c $in -o $out
+
+ldflags = -lgnustep-base -lobjc -lpanel -lcurses -lstdc++
+
+rule link
+    command = g++ $ldflags $ldflags2 -o $out $in
+
+build build/backend.o: cc src/backend.c
+build build/frontend.o: objcxx src/frontend.mm
+build build/main.o: objcxx src/main.mm
+build build/middleware.o: objcc src/middleware.m
+build build/settings.o: cxx src/settings.cpp
+build build/types.o: objcc src/types.m
+build build/widgets/channels.o: objcxx src/widgets/channels.mm
+build build/widgets/checkbox.o: objcxx src/widgets/checkbox.mm
+build build/widgets/menu.o: objcc src/widgets/menu.m
+build build/widgets/misc.o: objcc src/widgets/misc.m
+build build/widgets/notice.o: objcc src/widgets/notice.m
+build build/widgets/options.o: objcxx src/widgets/options.mm
+build build/widgets/widget.o: objcxx src/widgets/widget.mm
+
+build pacmixer: link build/backend.o build/frontend.o build/main.o build/middleware.o build/settings.o build/types.o build/widgets/channels.o build/widgets/checkbox.o build/widgets/menu.o build/widgets/misc.o build/widgets/notice.o build/widgets/options.o build/widgets/widget.o
+    ldflags2 = -lpulse
+
+default pacmixer
+
+subninja build_tests.ninja

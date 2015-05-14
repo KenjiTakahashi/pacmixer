@@ -49,3 +49,6 @@
 - Added ability to set current device for PLAYBACK/RECORDING.
 - Deal with options (e.g. ports, profiles) changing dynamically.
 - Fixed segfault on gnustep-base < 1.24 [mainly Debian].
+
+== 0.6:
+- Moved to ninja for building.

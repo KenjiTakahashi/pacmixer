@@ -16,12 +16,12 @@ Back in the old days, there were a good mixer for ALSA (alsamixer), so I thought
 * ncurses
 * gnustep-base
 * gcc-objc (for compilation)
+* ninja (for compilation)
 
 ## installation
 Type
 ```sh
-$ make
-# make install
+# ./mk install
 ```
 and you're done.
 
@@ -87,7 +87,7 @@ That will make it easier to identify the problem.
 
 Type
 ```sh
-$ make tests
+$ ./mk tests
 $ ./pacmixer_run_tests
 ```
 
