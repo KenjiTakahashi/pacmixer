@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 -(Dispatcher*) init {
     self = [super init];
     pool = [[NSAutoreleasePool alloc] init];
+    tui = [[TUI alloc] init];
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center addObserver: self
                selector: @selector(addWidget:)
@@ -35,7 +36,6 @@
                selector: @selector(addWidget:)
                    name: @"cardAppeared"
                  object: nil];
-    tui = [[TUI alloc] init];
     [center addObserver: tui
                selector: @selector(setDefaults:)
                    name: @"serverDefaultsAppeared"
@@ -80,9 +80,7 @@
     NSString *name = [info objectForKey: @"name"];
     NSString *internalId = [NSString stringWithFormat:
         @"%@_%d", id_, typeb];
-#ifdef DEBUG
-debug_fprintf(__func__, "d:%d:%s passed", [id_ intValue], [name UTF8String]);
-#endif
+    PACMIXER_LOG("D:%d:%s passed", [id_ intValue], [name UTF8String]);
     NSArray *channels = [info objectForKey: @"channels"];
     NSArray *volumes = [info objectForKey: @"volumes"];
     if(channels != nil && volumes != nil) {

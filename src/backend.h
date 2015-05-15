@@ -24,9 +24,7 @@
 #endif
 #include <stdlib.h>
 #include <string.h>
-#ifdef DEBUG
-#include "debug.h"
-#endif
+#include "log.h"
 
 
 typedef enum {

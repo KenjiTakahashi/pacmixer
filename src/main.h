@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012
+// Karol "Kenji Takahashi" Woźniak © 2012, 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -20,10 +20,8 @@
 #import <Foundation/NSDictionary.h>
 #import <Foundation/NSAutoreleasePool.h>
 #import "frontend.h"
+#import "log.h"
 #import "middleware.h"
-#ifdef DEBUG
-#import "debug.h"
-#endif
 
 
 @interface Dispatcher: NSObject {

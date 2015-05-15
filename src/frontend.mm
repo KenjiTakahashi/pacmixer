@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ static NSMutableArray *allWidgets;
 @implementation TUI
 -(TUI*) init {
     self = [super init];
+    pacmixer_log_set_path(settings.value<std::string>("Log.Dir").c_str());
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
@@ -109,9 +110,7 @@ static NSMutableArray *allWidgets;
     int mx;
     getmaxyx(stdscr, my, mx);
     int pmx = getmaxx(pad);
-#ifdef DEBUG
-debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
-#endif
+    PACMIXER_LOG("F:reprinting TUI at %dx%d", mx, my);
     wresize(win, my - 4, mx - 2);
     wresize(pad, my - 4, pmx);
     for(unsigned int i = 0; i < [widgets count]; ++i) {
@@ -194,9 +193,7 @@ debug_fprintf(__func__, "f:reprinting TUI at %dx%d", mx, my);
     for(unsigned int i = 0; i < [widgets count]; ++i) {
         id widget = [widgets objectAtIndex: i];
         if([[widget internalId] isEqualToString: id_]) {
-#ifdef DEBUG
-debug_fprintf(__func__, "f(v):%s removed at index %d", [id_ UTF8String], i);
-#endif
+            PACMIXER_LOG("F:%s removed at index %d", [id_ UTF8String], i);
             [indexes addIndex: i];
             if(highlight >= i) {
                 if(highlight > 0) {
@@ -213,9 +210,7 @@ debug_fprintf(__func__, "f(v):%s removed at index %d", [id_ UTF8String], i);
         Widget *widget = [allWidgets objectAtIndex: i];
         if([[widget internalId] isEqualToString: id_]) {
             [indexes addIndex: i];
-#ifdef DEBUG
-debug_fprintf(__func__, "f:%s removed at index %d", [id_ UTF8String], i);
-#endif
+            PACMIXER_LOG("F:%s removed at index %d", [id_ UTF8String], i);
         }
     }
     [allWidgets removeObjectsAtIndexes: indexes];

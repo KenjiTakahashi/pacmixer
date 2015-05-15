@@ -48,6 +48,7 @@ rule link
 
 build build/backend.o: cc src/backend.c
 build build/frontend.o: objcxx src/frontend.mm
+build build/log.o: cc src/log.c
 build build/main.o: objcxx src/main.mm
 build build/middleware.o: objcc src/middleware.m
 build build/settings.o: cxx src/settings.cpp
@@ -60,7 +61,7 @@ build build/widgets/notice.o: objcc src/widgets/notice.m
 build build/widgets/options.o: objcxx src/widgets/options.mm
 build build/widgets/widget.o: objcxx src/widgets/widget.mm
 
-build pacmixer: link build/backend.o build/frontend.o build/main.o build/middleware.o build/settings.o build/types.o build/widgets/channels.o build/widgets/checkbox.o build/widgets/menu.o build/widgets/misc.o build/widgets/notice.o build/widgets/options.o build/widgets/widget.o
+build pacmixer: link build/backend.o build/frontend.o build/log.o build/main.o build/middleware.o build/settings.o build/types.o build/widgets/channels.o build/widgets/checkbox.o build/widgets/menu.o build/widgets/misc.o build/widgets/notice.o build/widgets/options.o build/widgets/widget.o
     ldflags2 = -lpulse
 
 default pacmixer

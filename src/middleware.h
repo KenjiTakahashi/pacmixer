@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -25,11 +25,9 @@
 #if GNUSTEP_BASE_MINOR_VERSION < 24
 #import <Foundation/NSThread.h>
 #endif
+#import "log.h"
 #import "types.h"
 #import "backend.h"
-#ifdef DEBUG
-#import "debug.h"
-#endif
 
 
 void callback_add_func(void*, const char*, backend_entry_type, uint32_t, backend_data_t*);

@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013, 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,9 +24,6 @@
 #import <curses.h>
 #import "../types.h"
 #import "misc.h"
-#ifdef DEBUG
-#import "../debug.h"
-#endif
 
 
 @class TUI;

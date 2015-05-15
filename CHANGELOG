@@ -52,3 +52,4 @@
 
 == 0.6:
 - Moved to ninja for building.
+- Better logging mechanism.

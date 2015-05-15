@@ -172,11 +172,7 @@ void backend_device_set(context_t *c, backend_entry_type type, uint32_t idx, con
 void _cb_state_changed(pa_context *context, void *userdata) {
     callback_t *callback = (callback_t*)userdata;
     pa_context_state_t state = pa_context_get_state(context);
-
-#ifdef DEBUG
-debug_fprintf(__func__, "b:server state changed to %d", state);
-#endif
-
+    PACMIXER_LOG("B:server state changed to %d", state);
     switch(state) {
         case PA_CONTEXT_READY:
             pa_context_set_subscribe_callback(context, _cb_event, callback);
@@ -203,9 +199,7 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
     if(!eol && info->index != PA_INVALID_INDEX) {
         client_callback_t *client_callback = (client_callback_t*)userdata;
         callback_t *callback = client_callback->callback;
-#ifdef DEBUG
-debug_fprintf(__func__, "%d:%s appeared", client_callback->index, info->name);
-#endif
+        PACMIXER_LOG("B:%d:%s appeared", client_callback->index, info->name);
         backend_data_t data;
         data.channels = client_callback->channels;
         data.volumes = client_callback->volumes;

@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,15 +23,13 @@
 #import <Foundation/NSIndexSet.h>
 #import <curses.h>
 #import <panel.h>
+#import "log.h"
 #import "widgets/menu.h"
 #import "widgets/widget.h"
 #import "widgets/misc.h"
 #import "widgets/notice.h"
 #import "widgets/options.h"
 #import "settings.h"
-#ifdef DEBUG
-#import "debug.h"
-#endif
 
 
 @interface TUI: NSObject <Controlling> {

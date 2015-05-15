@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -40,9 +40,7 @@
     hasDefault = type == INPUTS || type == OUTPUTS;
     isDefault = NO;
     [self print];
-#ifdef DEBUG
-debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8String]);
-#endif
+    PACMIXER_LOG("F:%d:%s posted", [internalId intValue], [name UTF8String]);
     return self;
 }
 
@@ -159,9 +157,7 @@ debug_fprintf(__func__, "f:%d:%s printed", [internalId intValue], [name UTF8Stri
         [ports show];
         [self printDefault];
     }
-#ifdef DEBUG
-debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UTF8String]);
-#endif
+    PACMIXER_LOG("F:%d:%s options added", [internalId intValue], [name UTF8String]);
     return ports;
 }
 
@@ -214,9 +210,7 @@ debug_fprintf(__func__, "f:%d:%s options added", [internalId intValue], [name UT
 }
 
 -(void) setDefault: (BOOL) default_ {
-#ifdef DEBUG
-debug_fprintf(__func__, "f:%d:%s set as default", [internalId intValue], [name UTF8String]);
-#endif
+    PACMIXER_LOG("F:%d:%s set as default", [internalId intValue], [name UTF8String]);
     isDefault = default_;
     [self printDefault];
 }

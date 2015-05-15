@@ -75,11 +75,7 @@ Shortcuts work like in outside mode, except that:
 
 ## something's broken?
 
-Please compile **pacmixer** using
-```sh
-$ make debug
-```
-then run it, reproduce the problem and send the contents of ```~/.pacmixer.log``` file with your bug report.
+Please include the log file (`$HOME/.local/share/pacmixer/pacmixer.log` by default) with your bug report.
 
 That will make it easier to identify the problem.
 

@@ -43,6 +43,9 @@ pacmixer::Settings::Settings() {
         defaults << "[Filter]\n";
         defaults << "Monitors = false\n";
         defaults << "Internals = true\n";
+        defaults << "\n";
+        defaults << "[Log]\n";
+        defaults << "Dir = \".local/share\"\n";
         defaults.close();
 
         this->g = std::make_shared<cpptoml::table>(cpptoml::parse_file(this->fn));
@@ -54,3 +57,4 @@ template<typename T> T pacmixer::Settings::value(std::string key) const {
 }
 
 template bool pacmixer::Settings::value<bool>(std::string key) const;
+template std::string pacmixer::Settings::value<std::string>(std::string key) const;

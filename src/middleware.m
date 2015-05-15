@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -86,9 +86,7 @@ void callback_add_func(
                        selector: @selector(setVolume:)
                            name: siname
                          object: nil];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s observer added", [siname UTF8String]);
-#endif
+            PACMIXER_LOG("M:%s observer added", [siname UTF8String]);
         }
         sname = [NSString stringWithFormat:
             @"volumeChanged%d_%d", idx, type];
@@ -99,10 +97,8 @@ debug_fprintf(__func__, "m:%s observer added", [siname UTF8String]);
                    selector: @selector(setMute:)
                        name: mname
                      object: nil];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s observer added", [mname UTF8String]);
-debug_fprintf(__func__, "m:%d:%s received", idx, name);
-#endif
+        PACMIXER_LOG("M:%s observer added", [mname UTF8String]);
+        PACMIXER_LOG("M:%d:%s received", idx, name);
         NSMutableDictionary *s = [
             NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: name], @"name",
@@ -142,9 +138,7 @@ debug_fprintf(__func__, "m:%d:%s received", idx, name);
                        name: sname
                      object: nil];
     }
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s observer added", [sname UTF8String]);
-#endif
+    PACMIXER_LOG("M:%s observer added", [sname UTF8String]);
     [pool release];
 }
 
@@ -179,9 +173,7 @@ void callback_update_func(
         [center postNotificationName: nname
                               object: self
                             userInfo: s];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
-#endif
+        PACMIXER_LOG("M:%s notification posted", [nname UTF8String]);
     } else if(data->volumes != NULL) {
         uint8_t chnum = data->channels_num;
         NSMutableArray *volumes = [[NSMutableArray alloc] init];
@@ -208,9 +200,7 @@ debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
         [center postNotificationName: nname
                               object: self
                             userInfo: s];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%s notification posted", [nname UTF8String]);
-#endif
+        PACMIXER_LOG("M:%s notification posted", [nname UTF8String]);
     }
     [pool release];
 }
@@ -224,9 +214,7 @@ void callback_remove_func(void *self_, uint32_t idx, backend_entry_type type) {
     [[NSNotificationCenter defaultCenter] postNotificationName: nname
                                                         object: self
                                                       userInfo: s];
-#ifdef DEBUG
-debug_fprintf(__func__, "m:%d %s notification posted", idx, [nname UTF8String]);
-#endif
+    PACMIXER_LOG("M:%d:%s notification posted", idx, [nname UTF8String]);
     [pool release];
 }
 
