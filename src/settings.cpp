@@ -25,8 +25,11 @@
 
 
 pacmixer::Settings::Settings() {
-    auto home = std::string(getenv("HOME"));
-    auto dir = home + "/.config/pacmixer";
+    auto home = std::string(getenv("XDG_CONFIG_HOME"));
+    if(home == "") {
+        home = std::string(getenv("HOME")) + "/.config";
+    }
+    auto dir = home + "/pacmixer";
     this->fn = dir + "/settings.toml";
 
     try {
@@ -41,7 +44,7 @@ pacmixer::Settings::Settings() {
 
         std::ofstream defaults(this->fn);
         defaults << "[Display]\n";
-        defaults << "StartScreen = \"All\"";
+        defaults << "StartScreen = \"All\"\n";
         defaults << "\n";
         defaults << "[Filter]\n";
         defaults << "Monitors = false\n";
