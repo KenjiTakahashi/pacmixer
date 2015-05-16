@@ -59,7 +59,7 @@ static NSMutableArray *allWidgets;
     xpaddingStates = [[NSMutableArray alloc] init];
     ypaddingStates = [[NSMutableArray alloc] init];
     bottom = [[Bottom alloc] init];
-    top = [[Top alloc] init];
+    top = [[Top alloc] initWithView: settings.value("Display.StartScreen")];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(removeWaiter:)
                                                  name: @"backendAppeared"

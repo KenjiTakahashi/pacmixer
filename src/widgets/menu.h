@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013, 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,7 +18,7 @@
 #import <Foundation/NSObject.h>
 #import <Foundation/NSString.h>
 #import <curses.h>
-#import "misc.h"
+#import "../enums.h"
 
 
 @interface Top: NSObject {
@@ -27,7 +27,7 @@
         View view;
 }
 
--(Top*) init;
+-(Top*) initWithView: (View) view_;
 -(void) dealloc;
 -(void) printString: (NSString*) str
            withView: (View) view_;

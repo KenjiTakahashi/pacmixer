@@ -40,6 +40,9 @@ pacmixer::Settings::Settings() {
         mkdir(dir.c_str(), 0777);
 
         std::ofstream defaults(this->fn);
+        defaults << "[Display]\n";
+        defaults << "StartScreen = \"All\"";
+        defaults << "\n";
         defaults << "[Filter]\n";
         defaults << "Monitors = false\n";
         defaults << "Internals = true\n";
@@ -54,6 +57,26 @@ pacmixer::Settings::Settings() {
 
 template<typename T> T pacmixer::Settings::value(std::string key) const {
     return this->g->get_qualified(key)->as<T>()->get();
+}
+
+View pacmixer::Settings::value(std::string key) const {
+    auto val = this->g->get_qualified(key)->as<std::string>()->get();
+    if(val == "Playback") {
+        return PLAYBACK;
+    }
+    if(val == "Recording") {
+        return RECORDING;
+    }
+    if(val == "Outputs") {
+        return OUTPUTS;
+    }
+    if(val == "Inputs") {
+        return INPUTS;
+    }
+    if(val == "Settings") {
+        return SETTINGS;
+    }
+    return ALL;
 }
 
 template bool pacmixer::Settings::value<bool>(std::string key) const;

@@ -20,38 +20,25 @@
 // OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 
-#ifndef __PACMIXER_SETTINGS_H__
-#define __PACMIXER_SETTINGS_H__
+#ifndef __PACMIXER_ENUMS_H__
+#define __PACMIXER_ENUMS_H__
 
 
-#include <iostream>
-#include <memory>
-#include <string>
-#include <sys/stat.h>
-#include "enums.h"
-
-// TODO: Use this "normally" when we move more code to CPP.
-// Right now it produces compatibility problems between cpptoml
-// code and ObjC++ compiler...
-// This file should probably be header only, because templates...
-namespace cpptoml {
-    class table;
-}
-
-namespace pacmixer {
-    class Settings {
-        std::string fn;
-        // TODO: We do not need pointer here,
-        // but we do, because forward decl.
-        std::shared_ptr<cpptoml::table> g;
-
-    public:
-        Settings();
-
-        template<typename T> T value(std::string key) const;
-        View value(std::string key) const;
-    };
-}
+typedef enum {
+    OUTPUTS = 0,
+    PLAYBACK = 1,
+    INPUTS = 2,
+    RECORDING = 3,
+    SETTINGS,
+    ALL,
+} View;
 
 
-#endif // __PACMIXER_SETTINGS_H__
+typedef enum {
+    MODE_INSIDE,
+    MODE_OUTSIDE,
+    MODE_SETTINGS
+} Mode;
+
+
+#endif // __PACMIXER_ENUMS_H__

@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -18,23 +18,6 @@
 #import <Foundation/NSObject.h>
 #import <Foundation/NSInvocation.h>
 #import <panel.h>
-
-
-typedef enum {
-    OUTPUTS = 0,
-    PLAYBACK = 1,
-    INPUTS = 2,
-    RECORDING = 3,
-    SETTINGS,
-    ALL,
-} View;
-
-
-typedef enum {
-    MODE_INSIDE,
-    MODE_OUTSIDE,
-    MODE_SETTINGS
-} Mode;
 
 
 @protocol Controlling <NSObject>

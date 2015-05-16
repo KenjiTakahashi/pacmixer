@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013, 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 
 
 @implementation Top
--(Top*) init {
+-(Top*) initWithView: (View) view_ {
     self = [super init];
-    view = ALL;
+    view = view_;
     int mx = getmaxx(stdscr);
     win = newwin(1, mx, 0, 0);
     [self print];
