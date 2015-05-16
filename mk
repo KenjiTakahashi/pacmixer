@@ -20,14 +20,14 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-if [[ "$1" = "tests" ]]; then
+if [ "$1" = "tests" ]; then
     ninja -v pacmixer_run_tests
     exit
 fi
 
 ninja -v
 
-if [[ "$1" = "install" ]]; then
+if [ "$1" = "install" ]; then
     PREFIX=${PREFIX:-/usr/local}
     DIR="${DESTDIR}${PREFIX}"
     BIN="${DIR}/bin"
