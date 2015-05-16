@@ -84,6 +84,7 @@ static NSMutableArray *allWidgets;
     [allWidgets release];
     [ypaddingStates release];
     [xpaddingStates release];
+    pacmixer_log_free();
     [super dealloc];
 }
 
