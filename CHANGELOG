@@ -54,3 +54,4 @@
 - Moved to ninja for building.
 - Better logging mechanism.
 - Added ability to configure start screen (Fixes #8).
+- Reworked configuration.
