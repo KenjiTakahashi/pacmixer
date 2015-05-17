@@ -81,6 +81,7 @@
 -(void) down;
 -(void) switchValue;
 -(int) height;
+-(int) endVPosition;
 -(int) endPosition;
 -(View) type;
 -(NSString*) name;

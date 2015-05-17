@@ -308,8 +308,12 @@
     return width;
 }
 
--(int) endPosition {
+-(int) endHPosition {
     return position + width;
+}
+
+-(int) endPosition {
+    return [self endHPosition];
 }
 
 -(View) type {

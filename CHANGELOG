@@ -55,3 +55,4 @@
 - Better logging mechanism.
 - Added ability to configure start screen (Fixes #8).
 - Reworked configuration.
+- Fixed crash when moving up (`h`) through options in settings screen.

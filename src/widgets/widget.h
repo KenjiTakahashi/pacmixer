@@ -76,6 +76,7 @@
 -(void) mute;
 -(void) switchValue;
 -(int) width;
+-(int) endHPosition;
 -(int) endPosition;
 -(View) type;
 -(NSString*) name;

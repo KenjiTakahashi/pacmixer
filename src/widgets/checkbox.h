@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2013
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2013, 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@
 -(void) setValue: (BOOL) value atIndex: (int) index;
 -(void) switchValue;
 -(int) height;
+-(int) endVPosition;
 -(int) endPosition;
 -(NSString*) internalId;
 -(void) show;

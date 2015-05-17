@@ -430,16 +430,16 @@ static NSMutableArray *allWidgets;
             [self setCurrent: highlight - 1];
         }
         id w = [widgets objectAtIndex: highlight];
-        BOOL cond = [w respondsToSelector: @selector(width)];
-        cond = cond && [w endPosition] - [w width] <= xpadding;
+        BOOL cond = [w respondsToSelector: @selector(endHPosition)];
+        cond = cond && [w endHPosition] - [w width] <= xpadding;
         if(cond) {
             int count = [xpaddingStates count] - 1;
             int delta = [[xpaddingStates objectAtIndex: count] intValue];
             [xpaddingStates removeObjectAtIndex: count];
             xpadding -= delta;
         }
-        cond = [w respondsToSelector: @selector(height)];
-        cond = cond && [w endPosition] - [w height] < ypadding;
+        cond = [w respondsToSelector: @selector(endVPosition)];
+        cond = cond && [w endVPosition] - [w height] < ypadding;
         if(cond) {
             int count = [ypaddingStates count] - 1;
             int delta = [[ypaddingStates objectAtIndex: count] intValue];
@@ -476,15 +476,15 @@ static NSMutableArray *allWidgets;
         int my;
         int mx;
         getmaxyx(stdscr, my, mx);
-        BOOL cond = [w respondsToSelector: @selector(width)];
-        cond = cond && [w endPosition] - xpadding >= mx;
+        BOOL cond = [w respondsToSelector: @selector(endHPosition)];
+        cond = cond && [w endHPosition] - xpadding >= mx;
         if(cond) {
             int delta = [w width] - (mx - start - 3 + xpadding);
             xpadding += delta;
             [xpaddingStates addObject: [NSNumber numberWithInt: delta]];
         }
-        cond = [w respondsToSelector: @selector(height)];
-        cond = cond && [w endPosition] - ypadding >= my - 1;
+        cond = [w respondsToSelector: @selector(endVPosition)];
+        cond = cond && [w endVPosition] - ypadding >= my - 1;
         if(cond) {
             int delta = [w height] - (my - start - 3 + ypadding);
             ypadding += delta;

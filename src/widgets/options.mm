@@ -1,5 +1,5 @@
 // This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
-// Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+// Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -211,8 +211,12 @@
     return [options count] + 2;
 }
 
--(int) endPosition {
+-(int) endVPosition {
     return self.position + self.height;
+}
+
+-(int) endPosition {
+    return [self endVPosition];
 }
 
 -(View) type {
