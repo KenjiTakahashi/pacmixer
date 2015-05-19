@@ -44,7 +44,7 @@ pacmixer::Settings::Settings() {
 
         std::ofstream defaults(this->fn);
         defaults << "[Display]\n";
-        defaults << "StartScreen = \"All\"\n";
+        defaults << "StartView = \"All\"\n";
         defaults << "\n";
         defaults << "[Filter]\n";
         defaults << "Monitors = false\n";
