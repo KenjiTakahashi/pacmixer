@@ -278,19 +278,19 @@
     [channels next];
 }
 
--(void) up {
+-(void) up: (int64_t) speed {
     if(mode == MODE_SETTINGS) {
         [ports up];
     } else {
-        [channels up];
+        [channels up: speed];
     }
 }
 
--(void) down {
+-(void) down: (int64_t) speed {
     if(mode == MODE_SETTINGS) {
         [ports down];
     } else {
-        [channels down];
+        [channels down: speed];
     }
 }
 

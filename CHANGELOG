@@ -56,3 +56,6 @@
 - Added ability to configure start view (Fixes #8).
 - Reworked configuration.
 - Fixed crash when moving up (`h`) through options in settings view.
+- Added ability to change volume at a different pace (using J/K shortcuts).
+- Added ability to configure volume changing speed (both j/k and J/K).
+- Prevented ability to set volume above max value under some circumstances.

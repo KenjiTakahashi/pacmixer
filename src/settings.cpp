@@ -46,6 +46,11 @@ pacmixer::Settings::Settings() {
         defaults << "[Display]\n";
         defaults << "StartView = \"All\"\n";
         defaults << "\n";
+        defaults << "[Control]\n";
+        defaults << "UpSpeed = 1\n";
+        defaults << "FastUpSpeed = 10\n";
+        defaults << "DownSpeed = 1\n";
+        defaults << "FastDownSpeed = 10\n";
         defaults << "[Filter]\n";
         defaults << "Monitors = false\n";
         defaults << "Internals = true\n";
@@ -84,3 +89,4 @@ View pacmixer::Settings::value(std::string key) const {
 
 template bool pacmixer::Settings::value<bool>(std::string key) const;
 template std::string pacmixer::Settings::value<std::string>(std::string key) const;
+template int64_t pacmixer::Settings::value<int64_t>(std::string key) const;

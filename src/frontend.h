@@ -72,8 +72,8 @@
 -(void) switchSetting;
 -(void) previous;
 -(void) next;
--(void) up;
--(void) down;
+-(void) up: (int64_t) speed;
+-(void) down: (int64_t) speed;
 -(void) mute;
 -(void) setAsDefault;
 -(void) inside;

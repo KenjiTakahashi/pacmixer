@@ -157,11 +157,19 @@
                 break;
             case 'k':
             case KEY_UP:
-                [tui up];
+                [tui up: pacmixer::setting<int64_t>("Control.UpSpeed")];
+                break;
+            case 'K':
+            case KEY_SR:
+                [tui up: pacmixer::setting<int64_t>("Control.FastUpSpeed")];
                 break;
             case 'j':
             case KEY_DOWN:
-                [tui down];
+                [tui down: pacmixer::setting<int64_t>("Control.DownSpeed")];
+                break;
+            case 'J':
+            case KEY_SF:
+                [tui down: pacmixer::setting<int64_t>("Control.FastDownSpeed")];
                 break;
             case 'm':
                 [tui mute];
