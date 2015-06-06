@@ -29,7 +29,7 @@ static NSMutableArray *allWidgets;
 @implementation TUI
 -(TUI*) init {
     self = [super init];
-    pacmixer_log_set_path(settings.value<std::string>("Log.Dir").c_str());
+    pacmixer_log_set_path(pacmixer::setting<std::string>("Log.Dir").c_str());
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
@@ -59,7 +59,7 @@ static NSMutableArray *allWidgets;
     xpaddingStates = [[NSMutableArray alloc] init];
     ypaddingStates = [[NSMutableArray alloc] init];
     bottom = [[Bottom alloc] init];
-    top = [[Top alloc] initWithView: settings.value("Display.StartView")];
+    top = [[Top alloc] initWithView: pacmixer::setting<View>("Display.StartView")];
     [[NSNotificationCenter defaultCenter] addObserver: self
                                              selector: @selector(removeWaiter:)
                                                  name: @"backendAppeared"
@@ -151,8 +151,8 @@ static NSMutableArray *allWidgets;
 }
 
 -(BOOL) applySettings: (NSString*) name {
-    bool filter1 = settings.value<bool>("Filter.Internals");
-    bool filter2 = settings.value<bool>("Filter.Monitors");
+    bool filter1 = pacmixer::setting<bool>("Filter.Internals");
+    bool filter2 = pacmixer::setting<bool>("Filter.Monitors");
     filter1 = filter1 && [name hasPrefix: @"PulseAudio"];
     filter2 = filter2 && [name hasPrefix: @"Monitor of"];
     return !filter1 && !filter2;

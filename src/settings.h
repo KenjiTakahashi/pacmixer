@@ -45,12 +45,26 @@ namespace pacmixer {
         // but we do, because forward decl.
         std::shared_ptr<cpptoml::table> g;
 
-    public:
         Settings();
+        Settings(const Settings&) = delete;
+        void operator=(const Settings&) = delete;
+
+    public:
+        static Settings& get() {
+            static Settings settings;
+            return settings;
+        }
 
         template<typename T> T value(std::string key) const;
         View value(std::string key) const;
     };
+
+    template<typename T> T setting(std::string key) {
+        return Settings::get().value<T>(key);
+    }
+    template<> inline View setting(std::string key) {
+        return Settings::get().value(key);
+    }
 }
 
 
