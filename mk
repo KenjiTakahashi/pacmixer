@@ -29,10 +29,14 @@ ninja -v
 
 if [ "$1" = "install" ]; then
     PREFIX=${PREFIX:-/usr/local}
+    MANPREFIX=${MANPREFIX:-"${PREFIX}/share/man"}
     DIR="${DESTDIR}${PREFIX}"
     BIN="${DIR}/bin"
+    MAN="${DESTDIR}${MANPREFIX}/man1"
     echo "Installing executable file into ${BIN}"
     mkdir -p "${BIN}"
-    cp pacmixer "${BIN}"
-    chmod 755 "${BIN}/pacmixer"
+    install -m 755 pacmixer "${BIN}"
+    echo "Installing man page file into ${MAN}"
+    mkdir -p "${MAN}"
+    install -m 644 pacmixer.1 "${MAN}"
 fi

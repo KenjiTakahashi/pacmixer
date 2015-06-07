@@ -1,0 +1,104 @@
+.TH PACMIXER 1
+.SH NAME
+pacmixer \- PulseAudio Curses Mixer.
+.SH SYNOPSIS
+pacmixer
+.SH DESCRIPTION
+pacmixer is an interactive controller for PulseAudio mixers and settings.
+
+It operates in three modes: OUTSIDE, INSIDE and SETTINGS. The OUTSIDE mode is the default (except for Settings view, where default is SETTINGS mode) and allows changing options and values on a per control basis. The INSIDE mode can be used to control individual channels. The SETTINGS mode can be used to adjust control settings.
+.SH KEYBOARD COMMANDS
+.TP
+.BR h ", " Left
+Moves to the previous control in OUTSIDE mode, channel in INSIDE mode, group in SETTINGS mode.
+.TP
+.BR l ", " Right
+Moves to the next control in OUTSIDE mode, channel in INSIDE mode, group in SETTINGS mode.
+.TP
+.BR k ", " Up
+Increases the volume in OUTSIDE and INSIDE modes standardly. Moves to the previous setting in SETTINGS mode.
+.TP
+.BR K ", " Shift+Up
+Increases the volume in OUTSIDE and INSIDE modes fastly.
+.TP
+.BR j ", " Down
+Decreases the volume in OUTSIDE and INSIDE modes standardly. Moves to the next setting in SETTINGS mode.
+.TP
+.BR J ", " Shift+Down
+Decreases the volume in OUTSIDE and INSIDE modes fastly.
+.TP
+.B m
+Mutes the volume.
+.TP
+.B d
+Sets control as default.
+.TP
+.B i
+Enters INSIDE mode.
+.TP
+.B s
+Enters SETTINGS mode.
+.TP
+.BR q ", " Esc
+Exits pacmixer in OUTSIDE mode. Moves back to OUTSIDE mode in INSIDE and SETTINGS modes.
+.TP
+.BR F1 \- F5 ", " 1 \- 5
+Switches to All/Playback/Recording/Outputs/Inputs view, respectively.
+.TP
+.BR F12 ", " 0
+Switches to Settings view.
+.TP
+.B Space
+(Un)checks setting in SETTINGS mode.
+.SH CONFIGURATION
+pacmixer uses toml based configuration file stored in either
+.I $XDG_CONFIG_HOME/pacmixer/settings.toml
+or
+.I $HOME/.config/pacmixer/settings.toml.
+
+When run for the first time, it will create a new file with all configuration options set to their defaults. This file can be used as a basis along with the reference below.
+.SS [Display]
+.TP
+.B StartView
+.I string
+Sets the view that should be visible when starting pacmixer. Available values are "All", "Playback", "Recording", "Outputs", "Inputs" and "Settings".
+.SS [Control]
+.TP
+.B UpSpeed
+.I integer
+Sets the speed of the standard volume up command.
+.TP
+.B FastUpSpeed
+.I integer
+Sets the speed of the fast volume up command.
+.TP
+.B DownSpeed
+.I integer
+Sets the speed of the standard volume down command.
+.TP
+.B FastDownSpeed
+.I integer
+Sets the speed of the fast volume down command.
+.SS [Filter]
+.TP
+.B Monitors
+.I boolean
+Filters out Monitor controls.
+.TP
+.B Internals
+.I boolean
+Filters out PA internal controls.
+.TP
+.B Options
+.I boolean
+Filters out Options part of the controls.
+.SS [Log]
+.TP
+.B Dir
+.I string
+Directory where log file(s) will be stored. Leave empty string to disable logging.
+.SH AUTHOR
+Karol 'Kenji Takahashi' Woźniak @
+.I kenji.sx
+.SH HOMEPAGE
+.I https://github.com/KenjiTakahashi/pacmixer
