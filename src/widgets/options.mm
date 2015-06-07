@@ -88,7 +88,7 @@
 }
 
 -(void) print {
-    if(!hidden) {
+    if(!(hidden || pacmixer::setting<bool>("Filter.Options"))) {
         werase(self.win);
         box(self.win, 0, 0);
         if([label length] > self.width - 2) {
@@ -208,6 +208,9 @@
 }
 
 -(int) height {
+    if(pacmixer::setting<bool>("Filter.Options")) {
+        return 0;
+    }
     return [options count] + 2;
 }
 

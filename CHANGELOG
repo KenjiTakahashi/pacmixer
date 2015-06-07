@@ -59,3 +59,4 @@
 - Added ability to change volume at a different pace (using J/K shortcuts).
 - Added ability to configure volume changing speed (both j/k and J/K).
 - Prevented ability to set volume above max value under some circumstances.
+- Added ability to filter options.

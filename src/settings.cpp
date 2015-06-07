@@ -54,6 +54,7 @@ pacmixer::Settings::Settings() {
         defaults << "[Filter]\n";
         defaults << "Monitors = false\n";
         defaults << "Internals = true\n";
+        defaults << "Options = false\n";
         defaults << "\n";
         defaults << "[Log]\n";
         defaults << "Dir = \".local/share\"\n";

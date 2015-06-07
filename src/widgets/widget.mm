@@ -144,8 +144,6 @@
 
 -(id) addOptions: (NSArray*) options_
         withName: (NSString*) optname {
-    int dy = hasDefault ? 5 : 2;
-    [channels reprint: height - [options_ count] - dy];
     Options *p = [[Options alloc] initWithWidth: width - 2
                                         andName: optname
                                       andValues: options_
@@ -157,15 +155,15 @@
         [ports show];
         [self printDefault];
     }
+    [channels reprint: height - [ports height] - (hasDefault ? 3 : 0)];
     PACMIXER_LOG("F:%d:%s options added", [internalId intValue], [name UTF8String]);
     return ports;
 }
 
 -(void) replaceOptions: (NSArray*) values {
-    int dy = hasDefault ? 5 : 2;
-    [channels reprint: height - [values count] - dy];
     [ports replaceValues: values];
     [ports reprint: height];
+    [channels reprint: height - [ports height] - (hasDefault ? 3 : 0)];
 }
 
 -(void) setHighlighted: (BOOL) active {
