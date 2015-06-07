@@ -19,7 +19,7 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-flags = -Wall -ggdb3 -O1 -D TESTS=1
+flags = -Wall -ggdb3 -O0 -D TESTS=1
 
 build build/tests/middleware.o: objcc src/middleware.m
 build build/tests/mock_pulseaudio.o: cc tests/mock_pulseaudio.c

@@ -612,7 +612,7 @@ TEST_CASE("_cb_card", "Should fire 'add' callback with card data") {
 
 uint32_t TEST_RETURN__cb_u_card_idx = PA_INVALID_INDEX;
 
-void TEST_CALLBACK__cb_u_card(void *s, backend_entry_type type, uint32_t idx, backend_data_t data) {
+void TEST_CALLBACK__cb_u_card(void *s, backend_entry_type type, uint32_t idx, backend_data_t *data) {
     TEST_RETURN__cb_u_card_idx = idx;
 }
 
@@ -634,9 +634,9 @@ TEST_CASE("_cb_u_card", "Should fire 'update' callback with new card data") {
 char TEST_RETURN__cb_server_sink[STRING_SIZE];
 char TEST_RETURN__cb_server_source[STRING_SIZE];
 
-void TEST_CALLBACK__cb_server(void *s, backend_entry_type type, uint32_t idx, backend_data_t data) {
-    strcpy(TEST_RETURN__cb_server_sink, data.defaults->sink);
-    strcpy(TEST_RETURN__cb_server_source, data.defaults->source);
+void TEST_CALLBACK__cb_server(void *s, backend_entry_type type, uint32_t idx, backend_data_t *data) {
+    strcpy(TEST_RETURN__cb_server_sink, data->defaults->sink);
+    strcpy(TEST_RETURN__cb_server_source, data->defaults->source);
 }
 
 TEST_CASE("_cb_server", "Should fire 'update' callback with server defaults data") {
@@ -948,6 +948,7 @@ TEST_CASE("_CB1", "Should fire 'add' callback for given data") {
     pa_cvolume cv;
     cv.channels = 0;
     callback_t cb;
+    cb.self = NULL;
     cb.add = (void*)TEST_CALLBACK__CB1;
     pa_sink_info *info = (pa_sink_info*)malloc(sizeof(pa_sink_info));
     info->index = PA_VALID_INDEX;
