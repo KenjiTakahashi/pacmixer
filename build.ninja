@@ -44,7 +44,7 @@ rule objcxx
 ldflags = -lgnustep-base -lobjc -lpanel -lcurses -lstdc++
 
 rule link
-    command = g++ $ldflags $ldflags2 -o $out $in
+    command = g++ $in $ldflags $ldflags2 -o $out
 
 build build/backend.o: cc src/backend.c
 build build/frontend.o: objcxx src/frontend.mm
