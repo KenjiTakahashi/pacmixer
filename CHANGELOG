@@ -50,7 +50,7 @@
 - Deal with options (e.g. ports, profiles) changing dynamically.
 - Fixed segfault on gnustep-base < 1.24 [mainly Debian].
 
-== 0.6:
+== 0.6 (08.06.2015):
 - Moved to ninja for building.
 - Better logging mechanism.
 - Added ability to configure start view (Fixes #8).
