@@ -25,8 +25,12 @@
 
 
 pacmixer::Settings::Settings() {
-    auto home = std::string(getenv("XDG_CONFIG_HOME"));
-    if(home == "") {
+    std::string home;
+    auto chome = getenv("XDG_CONFIG_HOME");
+    if(chome != NULL) {
+        home = std::string(chome);
+    }
+    if(home.empty()) {
         home = std::string(getenv("HOME")) + "/.config";
     }
     auto dir = home + "/pacmixer";
@@ -40,6 +44,7 @@ pacmixer::Settings::Settings() {
         std::cerr << "Old file will be moved to settings.toml~" << std::endl;
 
         rename(this->fn.c_str(), (dir + "/settings.toml~").c_str());
+        mkdir(home.c_str(), 0777);
         mkdir(dir.c_str(), 0777);
 
         std::ofstream defaults(this->fn);

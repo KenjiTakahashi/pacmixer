@@ -61,3 +61,7 @@
 - Prevented ability to set volume above max value under some circumstances.
 - Added ability to filter options.
 - Added a manpage.
+
+== 0.6.1:
+- Fixed crash when $XDG_CONFIG_HOME variable is not set.
+- Fixed crash when $XDG_CONFIG_HOME points at non-existing directory.
