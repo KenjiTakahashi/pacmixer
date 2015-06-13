@@ -34,7 +34,7 @@ void pacmixer_log_set_path(const char *path) {
     sprintf(dir, "%s/%s/pacmixer", home, path);
     pacmixer_logger.path = malloc((strlen(dir) + 15) * sizeof(char));
     sprintf(pacmixer_logger.path, "%s/pacmixer.log", dir);
-    mkdir(dir, 0777);
+    mkdirp(dir);
     free(dir);
 }
 

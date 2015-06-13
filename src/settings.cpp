@@ -44,8 +44,7 @@ pacmixer::Settings::Settings() {
         std::cerr << "Old file will be moved to settings.toml~" << std::endl;
 
         rename(this->fn.c_str(), (dir + "/settings.toml~").c_str());
-        mkdir(home.c_str(), 0777);
-        mkdir(dir.c_str(), 0777);
+        mkdirp(dir.c_str());
 
         std::ofstream defaults(this->fn);
         defaults << "[Display]\n";

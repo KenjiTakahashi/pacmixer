@@ -33,6 +33,7 @@ extern "C" {
 #include <stdarg.h>
 #include <string.h>
 #include <sys/stat.h>
+#include "../vendor/mkdirp.h"
 
 
 struct Logger {

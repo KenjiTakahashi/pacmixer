@@ -29,6 +29,7 @@
 #include <string>
 #include <sys/stat.h>
 #include "enums.h"
+#include "../vendor/mkdirp.h"
 
 // TODO: Use this "normally" when we move more code to CPP.
 // Right now it produces compatibility problems between cpptoml
