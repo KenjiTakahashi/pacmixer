@@ -62,7 +62,7 @@
 - Added ability to filter options.
 - Added a manpage.
 
-== 0.6.1:
+== 0.6.1 (14.06.2015):
 - Fixed crash when $XDG_CONFIG_HOME variable is not set.
 - Fixed crash when $XDG_CONFIG_HOME points at non-existing directory.
 - Fixed crash when "[Log].Dir" does not exist.
