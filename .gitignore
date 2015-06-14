@@ -2,4 +2,5 @@ pacmixer
 pacmixer_run_tests
 a.out
 .ninja*
+build.ninja
 build/

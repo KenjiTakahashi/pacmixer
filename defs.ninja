@@ -19,13 +19,28 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-flags = -Wall -ggdb3 -O0 -D TESTS=1
+cflags = -std=c99
+cppflags = -std=c++11
+mflags = `gnustep-config --objc-flags`
+mmflags = -fobjc-exceptions -fobjc-call-cxx-cdtors -D __STDC_LIMIT_MACROS
 
-build build/tests/middleware.o: objcc src/middleware.m
-build build/tests/mock_pulseaudio.o: cc tests/mock_pulseaudio.c
-build build/tests/mock_variables.o: cc tests/mock_variables.c
-build build/tests/test_backend.o: cxx tests/test_backend.cpp
-build build/tests/test_main.o: objcxx tests/test_main.mm
-build build/tests/test_middleware.o: objcxx tests/test_middleware.mm
-build build/tests/test_types.o: objcxx tests/test_types.mm
-build pacmixer_run_tests: link build/log.o build/tests/middleware.o build/types.o build/tests/mock_pulseaudio.o build/tests/mock_variables.o build/tests/test_backend.o build/tests/test_main.o build/tests/test_middleware.o build/tests/test_types.o
+rule c
+    depfile = $out.d
+    command = gcc -MMD -MF $out.d $flags $cflags -c $in -o $out
+
+rule cpp
+    depfile = $out.d
+    command = g++ -MMD -MF $out.d $flags $cppflags -c $in -o $out
+
+rule m
+    depfile = $out.d
+    command = gcc -MMD -MF $out.d $flags $cflags $mflags -c $in -o $out
+
+rule mm
+    depfile = $out.d
+    command = gcc -MMD -MF $out.d $flags $cppflags $mflags $mmflags -c $in -o $out
+
+ldflags = -lgnustep-base -lobjc -lpanel -lcurses -lstdc++
+
+rule link
+    command = g++ $in $ldflags $ldflags2 -o $out

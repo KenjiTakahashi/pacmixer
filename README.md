@@ -113,6 +113,15 @@ When run for the first time, it will create a new file with all configuration op
 
 Please include the log file (`$HOME/.local/share/pacmixer/pacmixer.log` by default) with your bug report.
 
+If it crashes hard (i.e. SEGFAULTS), you might also want to compile in debug mode and run through `gdb` to retrieve stacktrace.
+
+```sh
+$ ./mk debug
+$ gdb ./pacmixer
+gdb$ run
+gdb$ bt
+```
+
 That will make it easier to identify the problem.
 
 ## tests

@@ -20,14 +20,34 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-if [ "$1" = "tests" ]; then
-    ninja -v pacmixer_run_tests
-    exit
+FLAGS=${FLAGS:-$(echo "$*" | grep -q 'debug' && echo "-Wall -O0 -ggdb3" || echo "-Wall -O2")}
+BUILDFILE="build.ninja"
+EXCLUDES="src/backend.c src/main.mm"
+
+printf "include defs.ninja\n" > "${BUILDFILE}"
+
+echo "$*" | grep -q 'tests' && TESTS="tests/"
+for TYPE in c cpp m mm; do
+    for FILE in $(find src/ ${TESTS} -type f -name "*.${TYPE}"); do
+        if !([ -n "${TESTS}" ] && echo "${EXCLUDES}" | grep -q "${FILE}"); then
+            OUTFILE="build/${TESTS}$(basename ${FILE}).o"
+            OBJECTS="${OBJECTS} ${OUTFILE}"
+            printf "build ${OUTFILE}: ${TYPE} ${FILE}\n" >> "${BUILDFILE}"
+        fi
+    done
+done
+
+if [ -n "$TESTS" ]; then
+    printf "flags = ${FLAGS} -D TESTS=1\n" >> "${BUILDFILE}"
+    printf "build pacmixer_run_tests: link ${OBJECTS}\n" >> "${BUILDFILE}"
+else
+    printf "flags = ${FLAGS}\nldflags2 = -lpulse\n" >> "${BUILDFILE}"
+    printf "build pacmixer: link ${OBJECTS}\n" >> "${BUILDFILE}"
 fi
 
 ninja -v
 
-if [ "$1" = "install" ]; then
+if echo "$*" | grep -q 'install'; then
     PREFIX=${PREFIX:-/usr/local}
     MANPREFIX=${MANPREFIX:-"${PREFIX}/share/man"}
     DIR="${DESTDIR}${PREFIX}"
