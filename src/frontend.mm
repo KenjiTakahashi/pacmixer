@@ -496,14 +496,24 @@ static NSMutableArray *allWidgets;
 
 -(void) up: (int64_t) speed {
     if([widgets count]) {
-        [(Widget*)[widgets objectAtIndex: highlight] up: speed];
+        id widget = [widgets objectAtIndex: highlight];
+        if([widget respondsToSelector: @selector(up:)]) {
+            [widget up: speed];
+        } else {
+            [widget up];
+        }
         [[self class] refresh];
     }
 }
 
 -(void) down: (int64_t) speed {
     if([widgets count]) {
-        [(Widget*)[widgets objectAtIndex: highlight] down: speed];
+        id widget = [widgets objectAtIndex: highlight];
+        if([widget respondsToSelector: @selector(down:)]) {
+            [widget down: speed];
+        } else {
+            [widget down];
+        }
         [[self class] refresh];
     }
 }
