@@ -138,8 +138,7 @@
     [self print];
 }
 
--(void) up: (NSNumber*) sp {
-    int64_t speed = [sp intValue];
+-(void) up: (int64_t) speed {
     if(currentLevel + delta * speed < maxLevel) {
         [self setLevel: currentLevel + delta * speed];
     } else if(currentLevel < maxLevel) {
@@ -147,8 +146,7 @@
     }
 }
 
--(void) down: (NSNumber*) sp {
-    int64_t speed = [sp intValue];
+-(void) down: (int64_t) speed {
     if(currentLevel > delta * speed) {
         [self setLevel: currentLevel - delta * speed];
     } else if(currentLevel > 0) {
@@ -325,18 +323,25 @@
     return YES;
 }
 
--(void) upDown_: (NSString*) selname speed: (int64_t) speed {
-    NSNumber *sp = [NSNumber numberWithInt: speed];
+-(void) upDown_: (UpDown) updown speed: (int64_t) speed {
     if(inside) {
         Channel *channel = [channels objectAtIndex: highlight];
-        [channel performSelector: NSSelectorFromString(selname) withObject: sp];
+        if(updown == UP) {
+            [channel up: speed];
+        } else {
+            [channel down: speed];
+        }
     } else {
         int count = [channels count];
         NSMutableArray *values = [NSMutableArray arrayWithCapacity: count];
         for(int i = 0; i < count; ++i) {
             Channel *channel = [channels objectAtIndex: i];
             [channel setPropagation: NO];
-            [channel performSelector: NSSelectorFromString(selname) withObject: sp];
+            if(updown == UP) {
+                [channel up: speed];
+            } else {
+                [channel down: speed];
+            }
             [values addObject: [NSNumber numberWithInt: [channel level]]];
             [channel setPropagation: YES];
         }
@@ -345,11 +350,11 @@
 }
 
 -(void) up: (int64_t) speed {
-    [self upDown_: @"up:" speed: speed];
+    [self upDown_: UP speed: speed];
 }
 
 -(void) down: (int64_t) speed {
-    [self upDown_: @"down:" speed: speed];
+    [self upDown_: DOWN speed: speed];
 }
 
 -(void) inside {

@@ -62,14 +62,19 @@
 -(void) setPropagation: (BOOL) p;
 -(void) inside;
 -(void) outside;
--(void) up: (NSNumber*) speed;
--(void) down: (NSNumber*) speed;
+-(void) up: (int64_t) speed;
+-(void) down: (int64_t) speed;
 -(void) mute;
 -(BOOL) isMuted;
 -(void) show;
 -(void) hide;
 @end
 
+
+typedef enum {
+    UP,
+    DOWN
+} UpDown;
 
 @interface Channels: NSObject <Controlling, Hiding> {
     @private
@@ -101,7 +106,7 @@
 -(void) notify: (NSArray*) values;
 -(BOOL) previous;
 -(BOOL) next;
--(void) upDown_: (NSString*) selname speed: (int64_t) speed;
+-(void) upDown_: (UpDown) updown speed: (int64_t) speed;
 -(void) up: (int64_t) sp;
 -(void) down: (int64_t) sp;
 -(void) inside;
