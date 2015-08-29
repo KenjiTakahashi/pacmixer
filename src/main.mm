@@ -220,8 +220,12 @@
 
 
 int main(int argc, char const *argv[]) {
+    pacmixer_log_set_path(pacmixer::setting<std::string>("Log.Dir").c_str());
+
     Dispatcher *dispatcher = [[Dispatcher alloc] init];
     [dispatcher run];
     [dispatcher release];
+
+    pacmixer_log_free();
     return 0;
 }

@@ -29,7 +29,6 @@ static NSMutableArray *allWidgets;
 @implementation TUI
 -(TUI*) init {
     self = [super init];
-    pacmixer_log_set_path(pacmixer::setting<std::string>("Log.Dir").c_str());
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
@@ -84,7 +83,6 @@ static NSMutableArray *allWidgets;
     [allWidgets release];
     [ypaddingStates release];
     [xpaddingStates release];
-    pacmixer_log_free();
     [super dealloc];
 }
 
