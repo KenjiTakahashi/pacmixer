@@ -67,5 +67,6 @@
 - Fixed crash when $XDG_CONFIG_HOME points at non-existing directory.
 - Fixed crash when "[Log].Dir" does not exist.
 
-== 0.6.2:
+== 0.6.2 (30.08.2015):
 - Fixed log occasionally producing files with garbage names.
+- Fixed crash when moving up/down in card profiles.
