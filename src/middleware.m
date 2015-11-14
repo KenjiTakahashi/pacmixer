@@ -98,7 +98,7 @@ void callback_add_func(
                        name: mname
                      object: nil];
         PACMIXER_LOG("M:%s observer added", [mname UTF8String]);
-        PACMIXER_LOG("M:%d:%s received", idx, name);
+        PACMIXER_LOG("M:%d:%s:%s received", idx, name, data->internalName);
         NSMutableDictionary *s = [
             NSMutableDictionary dictionaryWithObjectsAndKeys:
             [NSString stringWithUTF8String: name], @"name",
