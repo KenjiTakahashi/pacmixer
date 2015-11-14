@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+ Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -382,66 +382,8 @@ void _cb_state_changed(pa_context*, void*);
  * @param info INPUT/OUTPUT client info.
  * @param eol Stop indicator.
  * @param userdata Additional data of type CLIENT_CALLBACK.
- *
- * @see _cb2()
  */
 void _cb_client(pa_context*, const pa_client_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting info about new SINK_INPUT.
- * Checks if we are done, makes up BACKEND_OPTION structure and calls _cb2().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SINK_INPUT info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb2()
- */
-void _cb_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting update info about existing SINK_INPUT.
- * Merely checks if we are done with iteration and calls _cb_u().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SINK_INPUT info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb_u()
- */
-void _cb_u_sink_input(pa_context*, const pa_sink_input_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting info about new SOURCE_OUTPUT.
- * Merely checks if we are done with iteration and calls _cb2().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SOURCE_OUTPUT info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb2()
- */
-void _cb_source_output(pa_context*, const pa_source_output_info*, int, void*);
-
-/**
- * Internal function.
- * Callback. Fired after getting update info about existing SOURCE_OUTPUT.
- * Merely checks if we are done with iteration and calls _cb_u().
- *
- * @param c PA context. It is NOT our backend CONTEXT.
- * @param info SOURCE_OUTPUT info.
- * @param eol Stop indicator.
- * @param userdata Additional data of type CALLBACK.
- *
- * @see _cb_u()
- */
-void _cb_u_source_output(pa_context*, const pa_source_output_info*, int, void*);
 
 /**
  * Internal function.
