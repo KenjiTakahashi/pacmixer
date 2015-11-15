@@ -534,6 +534,7 @@ void _do_option_free(backend_option_t*, int n);
         data.internalName = (char*)malloc((strlen(info->name) + 1) * sizeof(char));\
         strcpy(data.internalName, info->name);\
         ((tcallback_add_func)(callback->add))(callback->self, info->description, type, info->index, &data);\
+        free(data.internalName);\
         free(data.channels);\
         free(data.volumes);\
     }
