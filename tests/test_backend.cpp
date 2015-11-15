@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2013 - 2014
+ Karol "Kenji Takahashi" Woźniak © 2013 - 2015
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -356,11 +356,13 @@ TEST_CASE("_cb_state_changed", "Should fire a callback on state changes") {
 }
 
 char TEST_RETURN__cb_client_name[STRING_SIZE];
+char TEST_RETURN__cb_client_internalName[STRING_SIZE];
 uint32_t TEST_RETURN__cb_client_idx = PA_INVALID_INDEX;
 backend_data_t TEST_RETURN__cb_client_data;
 
 void TEST_CALLBACK__cb_client(void *s, const char *name, backend_entry_type type, uint32_t idx, backend_data_t *data) {
     strcpy(TEST_RETURN__cb_client_name, name);
+    strcpy(TEST_RETURN__cb_client_internalName, data->internalName);
     TEST_RETURN__cb_client_idx = idx;
     TEST_RETURN__cb_client_data.channels_num = data->channels_num;
     *TEST_RETURN__cb_client_data.channels = *(data->channels);
@@ -391,6 +393,7 @@ TEST_CASE("_cb_client", "Should fire 'add' callback with client data") {
     _cb_client(NULL, &info, 0, (void*)cc);
 
     REQUIRE(strcmp(TEST_RETURN__cb_client_name, "test_name") == 0);
+    REQUIRE(strcmp(TEST_RETURN__cb_client_internalName, "test_name") == 0);
     REQUIRE(TEST_RETURN__cb_client_idx == PA_VALID_INDEX);
     REQUIRE(TEST_RETURN__cb_client_data.option == NULL);
     REQUIRE(TEST_RETURN__cb_client_data.channels_num == 1);

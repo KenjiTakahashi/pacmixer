@@ -1,6 +1,6 @@
 /*
  This is a part of pacmixer @ http://github.com/KenjiTakahashi/pacmixer
- Karol "Kenji Takahashi" Woźniak © 2012 - 2014
+ Karol "Kenji Takahashi" Woźniak © 2012 - 2015
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -206,7 +206,10 @@ void _cb_client(pa_context *c, const pa_client_info *info, int eol, void *userda
         data.channels_num = client_callback->chnum;
         data.device = client_callback->device;
         data.option = NULL;
+        data.internalName = (char*)malloc((strlen(info->name) + 1) * sizeof(char));
+        strcpy(data.internalName, info->name);
         ((tcallback_add_func)(callback->add))(callback->self, info->name, client_callback->type, client_callback->index, &data);
+        free(data.internalName);
         free(client_callback->channels);
         free(client_callback->volumes);
         free(client_callback);
