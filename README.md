@@ -16,7 +16,7 @@ Back in the old days, there were a good mixer for ALSA (alsamixer), so I thought
 * Settings storage follows XDG => No more creepy "GNUStep" directory.
 
 ## screenshot
-![screenshot](https://copy.com/VWeHEkhBtCsr)
+![screenshot](http://img.kenji.sx/pacmixer2.png)
 
 ## requirements
 * libpulse
