@@ -79,6 +79,5 @@
 - Changed some display colors to be a bit brighter.
 - Force terminal background color to be black.
 - Added "OO/MM" mute labels like alsamixer does.
-- Made "default" notification boxes more explicit.
-- Show "default" box regardless of whether control supports it, and
-  move it to below the port selection option list.
+- Collapse "default" notification to a single line, below the channel
+  name, and leave room for it whether the channel supports it or not.

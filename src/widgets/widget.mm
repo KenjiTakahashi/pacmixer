@@ -77,9 +77,8 @@
     wresize(win, height, width);
     [self printName];
     [self printDefault];
-    int ch_height = height - ([ports height] > 2 ? [ports height] : 0);
     // Adjust for 'default' box, whether we have one or not
-    ch_height -= 3;
+    int ch_height = height - ([ports height] > 2 ? [ports height] : 0) - 1;
     [channels reprint: ch_height];
     [ports reprint: height];
 }
@@ -94,15 +93,14 @@
         length = 0;
     }
     wattron(win, color | A_BOLD);
-    // CJ - Not sure, related to the bottom label though.
-    mvwprintw(win, height - 1, 0, "%@",
+    mvwprintw(win, height - 2, 0, "%@",
         [@"" stringByPaddingToLength: width
                           withString: @" "
                      startingAtIndex: 0]
     );
     NSString *sn = [name length] > 8 ? [name substringToIndex: width] : name;
     // CJ - Bottom label of the mixer channel
-    mvwprintw(win, height - 1, length, "%@", sn);
+    mvwprintw(win, height - 2, length, "%@", sn);
     wattroff(win, color | A_BOLD);
 }
 
@@ -110,50 +108,32 @@
     if (hidden) {
         return;
     }
-    int y = height - 4;
-    NSString* default_label = @" Def. ";
-    // CJ - "Default" checkbox notification
-    if (!hasDefault)
-    {
-        wattron(win, COLOR_PAIR(1) | A_DIM);
-    }
-    mvwaddch(win, y, 0, ACS_ULCORNER);
-    whline(win, 0, width - 2);
-    mvwaddch(win, y++, width - 1, ACS_URCORNER);
-    mvwaddch(win, y, 0, ACS_VLINE);
-    if (hasDefault)
-    {
+    int y = height - 1;
+    int color;
+    NSString *label;
+    if (hasDefault) {
         if (isDefault) {
-            wattron(win, COLOR_PAIR(2) | A_BOLD);
-            if([default_label length] > (unsigned)width - 2) {
-                mvwprintw(win, y, 1, "%@", [default_label substringToIndex: width - 2]);
-            } else {
-                mvwprintw(win, y, 1, "%@",
-                    [default_label stringByPaddingToLength: width - 2
-                                                withString: @" "
-                                           startingAtIndex: 0]
-               );
-            }
-            wattroff(win, COLOR_PAIR(2) | A_BOLD);
+            color = COLOR_PAIR(8);
+            label = @"  Def.  ";
         } else {
-            for(int _ = 0; _ < width - 2; ++_) {
-                waddch(win, '-' | COLOR_PAIR(4));
-            }
+            color = COLOR_PAIR(9) | A_DIM;
+            label = @"  ----  ";
         }
     } else {
-        for(int _ = 0; _ < width - 2; ++_) {
-            waddch(win, ACS_CKBOARD);
-        }
+        color = COLOR_PAIR(1) | A_DIM;
+        label = @"";
     }
-    waddch(win, ACS_VLINE);
-    y++;
-    mvwaddch(win, y, 0, ACS_LLCORNER);
-    whline(win, 0, width - 2);
-    mvwaddch(win, y, width - 1, ACS_LRCORNER);
-    if (!hasDefault)
-    {
-        wattroff(win, COLOR_PAIR(1) | A_DIM);
+    wattron(win, color);
+    if([label length] > (unsigned)width) {
+        mvwprintw(win, y, 0, "%@", [label substringToIndex: width]);
+    } else {
+        mvwprintw(win, y, 0, "%@",
+            [label stringByPaddingToLength: width
+                                withString: @" "
+                           startingAtIndex: 0]
+       );
     }
+    wattroff(win, color);
     [TUI refresh];
 }
 
@@ -191,7 +171,7 @@
         [self printDefault];
     }
     // Adjust for 'default' box whether we have one or not
-    [channels reprint: height - [ports height] - 3];
+    [channels reprint: height - [ports height] - 1];
     PACMIXER_LOG("F:%d:%s options added", [internalId intValue], [name UTF8String]);
     return ports;
 }
@@ -200,7 +180,7 @@
     [ports replaceValues: values];
     [ports reprint: height];
     // Adjust for 'default' box whether we have one or not
-    [channels reprint: height - [ports height] - 3];
+    [channels reprint: height - [ports height] - 1];
 }
 
 -(void) setHighlighted: (BOOL) active {

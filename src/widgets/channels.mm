@@ -188,7 +188,7 @@
     highlight = 0;
     position = position_;
     getmaxyx(parent, my, mx);
-    my -= default_ ? 4 : 1;
+    my -= 2;
     mx = [channels_ count] + 2;
     hasPeak = NO;
     hasMute = NO;
@@ -253,6 +253,7 @@
 
 -(void) print {
     if(!hidden) {
+        // CJ - main channel box
         box(win, 0, 0);
         // CJ - Line inbetween mixer bar and mute widget
         if(hasPeak && hasMute) {

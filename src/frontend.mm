@@ -46,6 +46,8 @@ static NSMutableArray *allWidgets;
     init_pair(5, COLOR_WHITE, COLOR_MAGENTA); // extreme (>100%) level volume
     init_pair(6, COLOR_WHITE, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
+    init_pair(8, COLOR_GREEN, -1); // Default Channel
+    init_pair(9, COLOR_RED, -1); // Non-default Channel
     refresh();
     int my;
     int mx;
