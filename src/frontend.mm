@@ -38,7 +38,7 @@ static NSMutableArray *allWidgets;
     keypad(stdscr, TRUE);
     start_color();
     use_default_colors();
-    // default background/foreground (COLOR_PAIR(0) doesn't seem to work)
+    assume_default_colors(COLOR_WHITE, COLOR_BLACK);
     init_pair(1, -1, -1);
     init_pair(2, -1, COLOR_GREEN); // low level volume/not muted
     init_pair(3, -1, COLOR_YELLOW); // medium level volume

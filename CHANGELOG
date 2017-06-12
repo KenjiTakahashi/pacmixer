@@ -77,3 +77,4 @@
 
 == 0.x.x (xx.xx.xxxx):
 - Changed some display colors to be a bit brighter
+- Force terminal background color to be black
