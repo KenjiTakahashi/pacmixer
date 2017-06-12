@@ -121,12 +121,11 @@
         if([default_label length] > (unsigned)width - 2) {
             mvwprintw(win, y, 1, "%@", [default_label substringToIndex: width - 2]);
         } else {
-            mvwprintw(win, y, 1, "%@", default_label);
-        }
-        // Pad the display in case default_label doesn't occupy the whole width
-        for (int i = 0; i < width - 2 - (signed)[default_label length]; i++)
-        {
-            waddch(win, ' ');
+            mvwprintw(win, y, 1, "%@",
+                [default_label stringByPaddingToLength: width - 2
+                                            withString: @" "
+                                       startingAtIndex: 0]
+           );
         }
         wattroff(win, COLOR_PAIR(2) | A_BOLD);
     } else {
