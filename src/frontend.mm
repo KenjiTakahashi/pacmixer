@@ -25,10 +25,12 @@ static int xpadding;
 static int ypadding;
 static NSMutableArray *allWidgets;
 
+static BOOL showOptions = true;
 
 @implementation TUI
 -(TUI*) init {
     self = [super init];
+    showOptions = pacmixer::setting<bool>("Filter.Options");
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
@@ -516,6 +518,20 @@ static NSMutableArray *allWidgets;
         }
         [[self class] refresh];
     }
+}
+
++(void) toggleOptions {
+    showOptions = !showOptions;
+    if (showOptions) {
+        PACMIXER_LOG("CJ:Showing options now");
+    } else {
+        PACMIXER_LOG("CJ:No longer showing options");
+    }
+    [TUI refresh];
+}
+
++(BOOL) showOptions {
+    return showOptions;
 }
 
 -(void) mute {

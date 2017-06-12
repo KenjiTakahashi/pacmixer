@@ -174,6 +174,10 @@
             case 'm':
                 [tui mute];
                 break;
+            case 'o':
+                [TUI toggleOptions];
+                [tui reprint];
+                break;
             case 'i':
                 [tui inside];
                 break;

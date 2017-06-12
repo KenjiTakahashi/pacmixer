@@ -31,7 +31,6 @@
 #import "widgets/options.h"
 #import "settings.h"
 
-
 @interface TUI: NSObject <Controlling> {
     @private
         NSMutableArray *widgets;
@@ -75,6 +74,8 @@
 -(void) up: (int64_t) speed;
 -(void) down: (int64_t) speed;
 -(void) mute;
++(void) toggleOptions;
++(BOOL) showOptions;
 -(void) setAsDefault;
 -(void) inside;
 -(void) settings;

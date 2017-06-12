@@ -88,7 +88,7 @@
 }
 
 -(void) print {
-    if(!(hidden || pacmixer::setting<bool>("Filter.Options"))) {
+    if(!(hidden || [TUI showOptions])) {
         werase(self.win);
         box(self.win, 0, 0);
         // CJ - Label on the input selection bit (Port/Input/Output)
@@ -210,7 +210,7 @@
 }
 
 -(int) height {
-    if(pacmixer::setting<bool>("Filter.Options")) {
+    if([TUI showOptions]) {
         return 0;
     }
     return [options count] + 2;
