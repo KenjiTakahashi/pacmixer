@@ -56,7 +56,11 @@
     if(hidden) {
         return;
     }
-    mvwaddch(win, my - 1, 0, ' ' | (mute ? COLOR_PAIR(4) : COLOR_PAIR(2)));
+    // CJ - Mute widget
+    int color = mute ? COLOR_PAIR(4) : COLOR_PAIR(2);
+    wattron(win, color | A_BOLD);
+    mvwaddch(win, my - 1, 0, (mute ? 'M' : 'O') | color);
+    wattroff(win, color | A_BOLD);
     int currentPos = my - 1;
     if(isMutable) {
         currentPos -= 2;
@@ -79,6 +83,7 @@
         } else {
             color = COLOR_PAIR(1);
         }
+        // CJ - Actual mixer bar
         mvwaddch(win, currentPos - i, 0, ' ' | color);
     }
     [TUI refresh];
@@ -249,6 +254,7 @@
 -(void) print {
     if(!hidden) {
         box(win, 0, 0);
+        // CJ - Line inbetween mixer bar and mute widget
         if(hasPeak && hasMute) {
             mvwaddch(win, my - 3, 0, ACS_LTEE);
             mvwhline(win, my - 3, 1, 0, mx - 2);

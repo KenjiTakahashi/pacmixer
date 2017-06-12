@@ -91,6 +91,7 @@
     if(!(hidden || pacmixer::setting<bool>("Filter.Options"))) {
         werase(self.win);
         box(self.win, 0, 0);
+        // CJ - Label on the input selection bit (Port/Input/Output)
         if([label length] > self.width - 2) {
             mvwprintw(self.win, 0, 1, "%@", [label substringToIndex: self.width - 2]);
         } else {
@@ -106,6 +107,7 @@
                 wattron(self.win, A_REVERSE);
             }
             mvwprintw(self.win, i + 1, 1, "      ");
+            // CJ - individual options within the input selection bit
             if([obj length] > self.width - 2) {
                 mvwprintw(self.win, i + 1, 1, "%@",
                     [obj substringToIndex: self.width - 2]

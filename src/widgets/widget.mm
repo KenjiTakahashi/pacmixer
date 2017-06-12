@@ -93,12 +93,14 @@
         length = 0;
     }
     wattron(win, color | A_BOLD);
+    // CJ - Not sure, related to the bottom label though.
     mvwprintw(win, height - 1, 0, "%@",
         [@"" stringByPaddingToLength: width
                           withString: @" "
                      startingAtIndex: 0]
     );
     NSString *sn = [name length] > 8 ? [name substringToIndex: width] : name;
+    // CJ - Bottom label of the mixer channel
     mvwprintw(win, height - 1, length, "%@", sn);
     wattroff(win, color | A_BOLD);
 }
@@ -108,14 +110,32 @@
         return;
     }
     int y = height - [ports height] - 4;
+    NSString* default_label = @" Def. ";
+    // CJ - "Default" checkbox notification
     mvwaddch(win, y, 0, ACS_ULCORNER);
     whline(win, 0, width - 2);
     mvwaddch(win, y++, width - 1, ACS_URCORNER);
-    mvwaddch(win, y++, 0, ACS_VLINE);
-    for(int _ = 0; _ < width - 2; ++_) {
-        waddch(win, ' ' | (isDefault ? COLOR_PAIR(2) : COLOR_PAIR(4)));
+    mvwaddch(win, y, 0, ACS_VLINE);
+    if (isDefault) {
+        wattron(win, COLOR_PAIR(2) | A_BOLD);
+        if([default_label length] > (unsigned)width - 2) {
+            mvwprintw(win, y, 1, "%@", [default_label substringToIndex: width - 2]);
+        } else {
+            mvwprintw(win, y, 1, "%@", default_label);
+        }
+        // Pad the display in case default_label doesn't occupy the whole width
+        for (int i = 0; i < width - 2 - (signed)[default_label length]; i++)
+        {
+            waddch(win, ' ');
+        }
+        wattroff(win, COLOR_PAIR(2) | A_BOLD);
+    } else {
+        for(int _ = 0; _ < width - 2; ++_) {
+            waddch(win, '-' | COLOR_PAIR(4));
+        }
     }
     waddch(win, ACS_VLINE);
+    y++;
     mvwaddch(win, y, 0, ACS_LLCORNER);
     whline(win, 0, width - 2);
     mvwaddch(win, y, width - 1, ACS_LRCORNER);
