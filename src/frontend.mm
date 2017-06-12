@@ -43,8 +43,8 @@ static NSMutableArray *allWidgets;
     init_pair(2, -1, COLOR_GREEN); // low level volume/not muted
     init_pair(3, -1, COLOR_YELLOW); // medium level volume
     init_pair(4, -1, COLOR_RED); // high level volume/muted
-    init_pair(5, COLOR_BLACK, COLOR_MAGENTA); // extreme (>100%) level volume
-    init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
+    init_pair(5, COLOR_WHITE, COLOR_MAGENTA); // extreme (>100%) level volume
+    init_pair(6, COLOR_WHITE, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     refresh();
     int my;
