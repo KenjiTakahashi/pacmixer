@@ -76,7 +76,9 @@
 - Fixed possible SEGFAULT when new client appears.
 
 == 0.x.x (xx.xx.xxxx):
-- Changed some display colors to be a bit brighter
-- Force terminal background color to be black
-- Added "OO/MM" mute labels like alsamixer does
-- Made "default" notification boxes more explicit
+- Changed some display colors to be a bit brighter.
+- Force terminal background color to be black.
+- Added "OO/MM" mute labels like alsamixer does.
+- Made "default" notification boxes more explicit.
+- Show "default" box regardless of whether control supports it, and
+  move it to below the port selection option list.

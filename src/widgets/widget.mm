@@ -78,7 +78,8 @@
     [self printName];
     [self printDefault];
     int ch_height = height - ([ports height] > 2 ? [ports height] : 0);
-    ch_height -= hasDefault ? 3 : 0;
+    // Adjust for 'default' box, whether we have one or not
+    ch_height -= 3;
     [channels reprint: ch_height];
     [ports reprint: height];
 }
@@ -106,31 +107,42 @@
 }
 
 -(void) printDefault {
-    if(!hasDefault || hidden) {
+    if (hidden) {
         return;
     }
-    int y = height - [ports height] - 4;
+    int y = height - 4;
     NSString* default_label = @" Def. ";
     // CJ - "Default" checkbox notification
+    if (!hasDefault)
+    {
+        wattron(win, COLOR_PAIR(1) | A_DIM);
+    }
     mvwaddch(win, y, 0, ACS_ULCORNER);
     whline(win, 0, width - 2);
     mvwaddch(win, y++, width - 1, ACS_URCORNER);
     mvwaddch(win, y, 0, ACS_VLINE);
-    if (isDefault) {
-        wattron(win, COLOR_PAIR(2) | A_BOLD);
-        if([default_label length] > (unsigned)width - 2) {
-            mvwprintw(win, y, 1, "%@", [default_label substringToIndex: width - 2]);
+    if (hasDefault)
+    {
+        if (isDefault) {
+            wattron(win, COLOR_PAIR(2) | A_BOLD);
+            if([default_label length] > (unsigned)width - 2) {
+                mvwprintw(win, y, 1, "%@", [default_label substringToIndex: width - 2]);
+            } else {
+                mvwprintw(win, y, 1, "%@",
+                    [default_label stringByPaddingToLength: width - 2
+                                                withString: @" "
+                                           startingAtIndex: 0]
+               );
+            }
+            wattroff(win, COLOR_PAIR(2) | A_BOLD);
         } else {
-            mvwprintw(win, y, 1, "%@",
-                [default_label stringByPaddingToLength: width - 2
-                                            withString: @" "
-                                       startingAtIndex: 0]
-           );
+            for(int _ = 0; _ < width - 2; ++_) {
+                waddch(win, '-' | COLOR_PAIR(4));
+            }
         }
-        wattroff(win, COLOR_PAIR(2) | A_BOLD);
     } else {
         for(int _ = 0; _ < width - 2; ++_) {
-            waddch(win, '-' | COLOR_PAIR(4));
+            waddch(win, ACS_CKBOARD);
         }
     }
     waddch(win, ACS_VLINE);
@@ -138,6 +150,10 @@
     mvwaddch(win, y, 0, ACS_LLCORNER);
     whline(win, 0, width - 2);
     mvwaddch(win, y, width - 1, ACS_LRCORNER);
+    if (!hasDefault)
+    {
+        wattroff(win, COLOR_PAIR(1) | A_DIM);
+    }
     [TUI refresh];
 }
 
@@ -174,7 +190,8 @@
         [ports show];
         [self printDefault];
     }
-    [channels reprint: height - [ports height] - (hasDefault ? 3 : 0)];
+    // Adjust for 'default' box whether we have one or not
+    [channels reprint: height - [ports height] - 3];
     PACMIXER_LOG("F:%d:%s options added", [internalId intValue], [name UTF8String]);
     return ports;
 }
@@ -182,7 +199,8 @@
 -(void) replaceOptions: (NSArray*) values {
     [ports replaceValues: values];
     [ports reprint: height];
-    [channels reprint: height - [ports height] - (hasDefault ? 3 : 0)];
+    // Adjust for 'default' box whether we have one or not
+    [channels reprint: height - [ports height] - 3];
 }
 
 -(void) setHighlighted: (BOOL) active {

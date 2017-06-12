@@ -51,7 +51,7 @@
               andId: (NSString*) id_
           andParent: (WINDOW*) parent_ {
     _width = width_;
-    _position = getmaxy(parent_) - [options_ count] - 3;
+    _position = getmaxy(parent_) - [options_ count] - 6;
     return [self initWithName: label_
                     andValues: options_
                         andId: id_
@@ -123,7 +123,7 @@
 }
 
 -(void) reprint: (int) height_ {
-    [self setPosition: height_ - [options count] - 3];
+    [self setPosition: height_ - [options count] - 6];
     wresize(self.win, self.height, self.width);
     [self print];
 }
