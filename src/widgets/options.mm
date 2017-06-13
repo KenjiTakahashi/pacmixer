@@ -88,7 +88,7 @@
 }
 
 -(void) print {
-    if(!(hidden || [TUI showOptions])) {
+    if(!hidden && [TUI showOptions]) {
         werase(self.win);
         wattron(self.win, COLOR_PAIR(11));
         box(self.win, 0, 0);
@@ -220,9 +220,10 @@
 
 -(int) height {
     if([TUI showOptions]) {
+        return [options count] + 2;
+    } else {
         return 0;
     }
-    return [options count] + 2;
 }
 
 -(int) endVPosition {

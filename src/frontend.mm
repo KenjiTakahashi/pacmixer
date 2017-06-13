@@ -30,7 +30,7 @@ static BOOL showOptions = true;
 @implementation TUI
 -(TUI*) init {
     self = [super init];
-    showOptions = pacmixer::setting<bool>("Filter.Options");
+    showOptions = !pacmixer::setting<bool>("Filter.Options");
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
