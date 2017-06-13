@@ -33,6 +33,7 @@
     @private
         int my;
         WINDOW *win;
+        WINDOW *numberWin;
         int currentLevel;
         int maxLevel;
         int normLevel;
@@ -43,6 +44,7 @@
         BOOL propagate;
         BOOL hidden;
         NSString *signal;
+        BOOL numberAlignRight;
 }
 
 -(Channel*) initWithIndex: (int) i
@@ -50,10 +52,12 @@
              andNormLevel: (NSNumber*) nlevel_
                   andMute: (NSNumber*) mute_ // it's BOOL, but we need a pointer
                 andSignal: (NSString*) signal_
-                andParent: (WINDOW*) parent;
+                andParent: (WINDOW*) parent
+          andNumberParent: (WINDOW*) numberParent;
 -(void) dealloc;
 -(void) print;
 -(void) reprint: (int) height;
+-(void) resetNumberWin;
 -(void) adjust: (int) i;
 -(void) setMute: (BOOL) mute_;
 -(void) setLevel: (int) level_;
@@ -79,6 +83,7 @@ typedef enum {
 @interface Channels: NSObject <Controlling, Hiding> {
     @private
         WINDOW *win;
+        WINDOW *numberWin;
         NSMutableArray *channels;
         BOOL inside;
         BOOL hasPeak;

@@ -36,7 +36,9 @@
 -(void) printString: (NSString*) str
            withView: (View) view_ {
     if(view == view_) {
+        wattron(win, COLOR_PAIR(10) | A_BOLD);
         wprintw(win, " [%@] ", str);
+        wattroff(win, COLOR_PAIR(10) | A_BOLD);
     } else {
         wprintw(win, " %@ ", str);
     }
@@ -99,36 +101,37 @@
     int color = COLOR_PAIR(6);
     if(view == SETTINGS) {
         line =
-            @" h/l: previous/next group, "
-            @"j/k: previous/next setting, "
-            @"space: (un)check setting, "
+            @" h/l: prev/next group, "
+            @"j/k: prev/next setting, "
+            @"space: toggle setting, "
             @"q: Exit";
     } else if(mode == MODE_OUTSIDE) {
         line =
-            @" i: inside mode, "
-            @"s: settings mode, "
-            @"h/l: previous/next control, "
-            @"j/k: volume down/up, "
+            @" i: inside, "
+            @"s: settings, "
+            @"o: toggle opts, "
+            @"h/l: prev/next ctrl, "
+            @"j/k: vol down/up, "
             @"m: (un)mute, "
-            @"d: set as default, "
+            @"d: set default, "
             @"q: Exit";
     } else if(mode == MODE_INSIDE) {
         line =
-            @" q: outside mode, "
-            @"s: settings mode, "
-            @"h/l: previous/next channel, "
-            @"j/k: volume down/up, "
+            @" q: outside, "
+            @"s: settings, "
+            @"h/l: prev/next ctrl, "
+            @"j/k: vol down/up, "
             @"m: (un)mute"
             @"d: set as default, ";
         mode_ = 'i';
         color = COLOR_PAIR(7);
     } else if(mode == MODE_SETTINGS) {
         line =
-            @" q: outside mode, "
-            @"i: inside mode, "
-            @"h/l: previous/next control, "
-            @"j/k: previous/next setting, "
-            @"space: (un)check setting";
+            @" q: outside, "
+            @"i: inside, "
+            @"h/l: prev/next ctrl, "
+            @"j/k: prev/next setting, "
+            @"space: toggle setting";
         mode_ = 's';
         color = COLOR_PAIR(4);
     } else {

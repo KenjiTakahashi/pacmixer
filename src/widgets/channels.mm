@@ -25,13 +25,32 @@
              andNormLevel: (NSNumber*) nlevel_
                   andMute: (NSNumber*) mute_
                 andSignal: (NSString*) signal_
-                andParent: (WINDOW*) parent {
+                andParent: (WINDOW*) parent
+          andNumberParent: (WINDOW*) numberParent {
     self = [super init];
     signal = [signal_ copy];
     propagate = YES;
     hidden = YES;
+
+    // Set up our channel-drawing window (just a single char slice)
     my = getmaxy(parent) - 1;
     win = derwin(parent, my, 1, 0, i + 1);
+
+    // Set up our window where we'll draw our numeric level.  For now
+    // we're only going to support displaying two channels.  Really
+    // we should be more clever about it and check the width of the
+    // parent and if we have room for more, draw more, but since all
+    // my channels are only stereo, I'm just doing this for now.
+    numberAlignRight = true;
+    numberWin = NULL;
+    if (i == 0) {
+        numberWin = derwin(numberParent, 1, 3, 0, 0);
+        numberAlignRight = true;
+    } else if (i == 1) {
+        numberWin = derwin(numberParent, 1, 3, 0, 5);
+        numberAlignRight = false;
+    }
+
     if(mute_ != nil) {
         isMutable = YES;
     } else {
@@ -56,7 +75,14 @@
     if(hidden) {
         return;
     }
-    mvwaddch(win, my - 1, 0, ' ' | (mute ? COLOR_PAIR(4) : COLOR_PAIR(2)));
+
+    // Mute indicator
+    int color = mute ? COLOR_PAIR(4) : COLOR_PAIR(2);
+    wattron(win, color | A_BOLD);
+    mvwaddch(win, my - 1, 0, (mute ? 'M' : 'O') | color);
+    wattroff(win, color | A_BOLD);
+
+    // Actual mixer bar
     int currentPos = my - 1;
     if(isMutable) {
         currentPos -= 2;
@@ -81,17 +107,58 @@
         }
         mvwaddch(win, currentPos - i, 0, ' ' | color);
     }
+
+    // Now draw our numeric levels
+    float percent = (float)currentLevel / (float)normLevel * 100.;
+    if (numberWin != NULL) {
+        wattron(numberWin, COLOR_PAIR(10) | A_BOLD);
+        NSString *percentStr = [NSString stringWithFormat:@"%0.0f", percent];
+        if (numberAlignRight) {
+            // Taken from a comment at https://stackoverflow.com/questions/964322/padding-string-to-left
+            NSString *padded = [@"   " stringByAppendingString:percentStr];
+            mvwprintw(numberWin, 0, 0, [[padded substringFromIndex:[padded length] - 3] UTF8String]);
+        } else {
+            mvwprintw(numberWin, 0, 0, "%@",
+                [percentStr stringByPaddingToLength: 3
+                                         withString: @" "
+                                    startingAtIndex: 0]
+            );
+        }
+        wattroff(numberWin, COLOR_PAIR(10) | A_BOLD);
+    }
+
     [TUI refresh];
+}
+
+-(void) resetNumberWin {
+    // Resets our numberWin derived window, used for displaying numeric
+    // levels.  The parent window for these has already been moved in
+    // the Channels code, but we need to do it here as well, even though
+    // the locations are pretty much hardcoded.  The geometry doesn't
+    // actually update, otherwise.
+    //
+    // Also, this is a bit silly and Not The Right Way To Do It,
+    // but it's what I'm doing regardless.  See Channel.initWithIndex
+    // for where these offsets are stored initially.
+    if (numberWin != NULL) {
+        if (numberAlignRight) {
+            mvderwin(numberWin, 0, 0);
+        } else {
+            mvderwin(numberWin, 0, 5);
+        }
+    }
 }
 
 -(void) reprint: (int) height {
     my = height - 1;
     wresize(win, my, 1);
+    [self resetNumberWin];
     [self print];
 }
 
 -(void) adjust: (int) i {
     mvderwin(win, 0, i + 1);
+    [self resetNumberWin];
 }
 
 -(void) setMute: (BOOL) mute_ {
@@ -183,7 +250,8 @@
     highlight = 0;
     position = position_;
     getmaxyx(parent, my, mx);
-    my -= default_ ? 4 : 1;
+    int parent_mx = mx;
+    my -= 3;
     mx = [channels_ count] + 2;
     hasPeak = NO;
     hasMute = NO;
@@ -209,6 +277,7 @@
         my = 3;
     }
     win = derwin(parent, my, mx, y, position);
+    numberWin = derwin(parent, 1, parent_mx, my, 0);
     [self print];
     internalId = [id_ copy];
     channels = [[NSMutableArray alloc] init];
@@ -229,7 +298,8 @@
                                              andNormLevel: [obj normLevel]
                                                   andMute: mute
                                                 andSignal: csignal
-                                                andParent: win];
+                                                andParent: win
+                                          andNumberParent: numberWin];
         [channels addObject: channel];
     }
     return self;
@@ -248,18 +318,28 @@
 
 -(void) print {
     if(!hidden) {
+
+        // The main box around the channel bars
         box(win, 0, 0);
+
+        // Dividing line between level and mute indicator
         if(hasPeak && hasMute) {
             mvwaddch(win, my - 3, 0, ACS_LTEE);
             mvwhline(win, my - 3, 1, 0, mx - 2);
             mvwaddch(win, my - 3, mx - 1, ACS_RTEE);
         }
+
+        // Flourish between level numbers
+        if (numberWin != NULL) {
+            mvwprintw(numberWin, 0, 3, "<>");
+        }
+
         [TUI refresh];
     }
 }
 
 -(void) reprint: (int) height {
-    height -= 1;
+    height -= 2;
     if(!hasMute) {
         height -= 2;
     }
@@ -269,6 +349,7 @@
     } else {
         mvderwin(win, height - 4, position);
     }
+    mvderwin(numberWin, height, 0);
     for(unsigned int i = 0; i < [channels count]; ++i) {
         [(Channel*)[channels objectAtIndex: i] reprint: height];
     }
@@ -288,6 +369,7 @@
 
 -(void) adjust {
     mvderwin(win, y, position);
+    mvderwin(numberWin, getmaxy(win), 0);
     for(unsigned int i = 0; i < [channels count]; ++i) {
         [[channels objectAtIndex: i] adjust: i];
     }

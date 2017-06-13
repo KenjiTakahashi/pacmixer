@@ -74,3 +74,16 @@
 == 0.6.3 (15.11.2015):
 - Fixed possible memory leak in backend.
 - Fixed possible SEGFAULT when new client appears.
+
+== 0.x.x (xx.xx.xxxx):
+- Tweaked colors to be closer to alsamixer.
+- Force terminal background color to be black.
+- Added "OO/MM" mute labels, as alsamixer does.
+- Collapse "default" notification to a single line, below the channel
+  name, and leave room for it whether the channel supports it or not.
+- Added `o` keybinding to toggle display of control options.
+- Added numeric channel level indicator, as alsamixer does (currently
+  this will only ever show the first two channels per control).
+- Fix settings dialogs when options are turned off.
+- Add ^L hotkey to redraw screen, useful if some cruft gets left on
+  the screen.

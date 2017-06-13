@@ -51,7 +51,7 @@
               andId: (NSString*) id_
           andParent: (WINDOW*) parent_ {
     _width = width_;
-    _position = getmaxy(parent_) - [options_ count] - 3;
+    _position = getmaxy(parent_) - [options_ count] - 4;
     return [self initWithName: label_
                     andValues: options_
                         andId: id_
@@ -88,24 +88,36 @@
 }
 
 -(void) print {
-    if(!(hidden || pacmixer::setting<bool>("Filter.Options"))) {
+    if(!hidden && [TUI showOptions]) {
         werase(self.win);
+        wattron(self.win, COLOR_PAIR(11));
         box(self.win, 0, 0);
+
+        // Label on the input selection bit (Port/Input/Output)
         if([label length] > self.width - 2) {
             mvwprintw(self.win, 0, 1, "%@", [label substringToIndex: self.width - 2]);
         } else {
             mvwprintw(self.win, 0, 1, "%@", label);
         }
+        wattroff(self.win, COLOR_PAIR(11));
         for(unsigned int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
-            if(i == current) {
-                wattron(self.win, COLOR_PAIR(6));
-            }
+            int item_color;
             if(highlighted && i == highlight) {
-                wattroff(self.win, COLOR_PAIR(6));
-                wattron(self.win, A_REVERSE);
+                // The cursor during selection
+                //item_color = COLOR_PAIR(1) | A_REVERSE;
+                item_color = A_REVERSE;
+            } else if(i == current) {
+                // Currently-active option
+                item_color = COLOR_PAIR(6);
+            } else {
+                // Everything else
+                item_color = COLOR_PAIR(11);
             }
+            wattron(self.win, item_color);
             mvwprintw(self.win, i + 1, 1, "      ");
+
+            // Individual options within the input selection bit
             if([obj length] > self.width - 2) {
                 mvwprintw(self.win, i + 1, 1, "%@",
                     [obj substringToIndex: self.width - 2]
@@ -113,15 +125,14 @@
             } else {
                 mvwprintw(self.win, i + 1, 1, "%@", obj);
             }
-            wattroff(self.win, A_REVERSE);
-            wattroff(self.win, COLOR_PAIR(6));
+            wattroff(self.win, item_color);
         }
         [TUI refresh];
     }
 }
 
 -(void) reprint: (int) height_ {
-    [self setPosition: height_ - [options count] - 3];
+    [self setPosition: height_ - [options count] - 4];
     wresize(self.win, self.height, self.width);
     [self print];
 }
@@ -208,10 +219,11 @@
 }
 
 -(int) height {
-    if(pacmixer::setting<bool>("Filter.Options")) {
+    if([TUI showOptions]) {
+        return [options count] + 2;
+    } else {
         return 0;
     }
-    return [options count] + 2;
 }
 
 -(int) endVPosition {

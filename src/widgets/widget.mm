@@ -77,8 +77,8 @@
     wresize(win, height, width);
     [self printName];
     [self printDefault];
-    int ch_height = height - ([ports height] > 2 ? [ports height] : 0);
-    ch_height -= hasDefault ? 3 : 0;
+    // Adjust for 'default' box, whether we have one or not
+    int ch_height = height - ([ports height] > 2 ? [ports height] : 0) - 1;
     [channels reprint: ch_height];
     [ports reprint: height];
 }
@@ -93,32 +93,48 @@
         length = 0;
     }
     wattron(win, color | A_BOLD);
-    mvwprintw(win, height - 1, 0, "%@",
+    mvwprintw(win, height - 2, 0, "%@",
         [@"" stringByPaddingToLength: width
                           withString: @" "
                      startingAtIndex: 0]
     );
     NSString *sn = [name length] > 8 ? [name substringToIndex: width] : name;
-    mvwprintw(win, height - 1, length, "%@", sn);
+
+    // Bottom label of the mixer channel
+    mvwprintw(win, height - 2, length, "%@", sn);
     wattroff(win, color | A_BOLD);
 }
 
 -(void) printDefault {
-    if(!hasDefault || hidden) {
+    if (hidden) {
         return;
     }
-    int y = height - [ports height] - 4;
-    mvwaddch(win, y, 0, ACS_ULCORNER);
-    whline(win, 0, width - 2);
-    mvwaddch(win, y++, width - 1, ACS_URCORNER);
-    mvwaddch(win, y++, 0, ACS_VLINE);
-    for(int _ = 0; _ < width - 2; ++_) {
-        waddch(win, ' ' | (isDefault ? COLOR_PAIR(2) : COLOR_PAIR(4)));
+    int y = height - 1;
+    int color;
+    NSString *label;
+    if (hasDefault) {
+        if (isDefault) {
+            color = COLOR_PAIR(8);
+            label = @"  Def.  ";
+        } else {
+            color = COLOR_PAIR(9) | A_DIM;
+            label = @"  ----  ";
+        }
+    } else {
+        color = COLOR_PAIR(1) | A_DIM;
+        label = @"";
     }
-    waddch(win, ACS_VLINE);
-    mvwaddch(win, y, 0, ACS_LLCORNER);
-    whline(win, 0, width - 2);
-    mvwaddch(win, y, width - 1, ACS_LRCORNER);
+    wattron(win, color);
+    if([label length] > (unsigned)width) {
+        mvwprintw(win, y, 0, "%@", [label substringToIndex: width]);
+    } else {
+        mvwprintw(win, y, 0, "%@",
+            [label stringByPaddingToLength: width
+                                withString: @" "
+                           startingAtIndex: 0]
+       );
+    }
+    wattroff(win, color);
     [TUI refresh];
 }
 
@@ -155,7 +171,8 @@
         [ports show];
         [self printDefault];
     }
-    [channels reprint: height - [ports height] - (hasDefault ? 3 : 0)];
+    // Adjust for 'default' box whether we have one or not
+    [channels reprint: height - [ports height] - 1];
     PACMIXER_LOG("F:%d:%s options added", [internalId intValue], [name UTF8String]);
     return ports;
 }
@@ -163,7 +180,8 @@
 -(void) replaceOptions: (NSArray*) values {
     [ports replaceValues: values];
     [ports reprint: height];
-    [channels reprint: height - [ports height] - (hasDefault ? 3 : 0)];
+    // Adjust for 'default' box whether we have one or not
+    [channels reprint: height - [ports height] - 1];
 }
 
 -(void) setHighlighted: (BOOL) active {

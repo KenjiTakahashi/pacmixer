@@ -25,10 +25,12 @@ static int xpadding;
 static int ypadding;
 static NSMutableArray *allWidgets;
 
+static BOOL showOptions = true;
 
 @implementation TUI
 -(TUI*) init {
     self = [super init];
+    showOptions = !pacmixer::setting<bool>("Filter.Options");
     allWidgets = [[NSMutableArray alloc] init];
     widgets = [[NSMutableArray alloc] init];
     initscr();
@@ -38,14 +40,18 @@ static NSMutableArray *allWidgets;
     keypad(stdscr, TRUE);
     start_color();
     use_default_colors();
-    // default background/foreground (COLOR_PAIR(0) doesn't seem to work)
+    assume_default_colors(COLOR_CYAN, COLOR_BLACK);
     init_pair(1, -1, -1);
-    init_pair(2, -1, COLOR_GREEN); // low level volume/not muted
-    init_pair(3, -1, COLOR_YELLOW); // medium level volume
-    init_pair(4, -1, COLOR_RED); // high level volume/muted
-    init_pair(5, COLOR_BLACK, COLOR_MAGENTA); // extreme (>100%) level volume
-    init_pair(6, COLOR_BLACK, COLOR_BLUE); // outside mode
+    init_pair(2, COLOR_WHITE, COLOR_GREEN); // low level volume/not muted
+    init_pair(3, COLOR_WHITE, COLOR_YELLOW); // medium level volume
+    init_pair(4, COLOR_WHITE, COLOR_RED); // high level volume/muted
+    init_pair(5, COLOR_WHITE, COLOR_MAGENTA); // extreme (>100%) level volume
+    init_pair(6, COLOR_WHITE, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
+    init_pair(8, COLOR_GREEN, -1); // Default Channel
+    init_pair(9, COLOR_RED, -1); // Non-default Channel
+    init_pair(10, COLOR_YELLOW, -1); // Numeric channel labels
+    init_pair(11, COLOR_WHITE, -1); // Notification popup, also options selection
     refresh();
     int my;
     int mx;
@@ -104,7 +110,7 @@ static NSMutableArray *allWidgets;
 }
 
 -(void) reprint {
-    werase(stdscr);
+    wclear(stdscr);
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);
@@ -377,6 +383,9 @@ static NSMutableArray *allWidgets;
 }
 
 -(void) showSettings {
+    // Settings don't display properly if options aren't active.  Should
+    // fix that, but instead am just forcing options on, for now.
+    [self enforceShowOptions];
     if([bottom mode] == MODE_SETTINGS) {
         [(Widget*)[widgets objectAtIndex: highlight] outside];
         [bottom outside];
@@ -516,6 +525,25 @@ static NSMutableArray *allWidgets;
     }
 }
 
+-(void) enforceShowOptions {
+    // Settings don't actually display properly if we have options
+    // turned off, and it ends up overwriting much of the terminal with
+    // blank space.  Rather than debug that properly, just force the
+    // display of options to be on, if it's not already.
+    if (![TUI showOptions]) {
+        [TUI toggleOptions];
+        [self reprint];
+    }
+}
+
++(void) toggleOptions {
+    showOptions = !showOptions;
+}
+
++(BOOL) showOptions {
+    return showOptions;
+}
+
 -(void) mute {
     if([widgets count]) {
         [(id<Controlling>)[widgets objectAtIndex: highlight] mute];
@@ -542,6 +570,9 @@ static NSMutableArray *allWidgets;
 }
 
 -(void) settings {
+    // Settings don't display properly if options aren't active.  Should
+    // fix that, but instead am just forcing options on, for now.
+    [self enforceShowOptions];
     if([top view] != SETTINGS && [widgets count]) {
         Widget *widget = [widgets objectAtIndex: highlight];
         if([widget canGoSettings]) {

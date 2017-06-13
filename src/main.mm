@@ -174,6 +174,10 @@
             case 'm':
                 [tui mute];
                 break;
+            case 'o':
+                [TUI toggleOptions];
+                [tui reprint];
+                break;
             case 'i':
                 [tui inside];
                 break;
@@ -182,6 +186,10 @@
                 break;
             case 'd':
                 [tui setAsDefault];
+                break;
+            case 12:
+                // Ctrl-L; redraw the screen
+                [tui reprint];
                 break;
             case KEY_F(1):
             case '1':
