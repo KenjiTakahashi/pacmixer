@@ -76,12 +76,12 @@
 - Fixed possible SEGFAULT when new client appears.
 
 == 0.x.x (xx.xx.xxxx):
-- Changed some display colors to be a bit brighter.
+- Tweaked colors to be closer to alsamixer.
 - Force terminal background color to be black.
-- Added "OO/MM" mute labels like alsamixer does.
+- Added "OO/MM" mute labels, as alsamixer does.
 - Collapse "default" notification to a single line, below the channel
   name, and leave room for it whether the channel supports it or not.
-- Added `o` keybinding to toggle display of port options.
+- Added `o` keybinding to toggle display of control options.
 - Added numeric channel level indicator, as alsamixer does (currently
   this will only ever show the first two channels per control).
-- Tweaked colors to be a bit closer to alsamixer.
+- Fix settings dialogs when options are turned off.

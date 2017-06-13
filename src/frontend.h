@@ -74,6 +74,7 @@
 -(void) up: (int64_t) speed;
 -(void) down: (int64_t) speed;
 -(void) mute;
+-(void) enforceShowOptions;
 +(void) toggleOptions;
 +(BOOL) showOptions;
 -(void) setAsDefault;

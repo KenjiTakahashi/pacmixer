@@ -383,6 +383,9 @@ static BOOL showOptions = true;
 }
 
 -(void) showSettings {
+    // Settings don't display properly if options aren't active.  Should
+    // fix that, but instead am just forcing options on, for now.
+    [self enforceShowOptions];
     if([bottom mode] == MODE_SETTINGS) {
         [(Widget*)[widgets objectAtIndex: highlight] outside];
         [bottom outside];
@@ -522,6 +525,17 @@ static BOOL showOptions = true;
     }
 }
 
+-(void) enforceShowOptions {
+    // Settings don't actually display properly if we have options
+    // turned off, and it ends up overwriting much of the terminal with
+    // blank space.  Rather than debug that properly, just force the
+    // display of options to be on, if it's not already.
+    if (![TUI showOptions]) {
+        [TUI toggleOptions];
+        [self reprint];
+    }
+}
+
 +(void) toggleOptions {
     showOptions = !showOptions;
 }
@@ -556,6 +570,9 @@ static BOOL showOptions = true;
 }
 
 -(void) settings {
+    // Settings don't display properly if options aren't active.  Should
+    // fix that, but instead am just forcing options on, for now.
+    [self enforceShowOptions];
     if([top view] != SETTINGS && [widgets count]) {
         Widget *widget = [widgets objectAtIndex: highlight];
         if([widget canGoSettings]) {
