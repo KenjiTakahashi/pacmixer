@@ -99,7 +99,8 @@
                      startingAtIndex: 0]
     );
     NSString *sn = [name length] > 8 ? [name substringToIndex: width] : name;
-    // CJ - Bottom label of the mixer channel
+
+    // Bottom label of the mixer channel
     mvwprintw(win, height - 2, length, "%@", sn);
     wattroff(win, color | A_BOLD);
 }

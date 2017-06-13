@@ -50,6 +50,7 @@ static BOOL showOptions = true;
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     init_pair(8, COLOR_GREEN, -1); // Default Channel
     init_pair(9, COLOR_RED, -1); // Non-default Channel
+    init_pair(10, COLOR_YELLOW, -1); // Numeric channel labels
     refresh();
     int my;
     int mx;
