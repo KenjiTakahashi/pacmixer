@@ -82,4 +82,5 @@
 - Collapse "default" notification to a single line, below the channel
   name, and leave room for it whether the channel supports it or not.
 - Added `o` keybinding to toggle display of port options.
-- Added numeric channel level indicator, as alsamixer does.
+- Added numeric channel level indicator, as alsamixer does (currently
+  this will only ever show the first two channels per control)
