@@ -47,10 +47,10 @@
 }
 
 -(void) print {
-    wattron(win, A_REVERSE);
+    wattron(win, COLOR_PAIR(11) | A_REVERSE);
     box(win, 0, 0);
     mvwprintw(win, 1, 1, [message UTF8String]);
-    wattroff(win, A_REVERSE);
+    wattroff(win, COLOR_PAIR(11) | A_REVERSE);
 }
 
 -(void) dealloc {

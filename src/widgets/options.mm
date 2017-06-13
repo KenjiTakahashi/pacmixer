@@ -90,6 +90,7 @@
 -(void) print {
     if(!(hidden || [TUI showOptions])) {
         werase(self.win);
+        wattron(self.win, COLOR_PAIR(11));
         box(self.win, 0, 0);
 
         // Label on the input selection bit (Port/Input/Output)
@@ -98,15 +99,22 @@
         } else {
             mvwprintw(self.win, 0, 1, "%@", label);
         }
+        wattroff(self.win, COLOR_PAIR(11));
         for(unsigned int i = 0; i < [options count]; ++i) {
             NSString *obj = [options objectAtIndex: i];
-            if(i == current) {
-                wattron(self.win, COLOR_PAIR(6));
-            }
+            int item_color;
             if(highlighted && i == highlight) {
-                wattroff(self.win, COLOR_PAIR(6));
-                wattron(self.win, A_REVERSE);
+                // The cursor during selection
+                //item_color = COLOR_PAIR(1) | A_REVERSE;
+                item_color = A_REVERSE;
+            } else if(i == current) {
+                // Currently-active option
+                item_color = COLOR_PAIR(6);
+            } else {
+                // Everything else
+                item_color = COLOR_PAIR(11);
             }
+            wattron(self.win, item_color);
             mvwprintw(self.win, i + 1, 1, "      ");
 
             // Individual options within the input selection bit
@@ -117,8 +125,7 @@
             } else {
                 mvwprintw(self.win, i + 1, 1, "%@", obj);
             }
-            wattroff(self.win, A_REVERSE);
-            wattroff(self.win, COLOR_PAIR(6));
+            wattroff(self.win, item_color);
         }
         [TUI refresh];
     }

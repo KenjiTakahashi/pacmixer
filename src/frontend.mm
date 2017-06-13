@@ -40,17 +40,18 @@ static BOOL showOptions = true;
     keypad(stdscr, TRUE);
     start_color();
     use_default_colors();
-    assume_default_colors(COLOR_WHITE, COLOR_BLACK);
+    assume_default_colors(COLOR_CYAN, COLOR_BLACK);
     init_pair(1, -1, -1);
-    init_pair(2, -1, COLOR_GREEN); // low level volume/not muted
-    init_pair(3, -1, COLOR_YELLOW); // medium level volume
-    init_pair(4, -1, COLOR_RED); // high level volume/muted
+    init_pair(2, COLOR_WHITE, COLOR_GREEN); // low level volume/not muted
+    init_pair(3, COLOR_WHITE, COLOR_YELLOW); // medium level volume
+    init_pair(4, COLOR_WHITE, COLOR_RED); // high level volume/muted
     init_pair(5, COLOR_WHITE, COLOR_MAGENTA); // extreme (>100%) level volume
     init_pair(6, COLOR_WHITE, COLOR_BLUE); // outside mode
     init_pair(7, COLOR_BLACK, COLOR_WHITE); // inside mode
     init_pair(8, COLOR_GREEN, -1); // Default Channel
     init_pair(9, COLOR_RED, -1); // Non-default Channel
     init_pair(10, COLOR_YELLOW, -1); // Numeric channel labels
+    init_pair(11, COLOR_WHITE, -1); // Notification popup, also options selection
     refresh();
     int my;
     int mx;

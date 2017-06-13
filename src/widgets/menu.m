@@ -36,7 +36,9 @@
 -(void) printString: (NSString*) str
            withView: (View) view_ {
     if(view == view_) {
+        wattron(win, COLOR_PAIR(10) | A_BOLD);
         wprintw(win, " [%@] ", str);
+        wattroff(win, COLOR_PAIR(10) | A_BOLD);
     } else {
         wprintw(win, " %@ ", str);
     }
