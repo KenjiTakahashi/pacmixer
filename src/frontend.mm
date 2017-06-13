@@ -522,12 +522,6 @@ static BOOL showOptions = true;
 
 +(void) toggleOptions {
     showOptions = !showOptions;
-    if (showOptions) {
-        PACMIXER_LOG("CJ:Showing options now");
-    } else {
-        PACMIXER_LOG("CJ:No longer showing options");
-    }
-    [TUI refresh];
 }
 
 +(BOOL) showOptions {
