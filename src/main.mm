@@ -187,6 +187,10 @@
             case 'd':
                 [tui setAsDefault];
                 break;
+            case 12:
+                // Ctrl-L; redraw the screen
+                [tui reprint];
+                break;
             case KEY_F(1):
             case '1':
                 [tui setFilter: ALL];

@@ -110,7 +110,7 @@ static BOOL showOptions = true;
 }
 
 -(void) reprint {
-    werase(stdscr);
+    wclear(stdscr);
     int my;
     int mx;
     getmaxyx(stdscr, my, mx);

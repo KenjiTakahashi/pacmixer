@@ -85,3 +85,5 @@
 - Added numeric channel level indicator, as alsamixer does (currently
   this will only ever show the first two channels per control).
 - Fix settings dialogs when options are turned off.
+- Add ^L hotkey to redraw screen, useful if some cruft gets left on
+  the screen.

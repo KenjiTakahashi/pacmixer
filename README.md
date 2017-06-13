@@ -52,6 +52,7 @@ o: Toggles options dialog.
 q (or Esc): Exits settings/inside mode or exit the application.
 F1-F5 (or 1-5): Switches to All/Playback/Recording/Outputs/Inputs view, respectively.
 F12 (or 0): Switches to Settings view.
+^L: Redraws the screen
 ```
 
 #### settings view
