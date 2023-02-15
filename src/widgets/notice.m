@@ -49,7 +49,7 @@
 -(void) print {
     wattron(win, A_REVERSE);
     box(win, 0, 0);
-    mvwprintw(win, 1, 1, [message UTF8String]);
+    mvwprintw(win, 1, 1, "%s", [message UTF8String]);
     wattroff(win, A_REVERSE);
 }
 
