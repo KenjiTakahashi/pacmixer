@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/KenjiTakahashi/pacmixer.png?branch=master)](https://travis-ci.org/KenjiTakahashi/pacmixer)
+[![Build Status](https://github.com/KenjiTakahashi/pacmixer/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/KenjiTakahashi/pacmixer/actions/workflows/tests.yml)
 
 **pacmixer** is an [alsamixer][alsamixer] alike for PulseAudio.
 
