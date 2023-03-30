@@ -219,6 +219,7 @@ void callback_remove_func(void *self_, uint32_t idx, backend_entry_type type) {
 }
 
 void callback_state_func(void *self_, server_state state) {
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
 #if GNUSTEP_BASE_MINOR_VERSION < 24
     [NSThread _createThreadForCurrentPthread];
 #endif
@@ -227,6 +228,7 @@ void callback_state_func(void *self_, server_state state) {
     [[NSNotificationCenter defaultCenter] postNotificationName: name
                                                         object: self
                                                       userInfo: nil];
+    [pool release];
 }
 
 @implementation Block
