@@ -336,7 +336,7 @@ void callback_state_func(void *self_, server_state state) {
     [center addObserver: self
                selector: @selector(restart:)
                    name: @"backendGone"
-                 object: nil];
+                 object: self];
     return self;
 }
 

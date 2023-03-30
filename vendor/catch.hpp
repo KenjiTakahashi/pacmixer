@@ -7069,7 +7069,8 @@ namespace Catch {
         }
 
         void invokeActiveTestCase() {
-            FatalConditionHandlerGuard _(&m_fatalConditionhandler);
+            // XXX(Kenji): Had to add a name here, otherwise it wouldn't compile
+            FatalConditionHandlerGuard _unused(&m_fatalConditionhandler);
             m_activeTestCase->invoke();
         }
 

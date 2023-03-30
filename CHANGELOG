@@ -74,3 +74,7 @@
 == 0.6.3 (15.11.2015):
 - Fixed possible memory leak in backend.
 - Fixed possible SEGFAULT when new client appears.
+
+== 0.6.4:
+- Fixed possible corruption due to invalid notification formatting (by @FuzzyNovaGoblin).
+- Fixed possible SEGFAULT on a PA server restart.
