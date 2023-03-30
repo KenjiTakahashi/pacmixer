@@ -20,6 +20,8 @@
 # TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 # OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+set -e
+
 FLAGS=${FLAGS:-$(echo "$*" | grep -q 'debug' && echo "-Wall -O0 -ggdb3" || echo "-Wall -O2")}
 BUILDFILE="build.ninja"
 EXCLUDES="src/backend.c src/main.mm"

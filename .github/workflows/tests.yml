@@ -1,0 +1,23 @@
+name: tests
+
+on: [push, pull_request]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: setup GNUStep
+        run: >
+          apt update &&
+          apt install -y --no-install-recommends \
+            ninja-build \
+            gnustep-make \
+            libgnustep-base-dev \
+            gobjc++
+
+      - uses: actions/checkout@v3
+      - name: build
+        run: ./mk tests
+      - name: test
+        run: ./pacmixer_run_tests
